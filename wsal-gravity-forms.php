@@ -53,14 +53,16 @@ $wsal_extension->init();
  * @param array $objects array of objects current registered within WSAL.
  */
 function wsal_extension_core_add_custom_event_objects( $objects ) {
-	// $new_objects = array(
-	// 	'my_custom_obj' => esc_html__( 'My Object Label (Typically the name of the plugin your creating an event for)', 'wp-security-audit-log' ),
-	// );
-	//
-	// // combine the two arrays.
-	// $objects = array_merge( $objects, $new_objects );
-	//
-	// return $objects;
+	$new_objects = array(
+		'gravityforms_forms'         => esc_html__( 'Forms in Gravity Forms', 'wp-security-audit-log' ),
+		'gravityforms_confirmations' => esc_html__( 'Confirmations in Gravity Forms', 'wp-security-audit-log' ),
+		'gravityforms_notifications' => esc_html__( 'Notifications in Gravity Forms', 'wp-security-audit-log' ),
+	);
+
+	// combine the two arrays.
+	$objects = array_merge( $objects, $new_objects );
+
+	return $objects;
 }
 
 /**
@@ -91,20 +93,20 @@ function wsal_extension_core_add_custom_ignored_cpt( $post_types ) {
  * @param string $name  Variable name we wish to change.
  */
 function wsal_extension_core_add_custom_meta_format( $value, $name ) {
-	// $check_value = (string) $value;
-	// if ( '%MyCustomVariable%' === $name ) {
-	// 	if ( 'NULL' !== $check_value ) {
-	// 		return '<a target="_blank" href="' . esc_url( $value ) . '">' . __( 'View form in the editor', 'wp-security-audit-log' ) . '</a>';
-	// 	}
-	// 	return $value;
-	// }
-	//
-	// return $value;
+	$check_value = (string) $value;
+	if ( '%EditorLinkForm%' === $name ) {
+		if ( 'NULL' !== $check_value ) {
+			return '<a target="_blank" href="' . esc_url( $value ) . '">' . __( 'View form in the editor', 'wp-security-audit-log' ) . '</a>';
+		}
+		return $value;
+	}
+
+	return $value;
 }
 
 /*
 	Filter in our custom functions into WSAL.
  */
 add_filter( 'wsal_event_objects', 'wsal_extension_core_add_custom_event_objects', 10, 2 );
-add_filter( 'wsal_link_filter', 'wsal_extension_core_add_custom_meta_format_value', 10, 2 );
+add_filter( 'wsal_link_filter', 'wsal_extension_core_add_custom_meta_format', 10, 2 );
 add_filter( 'wsal_meta_formatter_custom_formatter', 'wsal_extension_core_add_custom_meta_format', 10, 2 );
