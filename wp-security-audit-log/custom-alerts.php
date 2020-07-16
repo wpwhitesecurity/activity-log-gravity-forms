@@ -126,7 +126,7 @@ $custom_alerts = array(
 				WSAL_MEDIUM,
 				__( 'A field created, modified or deleted', 'wp-security-audit-log' ),
 				__( 'Field name %field_name% %LineBreak% Field type %field_type% %LineBreak% Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EditorLinkForm%', 'wp-security-audit-log' ),
-				'gravityforms_notifications',
+				'gravityforms_fields',
 				'created',
 			),
 

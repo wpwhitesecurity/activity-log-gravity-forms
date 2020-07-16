@@ -58,6 +58,7 @@ function wsal_extension_core_add_custom_event_objects( $objects ) {
 		'gravityforms_confirmations' => esc_html__( 'Confirmations in Gravity Forms', 'wp-security-audit-log' ),
 		'gravityforms_notifications' => esc_html__( 'Notifications in Gravity Forms', 'wp-security-audit-log' ),
 		'gravityforms_entries'       => esc_html__( 'Notifications in Gravity Forms', 'wp-security-audit-log' ),
+		'gravityforms_fields'        => esc_html__( 'Fields in Gravity Forms', 'wp-security-audit-log' ),
 	);
 
 	// combine the two arrays.
