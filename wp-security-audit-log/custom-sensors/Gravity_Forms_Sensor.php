@@ -38,6 +38,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 		// Notifications
 		add_action( 'gform_post_notification_save', array( $this, 'event_form_notification_saved' ), 10, 3 );
+		add_action( 'gform_pre_notification_deleted', array( $this, 'event_form_notification_deleted' ), 10, 2 );
 
 	}
 
@@ -165,8 +166,6 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 	}
 
 	public function event_form_meta_updated( $form_meta, $form_id, $meta_name ) {
-
-		error_log( print_r( $form_id, true ) );
 
 		if ( isset( $this->_old_form ) ) {
 			$form = GFAPI::get_form( $form_id );
@@ -350,6 +349,31 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 			$this->plugin->alerts->Trigger( $alert_code, $variables );
 		}
 
+	}
+
+	public function event_form_notification_deleted( $notification, $form ) {
+		error_log( print_r( $notification, true ) );
+		$alert_code  = 5706;
+		$editor_link = esc_url(
+			add_query_arg(
+				array(
+					'id' => $form['id'],
+				),
+				admin_url( 'admin.php?page=gf_edit_forms' )
+			)
+		);
+
+		$variables = array(
+			'EventType'            => 'deleted',
+			'form_name'            => sanitize_text_field( $form['title'] ),
+			'form_id'              => $form['id'],
+			'notification_name'    => sanitize_text_field( $notification['name'] ),
+			'EditorLinkForm'       => $editor_link,
+		);
+
+		$this->plugin->alerts->Trigger( $alert_code, $variables );
+
+		return $notification;
 	}
 
 	/**
