@@ -39,7 +39,19 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 		// Notifications
 		add_action( 'gform_post_notification_save', array( $this, 'event_form_notification_saved' ), 10, 3 );
 		add_action( 'gform_pre_notification_deleted', array( $this, 'event_form_notification_deleted' ), 10, 2 );
+		add_action( 'gform_pre_notification_activated', array( $this, 'event_form_notification_activated' ), 10, 2 );
+		add_action( 'gform_pre_notification_deactivated', array( $this, 'event_form_notification_deactivated' ), 10, 2 );
 
+		// Entries
+		add_action( 'gform_update_is_starred', array( $this, 'event_form_entry_starred' ), 10, 3 );
+		add_action( 'gform_update_is_read', array( $this, 'event_form_entry_read' ), 10, 3 );
+		add_action( 'gform_delete_entry', array( $this, 'event_form_entry_deleted' ), 10, 1 );
+		add_action( 'gform_update_status', array( $this, 'event_form_entry_trashed' ), 10, 3 );
+		add_action( 'gform_post_note_added', array( $this, 'event_form_entry_note_added' ), 10, 6 );
+		add_action( 'gform_pre_note_deleted', array( $this, 'event_form_entry_note_deleted' ), 10, 2 );
+
+		// Global Settings
+		add_action( 'updated_option', array( $this, 'event_settings_updated' ), 10, 3 );
 	}
 
 	public function get_before_post_edit_data( $form ) {
@@ -119,6 +131,8 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 		);
 
 		$this->plugin->alerts->Trigger( $alert_code, $variables );
+
+		return $form_id;
 	}
 
 	/**
@@ -178,33 +192,140 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 			foreach ( $changed_data as $changed_setting => $value ) {
 
-				// error_log( print_r( $changed_setting, true ) );
-				// error_log( print_r( $value, true ) );
-
-				if ( 'is_active' === $changed_setting || 'is_trash' === $changed_setting || 'date_created' === $changed_setting || 'confirmations' === $changed_setting || 'notifications' === $changed_setting ) {
+				if ( 'is_active' === $changed_setting || 'is_trash' === $changed_setting || 'date_created' === $changed_setting || 'confirmations' === $changed_setting || 'notifications' === $changed_setting || 'nextFieldId' === $changed_setting ) {
 						continue;
 				}
 
-				$alert_code  = 5703;
-				$editor_link = esc_url(
-					add_query_arg(
-						array(
-							'id' => $form_id,
-						),
-						admin_url( 'admin.php?page=gf_edit_forms' )
-					)
-				);
+				if ( 'fields' === $changed_setting ) {
 
-				$variables = array(
-					'EventType'      => 'modified',
-					'setting_name'   => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $changed_setting ) ) ) ),
-					'setting_value'  => sanitize_text_field( str_replace( '_', '', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $value ) ) ) ),
-					'form_name'      => sanitize_text_field( $form['title'] ),
-					'form_id'        => $form_id,
-					'EditorLinkForm' => $editor_link,
-				);
+					$old_fields     = $this->_old_form['fields'];
+					$current_fields = $value;
 
-				$this->plugin->alerts->Trigger( $alert_code, $variables );
+					$compare_added_items = array_diff(
+						array_map( 'serialize', $current_fields ),
+						array_map( 'serialize', $old_fields )
+					);
+					$added_items = array_map( 'unserialize', $compare_added_items );
+
+					$compare_removed_items = array_diff(
+						array_map( 'serialize', $old_fields ),
+						array_map( 'serialize', $current_fields )
+					);
+					$removed_items = array_map( 'unserialize', $compare_removed_items );
+
+					$compare_changed_items = array_diff_assoc(
+						array_map( 'serialize', $current_fields ),
+						array_map( 'serialize', $old_fields )
+					);
+					$changed_items         = array_map( 'unserialize', $compare_changed_items );
+
+					if ( ! empty( $added_items ) ) {
+						// Check to confirm if this is a fresh field, or modified.
+						$compare_changed_items = array_diff_assoc(
+							array_map( 'serialize', $changed_items ),
+							array_map( 'serialize', $added_items )
+						);
+						$changed_items = array_map( 'unserialize', $compare_changed_items );
+
+						// This is indeed a fresh, new field.
+						if ( ! empty( $changed_items ) ) {
+							$item = array_shift( $added_items );
+
+							$alert_code  = 5715;
+							$editor_link = esc_url(
+								add_query_arg(
+									array(
+										'id' => $form_id,
+									),
+									admin_url( 'admin.php?page=gf_edit_forms' )
+								)
+							);
+
+							$variables = array(
+								'EventType'      => 'added',
+								'field_name'     => $item->label,
+								'field_type'     => $item->type,
+								'form_name'      => sanitize_text_field( $form['title'] ),
+								'form_id'        => $form_id,
+								'EditorLinkForm' => $editor_link,
+							);
+
+							$this->plugin->alerts->Trigger( $alert_code, $variables );
+						} else {
+							$item = array_shift( $added_items );
+
+							$alert_code  = 5715;
+							$editor_link = esc_url(
+								add_query_arg(
+									array(
+										'id' => $form_id,
+									),
+									admin_url( 'admin.php?page=gf_edit_forms' )
+								)
+							);
+
+							$variables = array(
+								'EventType'      => 'modified',
+								'field_name'     => $item->label,
+								'field_type'     => $item->type,
+								'form_name'      => sanitize_text_field( $form['title'] ),
+								'form_id'        => $form_id,
+								'EditorLinkForm' => $editor_link,
+							);
+
+							$this->plugin->alerts->Trigger( $alert_code, $variables );
+
+							return;
+						}
+					}
+
+					if ( ! empty( $removed_items ) ) {
+						$item = array_shift( $removed_items );
+
+						$alert_code  = 5715;
+						$editor_link = esc_url(
+							add_query_arg(
+								array(
+									'id' => $form_id,
+								),
+								admin_url( 'admin.php?page=gf_edit_forms' )
+							)
+						);
+
+						$variables = array(
+							'EventType'      => 'removed',
+							'field_name'     => $item->label,
+							'field_type'     => $item->type,
+							'form_name'      => sanitize_text_field( $form['title'] ),
+							'form_id'        => $form_id,
+							'EditorLinkForm' => $editor_link,
+						);
+
+						$this->plugin->alerts->Trigger( $alert_code, $variables );
+					}
+
+				} else {
+					$alert_code  = 5703;
+					$editor_link = esc_url(
+						add_query_arg(
+							array(
+								'id' => $form_id,
+							),
+							admin_url( 'admin.php?page=gf_edit_forms' )
+						)
+					);
+
+					$variables = array(
+						'EventType'      => 'modified',
+						'setting_name'   => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $changed_setting ) ) ) ),
+						'setting_value'  => sanitize_text_field( str_replace( '_', '', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $value ) ) ) ),
+						'form_name'      => sanitize_text_field( $form['title'] ),
+						'form_id'        => $form_id,
+						'EditorLinkForm' => $editor_link,
+					);
+
+					$this->plugin->alerts->Trigger( $alert_code, $variables );
+				}
 			}
 		}
 
@@ -218,14 +339,9 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 		if ( isset( $this->_old_form['confirmations'] ) ) {
 			foreach ( $this->_old_form['confirmations'] as $old_confirmation ) {
 				$id_to_lookup = $old_confirmation['id'];
-				error_log( print_r( 'IDS', true ) );
-				error_log( print_r( $id_to_lookup, true ) );
-				error_log( print_r( $confirmation['id'], true ) );
 				// Check if confirmation is found in old form, if so, we know its a modification.
 				if ( $id_to_lookup == $confirmation['id'] ) {
-					error_log( print_r( 'found', true ) );
 					$is_an_update = true;
-
 				}
 			}
 
@@ -352,7 +468,6 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 	}
 
 	public function event_form_notification_deleted( $notification, $form ) {
-		error_log( print_r( $notification, true ) );
 		$alert_code  = 5706;
 		$editor_link = esc_url(
 			add_query_arg(
@@ -376,6 +491,419 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 		return $notification;
 	}
 
+	public function event_form_notification_activated( $notification, $form ) {
+		$alert_code  = 5707;
+		$editor_link = esc_url(
+			add_query_arg(
+				array(
+					'id' => $form['id'],
+				),
+				admin_url( 'admin.php?page=gf_edit_forms' )
+			)
+		);
+
+		$variables = array(
+			'EventType'            => 'activated',
+			'form_name'            => sanitize_text_field( $form['title'] ),
+			'form_id'              => $form['id'],
+			'notification_name'    => sanitize_text_field( $notification['name'] ),
+			'EditorLinkForm'       => $editor_link,
+		);
+
+		$this->plugin->alerts->Trigger( $alert_code, $variables );
+
+		return $notification;
+	}
+
+	public function event_form_notification_deactivated( $notification, $form ) {
+		$alert_code  = 5707;
+		$editor_link = esc_url(
+			add_query_arg(
+				array(
+					'id' => $form['id'],
+				),
+				admin_url( 'admin.php?page=gf_edit_forms' )
+			)
+		);
+
+		$variables = array(
+			'EventType'            => 'deactivated',
+			'form_name'            => sanitize_text_field( $form['title'] ),
+			'form_id'              => $form['id'],
+			'notification_name'    => sanitize_text_field( $notification['name'] ),
+			'EditorLinkForm'       => $editor_link,
+		);
+
+		$this->plugin->alerts->Trigger( $alert_code, $variables );
+
+		return $notification;
+	}
+
+	public function event_form_entry_starred( $entry_id, $property_value, $previous_value ) {
+
+		$entry = GFAPI::get_entry( $entry_id );
+		$form  = GFAPI::get_form( $entry['form_id'] );
+
+		// Get the 1st field with a value so we can use it as the name.
+		if ( ! empty( rgar( $entry, '1' ) ) ) {
+			$entry_name = rgar( $entry, '1' );
+		} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
+			$entry_name = rgar( $entry, '2' );
+		} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
+			$entry_name = rgar( $entry, '3' );
+		} else {
+			$entry_name = 'Not found';
+		}
+
+		$editor_link = esc_url(
+			add_query_arg(
+				array(
+					'view' => 'entry',
+					'id' => $entry['form_id'],
+					'lid' => $entry_id,
+				),
+				admin_url( 'admin.php?page=gf_entries' )
+			)
+		);
+
+		// Starred.
+		if ( $previous_value != $property_value && $property_value == 1 ) {
+			$alert_code  = 5710;
+			$variables  = array(
+				'EventType'   => 'starred',
+				'entry_title' => $entry_name,
+				'form_name'   => $form['title'],
+				'form_id'     => $form['id'],
+				'EntryLink'   => $editor_link,
+			);
+			$this->plugin->alerts->Trigger( $alert_code, $variables );
+    }
+
+		// Unstarred.
+		if ( $previous_value != $property_value && $property_value == 0 ) {
+			$alert_code  = 5710;
+			$variables = array(
+				'EventType'   => 'unstarred',
+				'entry_title' => $entry_name,
+				'form_name'   => $form['title'],
+				'form_id'     => $form['id'],
+				'EntryLink'   => $editor_link,
+			);
+			$this->plugin->alerts->Trigger( $alert_code, $variables );
+		}
+
+	}
+
+	public function event_form_entry_read( $entry_id, $property_value, $previous_value ) {
+		$entry = GFAPI::get_entry( $entry_id );
+		$form  = GFAPI::get_form( $entry['form_id'] );
+
+		// Get the 1st field with a value so we can use it as the name.
+		if ( ! empty( rgar( $entry, '1' ) ) ) {
+			$entry_name = rgar( $entry, '1' );
+		} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
+			$entry_name = rgar( $entry, '2' );
+		} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
+			$entry_name = rgar( $entry, '3' );
+		} else {
+			$entry_name = 'Not found';
+		}
+
+		$editor_link = esc_url(
+			add_query_arg(
+				array(
+					'view' => 'entry',
+					'id' => $entry['form_id'],
+					'lid' => $entry_id,
+				),
+				admin_url( 'admin.php?page=gf_entries' )
+			)
+		);
+
+		// Starred.
+		if ( $property_value == 1 ) {
+			$alert_code  = 5711;
+			$variables  = array(
+				'EventType'   => 'read',
+				'entry_title' => $entry_name,
+				'form_name'   => $form['title'],
+				'form_id'     => $form['id'],
+				'EntryLink'   => $editor_link,
+			);
+			$this->plugin->alerts->Trigger( $alert_code, $variables );
+		}
+
+		// Unstarred.
+		if ( $property_value == 0 ) {
+			$alert_code  = 5711;
+			$variables = array(
+				'EventType'   => 'unread',
+				'entry_title' => $entry_name,
+				'form_name'   => $form['title'],
+				'form_id'     => $form['id'],
+				'EntryLink'   => $editor_link,
+			);
+			$this->plugin->alerts->Trigger( $alert_code, $variables );
+		}
+
+	}
+
+	public function event_form_entry_deleted( $entry_id ) {
+    $entry = GFAPI::get_entry( $entry_id );
+		$form  = GFAPI::get_form( $entry['form_id'] );
+
+		// Get the 1st field with a value so we can use it as the name.
+		if ( ! empty( rgar( $entry, '1' ) ) ) {
+			$entry_name = rgar( $entry, '1' );
+		} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
+			$entry_name = rgar( $entry, '2' );
+		} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
+			$entry_name = rgar( $entry, '3' );
+		} else {
+			$entry_name = 'Not found';
+		}
+
+		$alert_code  = 5713;
+		$variables = array(
+			'EventType'   => 'deleted',
+			'entry_title' => $entry_name,
+			'form_name'   => $form['title'],
+			'form_id'     => $form['id'],
+		);
+		$this->plugin->alerts->Trigger( $alert_code, $variables );
+
+	}
+
+	public function event_form_entry_trashed( $entry_id, $property_value, $previous_value ) {
+		if ( $previous_value !== $property_value && 'trash' === $property_value ) {
+			$entry = GFAPI::get_entry( $entry_id );
+			$form  = GFAPI::get_form( $entry['form_id'] );
+
+			// Get the 1st field with a value so we can use it as the name.
+			if ( ! empty( rgar( $entry, '1' ) ) ) {
+				$entry_name = rgar( $entry, '1' );
+			} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
+				$entry_name = rgar( $entry, '2' );
+			} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
+				$entry_name = rgar( $entry, '3' );
+			} else {
+				$entry_name = 'Not found';
+			}
+
+			$editor_link = esc_url(
+				add_query_arg(
+					array(
+						'view' => 'entry',
+						'id' => $entry['form_id'],
+						'lid' => $entry_id,
+					),
+					admin_url( 'admin.php?page=gf_entries' )
+				)
+			);
+
+			$alert_code  = 5712;
+			$variables = array(
+				'EventType'   => 'deleted',
+				'event_desc'  => esc_html__( 'moved to trash', 'wp-security-audit-log' ),
+				'entry_title' => $entry_name,
+				'form_name'   => $form['title'],
+				'form_id'     => $form['id'],
+				'EntryLink'   => $editor_link,
+			);
+			$this->plugin->alerts->Trigger( $alert_code, $variables );
+		}
+
+		if ( $previous_value !== $property_value && 'active' === $property_value ) {
+			$entry = GFAPI::get_entry( $entry_id );
+			$form  = GFAPI::get_form( $entry['form_id'] );
+
+			// Get the 1st field with a value so we can use it as the name.
+			if ( ! empty( rgar( $entry, '1' ) ) ) {
+				$entry_name = rgar( $entry, '1' );
+			} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
+				$entry_name = rgar( $entry, '2' );
+			} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
+				$entry_name = rgar( $entry, '3' );
+			} else {
+				$entry_name = 'Not found';
+			}
+
+			$editor_link = esc_url(
+				add_query_arg(
+					array(
+						'view' => 'entry',
+						'id' => $entry['form_id'],
+						'lid' => $entry_id,
+					),
+					admin_url( 'admin.php?page=gf_entries' )
+				)
+			);
+
+			$alert_code  = 5712;
+			$variables = array(
+				'EventType'   => 'restored',
+				'event_desc'  => esc_html__( 'restored', 'wp-security-audit-log' ),
+				'entry_title' => $entry_name,
+				'form_name'   => $form['title'],
+				'form_id'     => $form['id'],
+				'EntryLink'   => $editor_link,
+			);
+			$this->plugin->alerts->Trigger( $alert_code, $variables );
+		}
+
+
+	}
+
+	public function event_form_entry_note_added( $insert_id, $entry_id, $user_id, $user_name, $note, $note_type ) {
+
+		$entry = GFAPI::get_entry( $entry_id );
+		$form  = GFAPI::get_form( $entry['form_id'] );
+
+		// Get the 1st field with a value so we can use it as the name.
+		if ( ! empty( rgar( $entry, '1' ) ) ) {
+			$entry_name = rgar( $entry, '1' );
+		} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
+			$entry_name = rgar( $entry, '2' );
+		} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
+			$entry_name = rgar( $entry, '3' );
+		} else {
+			$entry_name = 'Not found';
+		}
+
+		$editor_link = esc_url(
+			add_query_arg(
+				array(
+					'view' => 'entry',
+					'id' => $entry['form_id'],
+					'lid' => $entry_id,
+				),
+				admin_url( 'admin.php?page=gf_entries' )
+			)
+		);
+
+		$alert_code  = 5714;
+		$variables = array(
+			'EventType'   => 'added',
+			'entry_note'  => $note,
+			'entry_title' => $entry_name,
+			'form_name'   => $form['title'],
+			'form_id'     => $form['id'],
+			'EntryLink'   => $editor_link,
+		);
+		$this->plugin->alerts->Trigger( $alert_code, $variables );
+
+	}
+
+	public function event_form_entry_note_deleted( $note_id, $lead_id ) {
+
+		$entry = GFAPI::get_entry( $lead_id );
+		$form  = GFAPI::get_form( $entry['form_id'] );
+		$note = GFAPI::get_note( $note_id );
+
+		// Get the 1st field with a value so we can use it as the name.
+		if ( ! empty( rgar( $entry, '1' ) ) ) {
+			$entry_name = rgar( $entry, '1' );
+		} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
+			$entry_name = rgar( $entry, '2' );
+		} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
+			$entry_name = rgar( $entry, '3' );
+		} else {
+			$entry_name = 'Not found';
+		}
+
+		$editor_link = esc_url(
+			add_query_arg(
+				array(
+					'view' => 'entry',
+					'id' => $entry['form_id'],
+					'lid' => $lead_id,
+				),
+				admin_url( 'admin.php?page=gf_entries' )
+			)
+		);
+
+		$alert_code  = 5714;
+		$variables = array(
+			'EventType'   => 'deleted',
+			'entry_note'  => $note->value,
+			'entry_title' => $entry_name,
+			'form_name'   => $form['title'],
+			'form_id'     => $form['id'],
+			'EntryLink'   => $editor_link,
+		);
+		$this->plugin->alerts->Trigger( $alert_code, $variables );
+
+	}
+
+	public function event_settings_updated( $option_name, $old_value, $value ) {
+
+		if ( ( strpos( $option_name, 'gform' ) !== false || strpos( $option_name, 'gravityforms' ) !== false ) && ( 'gform_version_info' !== $option_name ) ) {
+
+			// Skip settings we dont want.
+			if ( 'rg_gforms_key' === $option_name || 'rg_gforms_message' === $option_name ) {
+				return;
+			}
+
+			if ( 'rg_gforms_disable_css' === $option_name ) {
+				$option_name = 'Output CSS';
+				$value = ( 1 == $value ) ? 'No': 'Yes';
+				$old_value = ( 1 == $old_value ) ? 'No' : 'Yes';
+			}
+
+			if ( 'rg_gforms_enable_html5' === $option_name ) {
+				$option_name = 'Output HTML5';
+				$value = ( 1 == $value ) ? 'Yes' : 'No';
+				$old_value = ( 1 == $old_value ) ? 'Yes' : 'No';
+			}
+
+			if ( 'gform_enable_noconflict' === $option_name ) {
+				$option_name = 'No-Conflict Mode';
+				$value = ( 1 == $value ) ? 'On' : 'Off';
+				$old_value = ( 1 == $old_value ) ? 'On' : 'Off';
+			}
+
+			if ( 'rg_gforms_currency' === $option_name ) {
+				$option_name = 'Currency';
+			}
+
+			if ( 'gform_enable_background_updates' === $option_name ) {
+				$option_name = 'Background updates';
+				$value = ( 1 == $value ) ? 'On' : 'Off';
+				$old_value = ( 1 == $old_value ) ? 'On' : 'Off';
+			}
+
+			if ( 'gform_enable_toolbar_menu' === $option_name ) {
+				$option_name = 'Toolbar menu';
+				$value = ( 1 == $value ) ? 'On' : 'Off';
+				$old_value = ( 1 == $old_value ) ? 'On' : 'Off';
+			}
+
+			if ( 'gform_enable_logging' === $option_name ) {
+				$option_name = 'Logging';
+				$value = ( 1 == $value ) ? 'On' : 'Off';
+				$old_value = ( 1 == $old_value ) ? 'On' : 'Off';
+			}
+
+			if ( 'rg_gforms_captcha_type' === $option_name ) {
+				$option_name = 'Captcha type';
+			}
+
+			if ( 'gravityformsaddon_gravityformswebapi_settings' === $option_name ) {
+				$option_name = 'Gravity Forms API Settings';
+				$value = ( 1 == $value['enabled'] ) ? 'On' : 'Off';
+				$old_value = ( 1 == $old_value['enabled'] ) ? 'On' : 'Off';
+			}
+
+			$alert_code  = 5716;
+			$variables = array(
+				'EventType'    => 'modified',
+				'setting_name' => $option_name,
+				'old_value'    => $old_value,
+				'new_value'    => $value,
+			);
+			$this->plugin->alerts->Trigger( $alert_code, $variables );
+		}
+	}
 	/**
 	 * Method: This function make sures that alert 5500
 	 * has not been triggered before triggering.

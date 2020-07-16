@@ -57,6 +57,7 @@ function wsal_extension_core_add_custom_event_objects( $objects ) {
 		'gravityforms_forms'         => esc_html__( 'Forms in Gravity Forms', 'wp-security-audit-log' ),
 		'gravityforms_confirmations' => esc_html__( 'Confirmations in Gravity Forms', 'wp-security-audit-log' ),
 		'gravityforms_notifications' => esc_html__( 'Notifications in Gravity Forms', 'wp-security-audit-log' ),
+		'gravityforms_entries'       => esc_html__( 'Notifications in Gravity Forms', 'wp-security-audit-log' ),
 	);
 
 	// combine the two arrays.
@@ -92,21 +93,43 @@ function wsal_extension_core_add_custom_ignored_cpt( $post_types ) {
  * @param string $value Value of variable.
  * @param string $name  Variable name we wish to change.
  */
-function wsal_extension_core_add_custom_meta_format( $value, $name ) {
-	$check_value = (string) $value;
+ function wsal_extension_core_add_custom_meta_format( $value, $name ) {
+ 	$check_value = (string) $value;
 	if ( '%EditorLinkForm%' === $name ) {
+ 		if ( 'NULL' !== $check_value ) {
+ 			return '<a target="_blank" href="' . esc_url( $value ) . '">' . __( 'View form in the editor', 'wp-security-audit-log' ) . '</a>';
+ 		}
+ 		return $value;
+ 	}
+
+	if ( '%EntryLink%' === $name ) {
 		if ( 'NULL' !== $check_value ) {
-			return '<a target="_blank" href="' . esc_url( $value ) . '">' . __( 'View form in the editor', 'wp-security-audit-log' ) . '</a>';
+			return '<a target="_blank" href="' . esc_url( $value ) . '">' . __( 'View entry', 'wp-security-audit-log' ) . '</a>';
 		}
 		return $value;
 	}
 
-	return $value;
-}
+ 	return $value;
+ }
+
+ function wsal_extension_core_add_custom_event_type( $types ) {
+ 	$new_types = array(
+		'starred'   => __( 'Starred', 'wp-security-audit-log' ),
+		'unstarred' => __( 'Unstarred', 'wp-security-audit-log' ),
+		'read'      => __( 'Read', 'wp-security-audit-log' ),
+		'unread'    => __( 'Unread', 'wp-security-audit-log' ),
+ 	);
+
+ 	// combine the two arrays.
+ 	$types = array_merge( $types, $new_types );
+
+ 	return $types;
+ }
 
 /*
 	Filter in our custom functions into WSAL.
  */
 add_filter( 'wsal_event_objects', 'wsal_extension_core_add_custom_event_objects', 10, 2 );
+add_filter( 'wsal_event_type_data', 'wsal_extension_core_add_custom_event_type', 10, 2 );
 add_filter( 'wsal_link_filter', 'wsal_extension_core_add_custom_meta_format', 10, 2 );
 add_filter( 'wsal_meta_formatter_custom_formatter', 'wsal_extension_core_add_custom_meta_format', 10, 2 );
