@@ -315,16 +315,69 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 						)
 					);
 
-					$variables = array(
-						'EventType'      => 'modified',
-						'setting_name'   => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $changed_setting ) ) ) ),
-						'setting_value'  => sanitize_text_field( str_replace( '_', '', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $value ) ) ) ),
-						'form_name'      => sanitize_text_field( $form['title'] ),
-						'form_id'        => $form_id,
-						'EditorLinkForm' => $editor_link,
-					);
+					// Handle personal data settings.
+					if ( 'personalData' === $changed_setting ) {
+						$old_fields = $this->_old_form[$changed_setting];
+						$compare_changed_items = array_diff_assoc(
+							array_map( 'serialize', $value ),
+							array_map( 'serialize', $old_fields )
+						);
+						$changed_items = array_map( 'unserialize', $compare_changed_items );
 
-					$this->plugin->alerts->Trigger( $alert_code, $variables );
+						foreach( $changed_items as $name => $value ) {
+
+							if ( 'preventIP' === $name ) {
+								$name = 'Prevent the storage of IP addresses';
+							} elseif ( 'retention' === $name ) {
+								$name = 'Retention policy';
+								$value = $value['policy'];
+							} elseif ( 'exportingAndErasing' === $name ) {
+								$name = 'Enable integration for exporting and erasing personal data';
+								$value = $value['enabled'];
+							}
+
+							// Give the value a more useful label.
+							if ( empty( $value ) ) {
+								$value = 'disabled';
+							} elseif ( 1 == $value ) {
+								$value = 'enabled';
+							} elseif ( 'retain' === $value ) {
+								$value = 'Retain entries indefinitely';
+							} elseif ( 'trash' === $value ) {
+								$value = 'Trash entries automatically';
+							} elseif ( 'delete' === $value ) {
+								$value = 'Delete entries permanently automatically';
+							}
+
+							if ( ! $this->was_triggered_recently( 5703 ) ) {
+								$variables = array(
+									'EventType'      => 'modified',
+									'setting_name'   => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $name ) ) ) ),
+									'setting_value'  => sanitize_text_field( $value ),
+									'form_name'      => sanitize_text_field( $form['title'] ),
+									'form_id'        => $form_id,
+									'EditorLinkForm' => $editor_link,
+								);
+								$this->plugin->alerts->Trigger( $alert_code, $variables );
+							}
+
+						}
+
+					}
+
+					// Handle everything else.
+					if ( 'personalData' !== $changed_setting ) {
+						$variables = array(
+							'EventType'      => 'modified',
+							'setting_name'   => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $changed_setting ) ) ) ),
+							'setting_value'  => sanitize_text_field( str_replace( '_', '', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $value ) ) ) ),
+							'form_name'      => sanitize_text_field( $form['title'] ),
+							'form_id'        => $form_id,
+							'EditorLinkForm' => $editor_link,
+						);
+						$this->plugin->alerts->Trigger( $alert_code, $variables );
+					}
+
 				}
 			}
 		}
@@ -388,7 +441,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 					'EditorLinkForm'       => $editor_link,
 				);
 
-				$this->plugin->alerts->TriggerIf( $alert_code, $variables, array( $this, 'has_event_already_triggered' ) );
+				$this->plugin->alerts->TriggerIf( $alert_code, $variables );
 			}
 		}
 
@@ -904,17 +957,39 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 			$this->plugin->alerts->Trigger( $alert_code, $variables );
 		}
 	}
+
 	/**
-	 * Method: This function make sures that alert 5500
-	 * has not been triggered before triggering.
+	 * Check if the alert was triggered recently.
 	 *
-	 * @param  WSAL_AlertManager $manager - WSAL Alert Manager.
-	 * @return bool
+	 * Checks last 5 events if they occured less than 5 seconds ago.
+	 *
+	 * @param integer|array $alert_id - Alert code.
+	 * @return boolean
 	 */
-	public function has_event_already_triggered( WSAL_AlertManager $manager ) {
-		// if ( $manager->WillOrHasTriggered( 5705 ) ) {
-		// 	return false;
-		// }
-		return true;
+	private function was_triggered_recently( $alert_id ) {
+		// if we have already checked this don't check again.
+		if ( isset( $this->cached_alert_checks ) && array_key_exists( $alert_id, $this->cached_alert_checks ) && $this->cached_alert_checks[ $alert_id ] ) {
+			return true;
+		}
+		$query = new WSAL_Models_OccurrenceQuery();
+		$query->addOrderBy( 'created_on', true );
+		$query->setLimit( 5 );
+		$last_occurences  = $query->getAdapter()->Execute( $query );
+		$known_to_trigger = false;
+		foreach ( $last_occurences as $last_occurence ) {
+			if ( $known_to_trigger ) {
+				break;
+			}
+			if ( ! empty( $last_occurence ) && ( $last_occurence->created_on + 5 ) > time() ) {
+				if ( ! is_array( $alert_id ) && $last_occurence->alert_id === $alert_id ) {
+					$known_to_trigger = true;
+				} elseif ( is_array( $alert_id ) && in_array( $last_occurence[0]->alert_id, $alert_id, true ) ) {
+					$known_to_trigger = true;
+				}
+			}
+		}
+		// once we know the answer to this don't check again to avoid queries.
+		$this->cached_alert_checks[ $alert_id ] = $known_to_trigger;
+		return $known_to_trigger;
 	}
 }
