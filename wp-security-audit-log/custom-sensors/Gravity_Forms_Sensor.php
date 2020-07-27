@@ -315,6 +315,8 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 						)
 					);
 
+					error_log( print_r( $changed_setting, true ) );
+
 					// Handle personal data settings.
 					if ( 'personalData' === $changed_setting ) {
 						$old_fields = $this->_old_form[$changed_setting];
@@ -367,15 +369,26 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 					// Handle everything else.
 					if ( 'personalData' !== $changed_setting ) {
-						$variables = array(
-							'EventType'      => 'modified',
-							'setting_name'   => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $changed_setting ) ) ) ),
-							'setting_value'  => sanitize_text_field( str_replace( '_', '', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $value ) ) ) ),
-							'form_name'      => sanitize_text_field( $form['title'] ),
-							'form_id'        => $form_id,
-							'EditorLinkForm' => $editor_link,
-						);
-						$this->plugin->alerts->Trigger( $alert_code, $variables );
+						if ( isset( $this->_old_form[$changed_setting] ) ) {
+							if ( is_array( $value ) ) {
+								$value_string = '';
+								foreach ( $value as $value_name => $val ) {
+									if ( ! empty( $val ) ) {
+										$value_string .= ucfirst( $value_name ) . ': ' . ucfirst( $val ) . ' | ';
+									}
+								}
+								$value = substr( $value_string, 0, -2 );
+							}
+							$variables = array(
+								'EventType'      => 'modified',
+								'setting_name'   => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $changed_setting ) ) ) ),
+								'setting_value'  => sanitize_text_field( str_replace( '_', '', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $value ) ) ) ),
+								'form_name'      => sanitize_text_field( $form['title'] ),
+								'form_id'        => $form_id,
+								'EditorLinkForm' => $editor_link,
+							);
+							$this->plugin->alerts->Trigger( $alert_code, $variables );
+						}
 					}
 
 				}
