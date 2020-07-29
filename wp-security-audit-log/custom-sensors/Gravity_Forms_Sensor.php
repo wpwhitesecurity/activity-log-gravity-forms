@@ -373,7 +373,11 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 							if ( is_array( $value ) ) {
 								$value_string = '';
 								foreach ( $value as $value_name => $val ) {
-									if ( ! empty( $val ) ) {
+									if ( is_array( $val ) ) {
+										foreach ( $val as $name => $v ) {
+											$value_string .= ucfirst( $name ) . ': ' . ucfirst( $v ) . ' | ';
+										}
+									} elseif ( ! empty( $val ) ) {
 										$value_string .= ucfirst( $value_name ) . ': ' . ucfirst( $val ) . ' | ';
 									}
 								}
