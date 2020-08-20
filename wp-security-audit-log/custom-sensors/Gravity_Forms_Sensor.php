@@ -205,13 +205,13 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 						array_map( 'serialize', $current_fields ),
 						array_map( 'serialize', $old_fields )
 					);
-					$added_items = array_map( 'unserialize', $compare_added_items );
+					$added_items         = array_map( 'unserialize', $compare_added_items );
 
 					$compare_removed_items = array_diff(
 						array_map( 'serialize', $old_fields ),
 						array_map( 'serialize', $current_fields )
 					);
-					$removed_items = array_map( 'unserialize', $compare_removed_items );
+					$removed_items         = array_map( 'unserialize', $compare_removed_items );
 
 					$compare_changed_items = array_diff_assoc(
 						array_map( 'serialize', $current_fields ),
@@ -219,91 +219,124 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 					);
 					$changed_items         = array_map( 'unserialize', $compare_changed_items );
 
-					if ( ! empty( $added_items ) ) {
-						// Check to confirm if this is a fresh field, or modified.
-						$compare_changed_items = array_diff_assoc(
-							array_map( 'serialize', $changed_items ),
-							array_map( 'serialize', $added_items )
-						);
-						$changed_items = array_map( 'unserialize', $compare_changed_items );
+					// Handle added items
+					if ( ! empty( $added_items ) && ( count( $current_fields ) > count( $old_fields ) ) ) {
+						error_log( print_r( 'ADDED RUNNING', true ) );
+						foreach ( $added_items as $item ) {
 
-						// This is indeed a fresh, new field.
-						if ( ! empty( $changed_items ) ) {
-							$item = array_shift( $added_items );
+							// Make sure this field is not a modified field.
+							$ok_to_alert = true;
+							foreach ( $old_fields as $old => $value ) {
+								if ( $value->id === $item->id ) {
+									$ok_to_alert = false;
+								}
+							}
+							foreach ( $changed_items as $changed => $value ) {
+								if ( $value->id === $item->id ) {
+									unset( $changed_items[ $changed ] );
+								}
+							}
 
-							$alert_code  = 5715;
-							$editor_link = esc_url(
-								add_query_arg(
-									array(
-										'id' => $form_id,
-									),
-									admin_url( 'admin.php?page=gf_edit_forms' )
-								)
-							);
+							if ( $ok_to_alert ) {
+								$alert_code  = 5715;
+								$editor_link = esc_url(
+									add_query_arg(
+										array(
+											'id' => $form_id,
+										),
+										admin_url( 'admin.php?page=gf_edit_forms' )
+									)
+								);
 
-							$variables = array(
-								'EventType'      => 'added',
-								'field_name'     => $item->label,
-								'field_type'     => $item->type,
-								'form_name'      => sanitize_text_field( $form['title'] ),
-								'form_id'        => $form_id,
-								'EditorLinkForm' => $editor_link,
-							);
+								$variables = array(
+									'EventType'      => 'added',
+									'field_name'     => $item->label,
+									'field_type'     => $item->type,
+									'form_name'      => sanitize_text_field( $form['title'] ),
+									'form_id'        => $form_id,
+									'EditorLinkForm' => $editor_link,
+								);
 
-							$this->plugin->alerts->Trigger( $alert_code, $variables );
-						} else {
-							$item = array_shift( $added_items );
-
-							$alert_code  = 5715;
-							$editor_link = esc_url(
-								add_query_arg(
-									array(
-										'id' => $form_id,
-									),
-									admin_url( 'admin.php?page=gf_edit_forms' )
-								)
-							);
-
-							$variables = array(
-								'EventType'      => 'modified',
-								'field_name'     => $item->label,
-								'field_type'     => $item->type,
-								'form_name'      => sanitize_text_field( $form['title'] ),
-								'form_id'        => $form_id,
-								'EditorLinkForm' => $editor_link,
-							);
-
-							$this->plugin->alerts->Trigger( $alert_code, $variables );
-
-							return;
+								$this->plugin->alerts->Trigger( $alert_code, $variables );
+							}
 						}
 					}
 
-					if ( ! empty( $removed_items ) ) {
-						$item = array_shift( $removed_items );
+					if ( ! empty( $changed_items ) && ( count( $old_fields ) === count( $current_fields ) ) ) {
+						foreach ( $changed_items as $item ) {
+							$ok_to_alert = true;
+							foreach ( $old_fields as $old => $value ) {
+								if ( $value->id === $item->id && $value->label === $item->label ) {
+									$ok_to_alert = false;
+								}
+							}
 
-						$alert_code  = 5715;
-						$editor_link = esc_url(
-							add_query_arg(
-								array(
-									'id' => $form_id,
-								),
-								admin_url( 'admin.php?page=gf_edit_forms' )
-							)
-						);
+							foreach ( $removed_items as $removed => $value ) {
+								if ( $item->id === $value->id ) {
+									unset( $removed_items[ $removed ] );
+								}
+							}
 
-						$variables = array(
-							'EventType'      => 'removed',
-							'field_name'     => $item->label,
-							'field_type'     => $item->type,
-							'form_name'      => sanitize_text_field( $form['title'] ),
-							'form_id'        => $form_id,
-							'EditorLinkForm' => $editor_link,
-						);
+							if ( $ok_to_alert ) {
+								$alert_code  = 5715;
+								$editor_link = esc_url(
+									add_query_arg(
+										array(
+											'id' => $form_id,
+										),
+										admin_url( 'admin.php?page=gf_edit_forms' )
+									)
+								);
 
-						$this->plugin->alerts->Trigger( $alert_code, $variables );
+								$variables = array(
+									'EventType'      => 'modified',
+									'field_name'     => $item->label,
+									'field_type'     => $item->type,
+									'form_name'      => sanitize_text_field( $form['title'] ),
+									'form_id'        => $form_id,
+									'EditorLinkForm' => $editor_link,
+								);
+
+								$this->plugin->alerts->Trigger( $alert_code, $variables );
+							}
+						}
 					}
 
+					if ( ! empty( $removed_items ) && ( count( $old_fields ) > count( $current_fields ) ) ) {
+
+						foreach ( $removed_items as $item ) {
+							// Make sure this field is not a modified field.
+							$ok_to_alert = true;
+							foreach ( $current_fields as $old => $value ) {
+								if ( $value->id === $item->id && $value->label === $item->label ) {
+									$ok_to_alert = false;
+								}
+							}
+
+							if ( $ok_to_alert ) {
+								$alert_code          = 5715;
+										$editor_link = esc_url(
+											add_query_arg(
+												array(
+													'id' => $form_id,
+												),
+												admin_url( 'admin.php?page=gf_edit_forms' )
+											)
+										);
+
+										  $variables = array(
+											  'EventType'  => 'removed',
+											  'field_name' => $item->label,
+											  'field_type' => $item->type,
+											  'form_name'  => sanitize_text_field( $form['title'] ),
+											  'form_id'    => $form_id,
+											  'EditorLinkForm' => $editor_link,
+										  );
+
+										  $this->plugin->alerts->Trigger( $alert_code, $variables );
+							}
+						}
+					}
 				} else {
 					$alert_code  = 5703;
 					$editor_link = esc_url(
@@ -315,26 +348,24 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 						)
 					);
 
-					error_log( print_r( $changed_setting, true ) );
-
 					// Handle personal data settings.
 					if ( 'personalData' === $changed_setting ) {
-						$old_fields = $this->_old_form[$changed_setting];
+						$old_fields            = $this->_old_form[ $changed_setting ];
 						$compare_changed_items = array_diff_assoc(
 							array_map( 'serialize', $value ),
 							array_map( 'serialize', $old_fields )
 						);
-						$changed_items = array_map( 'unserialize', $compare_changed_items );
+						$changed_items         = array_map( 'unserialize', $compare_changed_items );
 
-						foreach( $changed_items as $name => $value ) {
+						foreach ( $changed_items as $name => $value ) {
 
 							if ( 'preventIP' === $name ) {
 								$name = 'Prevent the storage of IP addresses';
 							} elseif ( 'retention' === $name ) {
-								$name = 'Retention policy';
+								$name  = 'Retention policy';
 								$value = $value['policy'];
 							} elseif ( 'exportingAndErasing' === $name ) {
-								$name = 'Enable integration for exporting and erasing personal data';
+								$name  = 'Enable integration for exporting and erasing personal data';
 								$value = $value['enabled'];
 							}
 
@@ -362,14 +393,12 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 								);
 								$this->plugin->alerts->Trigger( $alert_code, $variables );
 							}
-
 						}
-
 					}
 
 					// Handle everything else.
 					if ( 'personalData' !== $changed_setting ) {
-						if ( isset( $this->_old_form[$changed_setting] ) ) {
+						if ( isset( $this->_old_form[ $changed_setting ] ) ) {
 							if ( is_array( $value ) ) {
 								$value_string = '';
 								foreach ( $value as $value_name => $val ) {
@@ -394,7 +423,6 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 							$this->plugin->alerts->Trigger( $alert_code, $variables );
 						}
 					}
-
 				}
 			}
 		}
@@ -478,12 +506,12 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 		);
 
 		$variables = array(
-			'EventType'            => 'deleted',
-			'form_name'            => sanitize_text_field( $form['title'] ),
-			'form_id'              => $form['id'],
-			'confirmation_name'    => sanitize_text_field( $confirmation['name'] ),
-			'confirmation_type'    => $confirmation['type'],
-			'EditorLinkForm'       => $editor_link,
+			'EventType'         => 'deleted',
+			'form_name'         => sanitize_text_field( $form['title'] ),
+			'form_id'           => $form['id'],
+			'confirmation_name' => sanitize_text_field( $confirmation['name'] ),
+			'confirmation_type' => $confirmation['type'],
+			'EditorLinkForm'    => $editor_link,
 		);
 
 		$this->plugin->alerts->Trigger( $alert_code, $variables );
@@ -505,11 +533,11 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 			);
 
 			$variables = array(
-				'EventType'            => 'created',
-				'form_name'            => sanitize_text_field( $form['title'] ),
-				'form_id'              => $form['id'],
-				'notification_name'    => sanitize_text_field( $notification['name'] ),
-				'EditorLinkForm'       => $editor_link,
+				'EventType'         => 'created',
+				'form_name'         => sanitize_text_field( $form['title'] ),
+				'form_id'           => $form['id'],
+				'notification_name' => sanitize_text_field( $notification['name'] ),
+				'EditorLinkForm'    => $editor_link,
 			);
 
 			$this->plugin->alerts->Trigger( $alert_code, $variables );
@@ -525,11 +553,11 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 			);
 
 			$variables = array(
-				'EventType'            => 'modified',
-				'form_name'            => sanitize_text_field( $form['title'] ),
-				'form_id'              => $form['id'],
-				'notification_name'    => sanitize_text_field( $notification['name'] ),
-				'EditorLinkForm'       => $editor_link,
+				'EventType'         => 'modified',
+				'form_name'         => sanitize_text_field( $form['title'] ),
+				'form_id'           => $form['id'],
+				'notification_name' => sanitize_text_field( $notification['name'] ),
+				'EditorLinkForm'    => $editor_link,
 			);
 
 			$this->plugin->alerts->Trigger( $alert_code, $variables );
@@ -549,11 +577,11 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 		);
 
 		$variables = array(
-			'EventType'            => 'deleted',
-			'form_name'            => sanitize_text_field( $form['title'] ),
-			'form_id'              => $form['id'],
-			'notification_name'    => sanitize_text_field( $notification['name'] ),
-			'EditorLinkForm'       => $editor_link,
+			'EventType'         => 'deleted',
+			'form_name'         => sanitize_text_field( $form['title'] ),
+			'form_id'           => $form['id'],
+			'notification_name' => sanitize_text_field( $notification['name'] ),
+			'EditorLinkForm'    => $editor_link,
 		);
 
 		$this->plugin->alerts->Trigger( $alert_code, $variables );
@@ -573,11 +601,11 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 		);
 
 		$variables = array(
-			'EventType'            => 'activated',
-			'form_name'            => sanitize_text_field( $form['title'] ),
-			'form_id'              => $form['id'],
-			'notification_name'    => sanitize_text_field( $notification['name'] ),
-			'EditorLinkForm'       => $editor_link,
+			'EventType'         => 'activated',
+			'form_name'         => sanitize_text_field( $form['title'] ),
+			'form_id'           => $form['id'],
+			'notification_name' => sanitize_text_field( $notification['name'] ),
+			'EditorLinkForm'    => $editor_link,
 		);
 
 		$this->plugin->alerts->Trigger( $alert_code, $variables );
@@ -597,11 +625,11 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 		);
 
 		$variables = array(
-			'EventType'            => 'deactivated',
-			'form_name'            => sanitize_text_field( $form['title'] ),
-			'form_id'              => $form['id'],
-			'notification_name'    => sanitize_text_field( $notification['name'] ),
-			'EditorLinkForm'       => $editor_link,
+			'EventType'         => 'deactivated',
+			'form_name'         => sanitize_text_field( $form['title'] ),
+			'form_id'           => $form['id'],
+			'notification_name' => sanitize_text_field( $notification['name'] ),
+			'EditorLinkForm'    => $editor_link,
 		);
 
 		$this->plugin->alerts->Trigger( $alert_code, $variables );
@@ -629,8 +657,8 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 			add_query_arg(
 				array(
 					'view' => 'entry',
-					'id' => $entry['form_id'],
-					'lid' => $entry_id,
+					'id'   => $entry['form_id'],
+					'lid'  => $entry_id,
 				),
 				admin_url( 'admin.php?page=gf_entries' )
 			)
@@ -638,7 +666,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 		// Starred.
 		if ( $previous_value != $property_value && $property_value == 1 ) {
-			$alert_code  = 5710;
+			$alert_code = 5710;
 			$variables  = array(
 				'EventType'   => 'starred',
 				'entry_title' => $entry_name,
@@ -647,12 +675,12 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 				'EntryLink'   => $editor_link,
 			);
 			$this->plugin->alerts->Trigger( $alert_code, $variables );
-    }
+		}
 
 		// Unstarred.
 		if ( $previous_value != $property_value && $property_value == 0 ) {
-			$alert_code  = 5710;
-			$variables = array(
+			$alert_code = 5710;
+			$variables  = array(
 				'EventType'   => 'unstarred',
 				'entry_title' => $entry_name,
 				'form_name'   => $form['title'],
@@ -683,8 +711,8 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 			add_query_arg(
 				array(
 					'view' => 'entry',
-					'id' => $entry['form_id'],
-					'lid' => $entry_id,
+					'id'   => $entry['form_id'],
+					'lid'  => $entry_id,
 				),
 				admin_url( 'admin.php?page=gf_entries' )
 			)
@@ -692,7 +720,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 		// Starred.
 		if ( $property_value == 1 ) {
-			$alert_code  = 5711;
+			$alert_code = 5711;
 			$variables  = array(
 				'EventType'   => 'read',
 				'entry_title' => $entry_name,
@@ -705,8 +733,8 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 		// Unstarred.
 		if ( $property_value == 0 ) {
-			$alert_code  = 5711;
-			$variables = array(
+			$alert_code = 5711;
+			$variables  = array(
 				'EventType'   => 'unread',
 				'entry_title' => $entry_name,
 				'form_name'   => $form['title'],
@@ -719,7 +747,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 	}
 
 	public function event_form_entry_deleted( $entry_id ) {
-    $entry = GFAPI::get_entry( $entry_id );
+		$entry = GFAPI::get_entry( $entry_id );
 		$form  = GFAPI::get_form( $entry['form_id'] );
 
 		// Get the 1st field with a value so we can use it as the name.
@@ -733,8 +761,8 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 			$entry_name = 'Not found';
 		}
 
-		$alert_code  = 5713;
-		$variables = array(
+		$alert_code = 5713;
+		$variables  = array(
 			'EventType'   => 'deleted',
 			'entry_title' => $entry_name,
 			'form_name'   => $form['title'],
@@ -764,15 +792,15 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 				add_query_arg(
 					array(
 						'view' => 'entry',
-						'id' => $entry['form_id'],
-						'lid' => $entry_id,
+						'id'   => $entry['form_id'],
+						'lid'  => $entry_id,
 					),
 					admin_url( 'admin.php?page=gf_entries' )
 				)
 			);
 
-			$alert_code  = 5712;
-			$variables = array(
+			$alert_code = 5712;
+			$variables  = array(
 				'EventType'   => 'deleted',
 				'event_desc'  => esc_html__( 'moved to trash', 'wp-security-audit-log' ),
 				'entry_title' => $entry_name,
@@ -802,15 +830,15 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 				add_query_arg(
 					array(
 						'view' => 'entry',
-						'id' => $entry['form_id'],
-						'lid' => $entry_id,
+						'id'   => $entry['form_id'],
+						'lid'  => $entry_id,
 					),
 					admin_url( 'admin.php?page=gf_entries' )
 				)
 			);
 
-			$alert_code  = 5712;
-			$variables = array(
+			$alert_code = 5712;
+			$variables  = array(
 				'EventType'   => 'restored',
 				'event_desc'  => esc_html__( 'restored', 'wp-security-audit-log' ),
 				'entry_title' => $entry_name,
@@ -820,7 +848,6 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 			);
 			$this->plugin->alerts->Trigger( $alert_code, $variables );
 		}
-
 
 	}
 
@@ -844,15 +871,15 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 			add_query_arg(
 				array(
 					'view' => 'entry',
-					'id' => $entry['form_id'],
-					'lid' => $entry_id,
+					'id'   => $entry['form_id'],
+					'lid'  => $entry_id,
 				),
 				admin_url( 'admin.php?page=gf_entries' )
 			)
 		);
 
-		$alert_code  = 5714;
-		$variables = array(
+		$alert_code = 5714;
+		$variables  = array(
 			'EventType'   => 'added',
 			'entry_note'  => $note,
 			'entry_title' => $entry_name,
@@ -868,7 +895,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 		$entry = GFAPI::get_entry( $lead_id );
 		$form  = GFAPI::get_form( $entry['form_id'] );
-		$note = GFAPI::get_note( $note_id );
+		$note  = GFAPI::get_note( $note_id );
 
 		// Get the 1st field with a value so we can use it as the name.
 		if ( ! empty( rgar( $entry, '1' ) ) ) {
@@ -885,15 +912,15 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 			add_query_arg(
 				array(
 					'view' => 'entry',
-					'id' => $entry['form_id'],
-					'lid' => $lead_id,
+					'id'   => $entry['form_id'],
+					'lid'  => $lead_id,
 				),
 				admin_url( 'admin.php?page=gf_entries' )
 			)
 		);
 
-		$alert_code  = 5714;
-		$variables = array(
+		$alert_code = 5714;
+		$variables  = array(
 			'EventType'   => 'deleted',
 			'entry_note'  => $note->value,
 			'entry_title' => $entry_name,
@@ -916,20 +943,20 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 			if ( 'rg_gforms_disable_css' === $option_name ) {
 				$option_name = 'Output CSS';
-				$value = ( 1 == $value ) ? 'No': 'Yes';
-				$old_value = ( 1 == $old_value ) ? 'No' : 'Yes';
+				$value       = ( 1 == $value ) ? 'No' : 'Yes';
+				$old_value   = ( 1 == $old_value ) ? 'No' : 'Yes';
 			}
 
 			if ( 'rg_gforms_enable_html5' === $option_name ) {
 				$option_name = 'Output HTML5';
-				$value = ( 1 == $value ) ? 'Yes' : 'No';
-				$old_value = ( 1 == $old_value ) ? 'Yes' : 'No';
+				$value       = ( 1 == $value ) ? 'Yes' : 'No';
+				$old_value   = ( 1 == $old_value ) ? 'Yes' : 'No';
 			}
 
 			if ( 'gform_enable_noconflict' === $option_name ) {
 				$option_name = 'No-Conflict Mode';
-				$value = ( 1 == $value ) ? 'On' : 'Off';
-				$old_value = ( 1 == $old_value ) ? 'On' : 'Off';
+				$value       = ( 1 == $value ) ? 'On' : 'Off';
+				$old_value   = ( 1 == $old_value ) ? 'On' : 'Off';
 			}
 
 			if ( 'rg_gforms_currency' === $option_name ) {
@@ -938,20 +965,20 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 			if ( 'gform_enable_background_updates' === $option_name ) {
 				$option_name = 'Background updates';
-				$value = ( 1 == $value ) ? 'On' : 'Off';
-				$old_value = ( 1 == $old_value ) ? 'On' : 'Off';
+				$value       = ( 1 == $value ) ? 'On' : 'Off';
+				$old_value   = ( 1 == $old_value ) ? 'On' : 'Off';
 			}
 
 			if ( 'gform_enable_toolbar_menu' === $option_name ) {
 				$option_name = 'Toolbar menu';
-				$value = ( 1 == $value ) ? 'On' : 'Off';
-				$old_value = ( 1 == $old_value ) ? 'On' : 'Off';
+				$value       = ( 1 == $value ) ? 'On' : 'Off';
+				$old_value   = ( 1 == $old_value ) ? 'On' : 'Off';
 			}
 
 			if ( 'gform_enable_logging' === $option_name ) {
 				$option_name = 'Logging';
-				$value = ( 1 == $value ) ? 'On' : 'Off';
-				$old_value = ( 1 == $old_value ) ? 'On' : 'Off';
+				$value       = ( 1 == $value ) ? 'On' : 'Off';
+				$old_value   = ( 1 == $old_value ) ? 'On' : 'Off';
 			}
 
 			if ( 'rg_gforms_captcha_type' === $option_name ) {
@@ -960,12 +987,12 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 			if ( 'gravityformsaddon_gravityformswebapi_settings' === $option_name ) {
 				$option_name = 'Gravity Forms API Settings';
-				$value = ( 1 == $value['enabled'] ) ? 'On' : 'Off';
-				$old_value = ( 1 == $old_value['enabled'] ) ? 'On' : 'Off';
+				$value       = ( 1 == $value['enabled'] ) ? 'On' : 'Off';
+				$old_value   = ( 1 == $old_value['enabled'] ) ? 'On' : 'Off';
 			}
 
-			$alert_code  = 5716;
-			$variables = array(
+			$alert_code = 5716;
+			$variables  = array(
 				'EventType'    => 'modified',
 				'setting_name' => $option_name,
 				'old_value'    => $old_value,
