@@ -802,7 +802,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 			$alert_code = 5712;
 			$variables  = array(
 				'EventType'   => 'deleted',
-				'event_desc'  => esc_html__( 'moved to trash', 'wp-security-audit-log' ),
+				'event_desc'  => esc_html__( 'moved to trash', 'wsal-gravity-forms' ),
 				'entry_title' => $entry_name,
 				'form_name'   => $form['title'],
 				'form_id'     => $form['id'],
@@ -840,7 +840,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 			$alert_code = 5712;
 			$variables  = array(
 				'EventType'   => 'restored',
-				'event_desc'  => esc_html__( 'restored', 'wp-security-audit-log' ),
+				'event_desc'  => esc_html__( 'restored', 'wsal-gravity-forms' ),
 				'entry_title' => $entry_name,
 				'form_name'   => $form['title'],
 				'form_id'     => $form['id'],

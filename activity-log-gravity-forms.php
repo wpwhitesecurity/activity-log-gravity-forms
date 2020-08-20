@@ -3,7 +3,7 @@
  * Plugin Name: WP Activity Log Extension for Gravity Forms
  * Plugin URI: https://wpactivitylog.com/extensions/
  * Description: A WP Activity Log plugin extension for Gravity Forms.
- * Text Domain: wp-security-audit-log
+ * Text Domain: wsal-gravity-forms
  * Author: WP White Security
  * Author URI: http://www.wpwhitesecurity.com/
  * Version: 1.0.0
@@ -54,11 +54,11 @@ $wsal_extension = new \WPWhiteSecurity\ActivityLog\Extensions\Common\Core( $plug
  */
 function wsal_extension_core_add_custom_event_objects( $objects ) {
 	$new_objects = array(
-		'gravityforms_forms'         => esc_html__( 'Forms in Gravity Forms', 'wp-security-audit-log' ),
-		'gravityforms_confirmations' => esc_html__( 'Confirmations in Gravity Forms', 'wp-security-audit-log' ),
-		'gravityforms_notifications' => esc_html__( 'Notifications in Gravity Forms', 'wp-security-audit-log' ),
-		'gravityforms_entries'       => esc_html__( 'Notifications in Gravity Forms', 'wp-security-audit-log' ),
-		'gravityforms_fields'        => esc_html__( 'Fields in Gravity Forms', 'wp-security-audit-log' ),
+		'gravityforms_forms'         => esc_html__( 'Forms in Gravity Forms', 'wsal-gravity-forms' ),
+		'gravityforms_confirmations' => esc_html__( 'Confirmations in Gravity Forms', 'wsal-gravity-forms' ),
+		'gravityforms_notifications' => esc_html__( 'Notifications in Gravity Forms', 'wsal-gravity-forms' ),
+		'gravityforms_entries'       => esc_html__( 'Notifications in Gravity Forms', 'wsal-gravity-forms' ),
+		'gravityforms_fields'        => esc_html__( 'Fields in Gravity Forms', 'wsal-gravity-forms' ),
 	);
 
 	// combine the two arrays.
@@ -98,14 +98,14 @@ function wsal_extension_core_add_custom_ignored_cpt( $post_types ) {
  	$check_value = (string) $value;
 	if ( '%EditorLinkForm%' === $name ) {
  		if ( 'NULL' !== $check_value ) {
- 			return '<a target="_blank" href="' . esc_url( $value ) . '">' . __( 'View form in the editor', 'wp-security-audit-log' ) . '</a>';
+ 			return '<a target="_blank" href="' . esc_url( $value ) . '">' . __( 'View form in the editor', 'wsal-gravity-forms' ) . '</a>';
  		}
  		return $value;
  	}
 
 	if ( '%EntryLink%' === $name ) {
 		if ( 'NULL' !== $check_value ) {
-			return '<a target="_blank" href="' . esc_url( $value ) . '">' . __( 'View entry', 'wp-security-audit-log' ) . '</a>';
+			return '<a target="_blank" href="' . esc_url( $value ) . '">' . __( 'View entry', 'wsal-gravity-forms' ) . '</a>';
 		}
 		return $value;
 	}
@@ -115,10 +115,10 @@ function wsal_extension_core_add_custom_ignored_cpt( $post_types ) {
 
  function wsal_extension_core_add_custom_event_type( $types ) {
  	$new_types = array(
-		'starred'   => __( 'Starred', 'wp-security-audit-log' ),
-		'unstarred' => __( 'Unstarred', 'wp-security-audit-log' ),
-		'read'      => __( 'Read', 'wp-security-audit-log' ),
-		'unread'    => __( 'Unread', 'wp-security-audit-log' ),
+		'starred'   => __( 'Starred', 'wsal-gravity-forms' ),
+		'unstarred' => __( 'Unstarred', 'wsal-gravity-forms' ),
+		'read'      => __( 'Read', 'wsal-gravity-forms' ),
+		'unread'    => __( 'Unread', 'wsal-gravity-forms' ),
  	);
 
  	// combine the two arrays.
