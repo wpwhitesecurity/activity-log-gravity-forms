@@ -34,9 +34,9 @@
 /*
 	REQUIRED. Here we include and fire up the main core class. This will be needed regardless so be sure to leave line 37-39 in tact.
 */
-require_once plugin_dir_path( __FILE__ ) . 'wsal-extension-core.php';
-$wsal_extension = WSAL_Extension_Core::get_instance();
-$wsal_extension->init();
+require_once plugin_dir_path( __FILE__ ) . 'core/class-extension-core.php';
+$plugin_text_domain =  'wsal-gravity-forms';
+$wsal_extension = new \WPWhiteSecurity\ActivityLog\Extensions\Common\Core( $plugin_text_domain );
 
 /*
 	From here, you may now place your custom code. Examples of the functions
