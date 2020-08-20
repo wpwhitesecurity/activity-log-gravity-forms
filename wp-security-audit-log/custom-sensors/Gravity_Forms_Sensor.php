@@ -192,8 +192,35 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 			foreach ( $changed_data as $changed_setting => $value ) {
 
-				if ( 'is_active' === $changed_setting || 'is_trash' === $changed_setting || 'date_created' === $changed_setting || 'confirmations' === $changed_setting || 'notifications' === $changed_setting || 'nextFieldId' === $changed_setting ) {
-						continue;
+				// Handle form duplicated
+				if ( 'notifications' === $changed_setting ) {
+					$old_fields = $this->_old_form[ $changed_setting ];
+					if ( count( $value ) > count( $old_fields ) ) {
+						$alert_code  = 5706;
+						$editor_link = esc_url(
+							add_query_arg(
+								array(
+									'id' => $form['id'],
+								),
+								admin_url( 'admin.php?page=gf_edit_forms' )
+							)
+						);
+
+						$notification = end( $value );
+
+						$variables = array(
+							'EventType'         => 'duplicated',
+							'form_name'         => sanitize_text_field( $form['title'] ),
+							'form_id'           => $form['id'],
+							'notification_name' => sanitize_text_field( $notification['name'] ),
+							'EditorLinkForm'    => $editor_link,
+						);
+
+						if ( isset( $_REQUEST['action'] ) && 'duplicate' === $_REQUEST['action'] ) {
+							$this->plugin->alerts->Trigger( $alert_code, $variables );
+						}
+
+					}
 				}
 
 				if ( 'fields' === $changed_setting ) {
@@ -221,7 +248,6 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 					// Handle added items
 					if ( ! empty( $added_items ) && ( count( $current_fields ) > count( $old_fields ) ) ) {
-						error_log( print_r( 'ADDED RUNNING', true ) );
 						foreach ( $added_items as $item ) {
 
 							// Make sure this field is not a modified field.
@@ -337,7 +363,10 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 							}
 						}
 					}
-				} else {
+				}
+
+				// Handle personal data settings.
+				if ( 'personalData' === $changed_setting ) {
 					$alert_code  = 5703;
 					$editor_link = esc_url(
 						add_query_arg(
@@ -348,80 +377,114 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 						)
 					);
 
-					// Handle personal data settings.
-					if ( 'personalData' === $changed_setting ) {
-						$old_fields            = $this->_old_form[ $changed_setting ];
-						$compare_changed_items = array_diff_assoc(
-							array_map( 'serialize', $value ),
-							array_map( 'serialize', $old_fields )
-						);
-						$changed_items         = array_map( 'unserialize', $compare_changed_items );
-
-						foreach ( $changed_items as $name => $value ) {
-
-							if ( 'preventIP' === $name ) {
-								$name = 'Prevent the storage of IP addresses';
-							} elseif ( 'retention' === $name ) {
-								$name  = 'Retention policy';
-								$value = $value['policy'];
-							} elseif ( 'exportingAndErasing' === $name ) {
-								$name  = 'Enable integration for exporting and erasing personal data';
-								$value = $value['enabled'];
-							}
-
-							// Give the value a more useful label.
-							if ( empty( $value ) ) {
-								$value = 'disabled';
-							} elseif ( 1 == $value ) {
-								$value = 'enabled';
-							} elseif ( 'retain' === $value ) {
-								$value = 'Retain entries indefinitely';
-							} elseif ( 'trash' === $value ) {
-								$value = 'Trash entries automatically';
-							} elseif ( 'delete' === $value ) {
-								$value = 'Delete entries permanently automatically';
-							}
-
-							if ( ! $this->was_triggered_recently( 5703 ) ) {
-								$variables = array(
-									'EventType'      => 'modified',
-									'setting_name'   => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $name ) ) ) ),
-									'setting_value'  => sanitize_text_field( $value ),
-									'form_name'      => sanitize_text_field( $form['title'] ),
-									'form_id'        => $form_id,
-									'EditorLinkForm' => $editor_link,
-								);
-								$this->plugin->alerts->Trigger( $alert_code, $variables );
-							}
-						}
+					if ( isset( $this->_old_form[ $changed_setting ]  ) ) {
+						$old_fields = $this->_old_form[ $changed_setting ];
+					} else {
+						$old_fields = array();
 					}
 
-					// Handle everything else.
-					if ( 'personalData' !== $changed_setting ) {
-						if ( isset( $this->_old_form[ $changed_setting ] ) ) {
-							if ( is_array( $value ) ) {
-								$value_string = '';
-								foreach ( $value as $value_name => $val ) {
-									if ( is_array( $val ) ) {
-										foreach ( $val as $name => $v ) {
-											$value_string .= ucfirst( $name ) . ': ' . ucfirst( $v ) . ' | ';
-										}
-									} elseif ( ! empty( $val ) ) {
-										$value_string .= ucfirst( $value_name ) . ': ' . ucfirst( $val ) . ' | ';
-									}
-								}
-								$value = substr( $value_string, 0, -2 );
-							}
+					$compare_changed_items = array_diff_assoc(
+						array_map( 'serialize', $value ),
+						array_map( 'serialize', $old_fields )
+					);
+					$changed_items         = array_map( 'unserialize', $compare_changed_items );
+
+					foreach ( $changed_items as $name => $value ) {
+
+
+						if ( 'preventIP' === $name ) {
+							$name = 'Prevent the storage of IP addresses';
+						} elseif ( 'retention' === $name ) {
+							$name  = 'Retention policy';
+							$value = $value['policy'];
+						} elseif ( 'exportingAndErasing' === $name ) {
+							$name  = 'Enable integration for exporting and erasing personal data';
+							$value = $value['enabled'];
+						}
+
+						// Give the value a more useful label.
+						if ( empty( $value ) || 0 === $value ) {
+							$value = 'disabled';
+						} elseif ( 1 == $value ) {
+							$value = 'enabled';
+						} elseif ( 'retain' === $value ) {
+							$value = 'Retain entries indefinitely';
+						} elseif ( 'trash' === $value ) {
+							$value = 'Trash entries automatically';
+						} elseif ( 'delete' === $value ) {
+							$value = 'Delete entries permanently automatically';
+						}
+
+						if ( ! $this->was_triggered_recently( 5703 ) ) {
 							$variables = array(
 								'EventType'      => 'modified',
-								'setting_name'   => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $changed_setting ) ) ) ),
-								'setting_value'  => sanitize_text_field( str_replace( '_', '', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $value ) ) ) ),
+								'setting_name'   => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $name ) ) ) ),
+								'setting_value'  => sanitize_text_field( $value ),
 								'form_name'      => sanitize_text_field( $form['title'] ),
 								'form_id'        => $form_id,
 								'EditorLinkForm' => $editor_link,
 							);
 							$this->plugin->alerts->Trigger( $alert_code, $variables );
 						}
+					}
+				} else {
+
+					if ( 'is_active' === $changed_setting || 'is_trash' === $changed_setting || 'date_created' === $changed_setting || 'confirmations' === $changed_setting || 'nextFieldId' === $changed_setting || 'notifications' === $changed_setting ) {
+							continue;
+					}
+
+					// Handle everything else.
+					if ( isset( $this->_old_form[ $changed_setting ] ) ) {
+						$alert_code  = 5703;
+						$editor_link = esc_url(
+							add_query_arg(
+								array(
+									'id' => $form_id,
+								),
+								admin_url( 'admin.php?page=gf_edit_forms' )
+							)
+						);
+
+						if ( is_array( $value ) ) {
+							$value_string = '';
+
+							/*
+							 * Here we create the string which is shwon in in the event output. We habdle all options here,
+							 * some of which are arrays within arrays (or deeper nested), hence the loops.
+							 */
+							foreach ( $value as $value_name => $val ) {
+								if ( is_array( $val ) ) {
+									foreach ( $val as $label => $setting_value ) {
+										if ( is_array( $setting_value ) ) {
+											foreach ( $setting_value as $name => $value ) {
+												if ( is_array( $value ) ) {
+													foreach ( $value as $sub_value_name => $sub_value ) {
+														$value_string .= ucfirst( $sub_value_name ) . ': ' . ucfirst( $sub_value ) . ' | ';
+													}
+												} else {
+													$value_string .= ucfirst( $name ) . ': ' . ucfirst( $value ) . ' | ';
+												}
+											}
+										} else {
+											$value_string .= ucfirst( $label ) . ': ' . ucfirst( $setting_value ) . ' | ';
+										}
+									}
+								} elseif ( ! empty( $val ) ) {
+									$value_string .= ucfirst( $value_name ) . ': ' . ucfirst( $val ) . ' | ';
+								}
+							}
+							// Remove last | from string.
+							$value = substr( $value_string, 0, -2 );
+						}
+						$variables = array(
+							'EventType'      => 'modified',
+							'setting_name'   => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $changed_setting ) ) ) ),
+							'setting_value'  => sanitize_text_field( str_replace( '_', '', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $value ) ) ) ),
+							'form_name'      => sanitize_text_field( $form['title'] ),
+							'form_id'        => $form_id,
+							'EditorLinkForm' => $editor_link,
+						);
+						$this->plugin->alerts->Trigger( $alert_code, $variables );
 					}
 				}
 			}
@@ -934,7 +997,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 	public function event_settings_updated( $option_name, $old_value, $value ) {
 
-		if ( ( strpos( $option_name, 'gform' ) !== false || strpos( $option_name, 'gravityforms' ) !== false ) && ( 'gform_version_info' !== $option_name ) ) {
+		if ( ( strpos( $option_name, 'gform' ) !== false || strpos( $option_name, 'gravityforms' ) !== false ) && ( 'gform_version_info' !== $option_name ) || strpos( $option_name, 'gravityformsaddon' ) !== false ) {
 
 			// Skip settings we dont want.
 			if ( 'rg_gforms_key' === $option_name || 'rg_gforms_message' === $option_name ) {
@@ -987,6 +1050,12 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 			if ( 'gravityformsaddon_gravityformswebapi_settings' === $option_name ) {
 				$option_name = 'Gravity Forms API Settings';
+				$value       = ( 1 == $value['enabled'] ) ? 'On' : 'Off';
+				$old_value   = ( 1 == $old_value['enabled'] ) ? 'On' : 'Off';
+			}
+
+			elseif ( 'rg_gforms_enable_akismet' === $option_name ) {
+				$option_name = 'Enable akisment';
 				$value       = ( 1 == $value['enabled'] ) ? 'On' : 'Off';
 				$old_value   = ( 1 == $old_value['enabled'] ) ? 'On' : 'Off';
 			}
