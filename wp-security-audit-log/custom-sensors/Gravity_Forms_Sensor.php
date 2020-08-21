@@ -1000,7 +1000,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 		if ( ( strpos( $option_name, 'gform' ) !== false || strpos( $option_name, 'gravityforms' ) !== false ) && ( 'gform_version_info' !== $option_name ) || strpos( $option_name, 'gravityformsaddon' ) !== false ) {
 
 			// Skip settings we dont want.
-			if ( 'rg_gforms_key' === $option_name || 'rg_gforms_message' === $option_name ) {
+			if ( 'rg_gforms_key' === $option_name || 'rg_gforms_message' === $option_name || 'gform_sticky_admin_messages' === $option_name ) {
 				return;
 			}
 
