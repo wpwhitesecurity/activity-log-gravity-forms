@@ -299,11 +299,6 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 									$ok_to_alert = false;
 								}
 							}
-							foreach ( $changed_items as $changed => $value ) {
-								if ( $value->id === $item->id ) {
-									unset( $changed_items[ $changed ] );
-								}
-							}
 
 							if ( $ok_to_alert ) {
 								$alert_code  = 5715;
@@ -333,11 +328,6 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 					if ( ! empty( $changed_items ) && ( count( $old_fields ) === count( $current_fields ) ) ) {
 						foreach ( $changed_items as $item ) {
 							$ok_to_alert = true;
-							foreach ( $old_fields as $old => $value ) {
-								if ( $value->id === $item->id && $value->label === $item->label ) {
-									$ok_to_alert = false;
-								}
-							}
 
 							foreach ( $removed_items as $removed => $value ) {
 								if ( $item->id === $value->id ) {
