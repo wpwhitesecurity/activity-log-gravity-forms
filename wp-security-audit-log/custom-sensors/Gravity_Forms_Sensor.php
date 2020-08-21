@@ -35,7 +35,6 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 		// Confirmations
 		add_action( 'gform_pre_confirmation_save', array( $this, 'event_form_confirmation_saved' ), 10, 3 );
 		add_action( 'gform_pre_confirmation_deleted', array( $this, 'event_form_confirmation_deleted' ), 10, 2 );
-
 		// Notifications
 		add_action( 'gform_post_notification_save', array( $this, 'event_form_notification_saved' ), 10, 3 );
 		add_action( 'gform_pre_notification_deleted', array( $this, 'event_form_notification_deleted' ), 10, 2 );
@@ -191,6 +190,49 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 			$changed_data          = array_map( 'unserialize', $compare_changed_items );
 
 			foreach ( $changed_data as $changed_setting => $value ) {
+
+
+				if ( 'confirmations' === $changed_setting ) {
+
+					$old_confirmations = $this->_old_form['confirmations'];
+
+					$compare_changed_items = array_diff_assoc(
+						array_map( 'serialize', $value ),
+						array_map( 'serialize', $old_confirmations )
+					);
+					$changed_items = array_map( 'unserialize', $compare_changed_items );
+
+					$alert_code  = 5708;
+					$editor_link = esc_url(
+						add_query_arg(
+							array(
+								'id' => $form['id'],
+							),
+							admin_url( 'admin.php?page=gf_edit_forms' )
+						)
+					);
+
+					foreach ( $changed_items as $confirmation ) {
+
+						if ( empty( $confirmation['isActive'] ) ) {
+							$active_state = 'deactivated';
+						} else {
+							$active_state = 'activated';
+						}
+
+						$variables = array(
+							'EventType'            => $active_state,
+							'form_name'            => sanitize_text_field( $form['title'] ),
+							'form_id'              => $form['id'],
+							'confirmation_name'    => sanitize_text_field( $confirmation['name'] ),
+							'confirmation_type'    => $confirmation['type'],
+							'confirmation_message' => $confirmation['message'],
+							'EditorLinkForm'       => $editor_link,
+						);
+
+						$this->plugin->alerts->Trigger( $alert_code, $variables );
+					}
+				}
 
 				// Handle form duplicated
 				if ( 'notifications' === $changed_setting ) {
@@ -429,7 +471,8 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 					}
 				} else {
 
-					if ( 'is_active' === $changed_setting || 'is_trash' === $changed_setting || 'date_created' === $changed_setting || 'confirmations' === $changed_setting || 'nextFieldId' === $changed_setting || 'notifications' === $changed_setting ) {
+					// Ensure we dont process fields we dont want at this stage.
+					if ( 'is_active' === $changed_setting || 'is_trash' === $changed_setting || 'date_created' === $changed_setting || 'confirmations' === $changed_setting || 'nextFieldId' === $changed_setting || 'notifications' === $changed_setting || 'fields' === $changed_setting ) {
 							continue;
 					}
 
@@ -476,6 +519,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 							// Remove last | from string.
 							$value = substr( $value_string, 0, -2 );
 						}
+
 						$variables = array(
 							'EventType'      => 'modified',
 							'setting_name'   => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $changed_setting ) ) ) ),

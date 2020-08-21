@@ -59,6 +59,15 @@ $custom_alerts = array(
 			),
 
 			array(
+				5708,
+				WSAL_MEDIUM,
+				__( 'A form confirmation was activated or deactivated', 'wsal-gravity-forms' ),
+				__( 'Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% Confirmation name: %confirmation_name% %LineBreak% %EditorLinkForm%', 'wsal-gravity-forms' ),
+				'gravityforms_confirmations',
+				'created',
+			),
+
+			array(
 				5706,
 				WSAL_LOW,
 				__( 'A form notification was created, modified or deleted', 'wsal-gravity-forms' ),
