@@ -50,6 +50,15 @@ $custom_alerts = array(
 			),
 
 			array(
+				5709,
+				WSAL_LOW,
+				__( 'A form was submitted', 'wsal-gravity-forms' ),
+				__( 'Form name %new_form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EditorLinkForm%', 'wsal-gravity-forms' ),
+				'gravityforms_forms',
+				'duplicated',
+			),
+
+			array(
 				5705,
 				WSAL_MEDIUM,
 				__( 'A form confirmation was created, modified or deleted', 'wsal-gravity-forms' ),

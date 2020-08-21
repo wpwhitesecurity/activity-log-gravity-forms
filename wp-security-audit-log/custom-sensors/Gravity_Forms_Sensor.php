@@ -7,7 +7,6 @@
  * @since   1.0.0
  * @package Wsal
  */
-
 class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 	/**
@@ -25,23 +24,24 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 	public function HookEvents() {
 		add_action( 'gform_form_post_get_meta', array( $this, 'get_before_post_edit_data' ) );
 
-		// Forms
+		// Forms.
 		add_action( 'gform_after_save_form', array( $this, 'event_form_saved' ), 10, 2 );
 		add_action( 'gform_post_form_trashed', array( $this, 'event_form_trashed' ), 10, 1 );
 		add_action( 'gform_before_delete_form', array( $this, 'event_form_deleted' ) );
 		add_action( 'gform_post_form_duplicated', array( $this, 'event_form_duplicated' ), 10, 2 );
 		add_action( 'gform_post_update_form_meta', array( $this, 'event_form_meta_updated' ), 10, 3 );
 
-		// Confirmations
+		// Confirmations.
 		add_action( 'gform_pre_confirmation_save', array( $this, 'event_form_confirmation_saved' ), 10, 3 );
 		add_action( 'gform_pre_confirmation_deleted', array( $this, 'event_form_confirmation_deleted' ), 10, 2 );
-		// Notifications
+
+		// Notifications.
 		add_action( 'gform_post_notification_save', array( $this, 'event_form_notification_saved' ), 10, 3 );
 		add_action( 'gform_pre_notification_deleted', array( $this, 'event_form_notification_deleted' ), 10, 2 );
 		add_action( 'gform_pre_notification_activated', array( $this, 'event_form_notification_activated' ), 10, 2 );
 		add_action( 'gform_pre_notification_deactivated', array( $this, 'event_form_notification_deactivated' ), 10, 2 );
 
-		// Entries
+		// Entries.
 		add_action( 'gform_update_is_starred', array( $this, 'event_form_entry_starred' ), 10, 3 );
 		add_action( 'gform_update_is_read', array( $this, 'event_form_entry_read' ), 10, 3 );
 		add_action( 'gform_delete_entry', array( $this, 'event_form_entry_deleted' ), 10, 1 );
@@ -49,8 +49,11 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 		add_action( 'gform_post_note_added', array( $this, 'event_form_entry_note_added' ), 10, 6 );
 		add_action( 'gform_pre_note_deleted', array( $this, 'event_form_entry_note_deleted' ), 10, 2 );
 
-		// Global Settings
+		// Global Settings.
 		add_action( 'updated_option', array( $this, 'event_settings_updated' ), 10, 3 );
+
+		// Form submitted.
+		add_action( 'gform_after_submission', array( $this, 'event_form_submitted' ), 10, 2 );
 	}
 
 	public function get_before_post_edit_data( $form ) {
@@ -191,7 +194,6 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 			foreach ( $changed_data as $changed_setting => $value ) {
 
-
 				if ( 'confirmations' === $changed_setting ) {
 
 					$old_confirmations = $this->_old_form['confirmations'];
@@ -200,7 +202,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 						array_map( 'serialize', $value ),
 						array_map( 'serialize', $old_confirmations )
 					);
-					$changed_items = array_map( 'unserialize', $compare_changed_items );
+					$changed_items         = array_map( 'unserialize', $compare_changed_items );
 
 					$alert_code  = 5708;
 					$editor_link = esc_url(
@@ -261,7 +263,6 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 						if ( isset( $_REQUEST['action'] ) && 'duplicate' === $_REQUEST['action'] ) {
 							$this->plugin->alerts->Trigger( $alert_code, $variables );
 						}
-
 					}
 				}
 
@@ -409,7 +410,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 						)
 					);
 
-					if ( isset( $this->_old_form[ $changed_setting ]  ) ) {
+					if ( isset( $this->_old_form[ $changed_setting ] ) ) {
 						$old_fields = $this->_old_form[ $changed_setting ];
 					} else {
 						$old_fields = array();
@@ -422,7 +423,6 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 					$changed_items         = array_map( 'unserialize', $compare_changed_items );
 
 					foreach ( $changed_items as $name => $value ) {
-
 
 						if ( 'preventIP' === $name ) {
 							$name = 'Prevent the storage of IP addresses';
@@ -949,7 +949,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 	}
 
 	public function event_form_entry_note_added( $insert_id, $entry_id, $user_id, $user_name, $note, $note_type ) {
-		
+
 		if ( 'user' === $note_type ) {
 			$entry = GFAPI::get_entry( $entry_id );
 			$form  = GFAPI::get_form( $entry['form_id'] );
@@ -989,8 +989,13 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 		}
 	}
 
+	/**
+	 * Handle entry notes being deleted.
+	 *
+	 * @param int $note_id - Note ID.
+	 * @param int $lead_id - Lead ID.
+	 */
 	public function event_form_entry_note_deleted( $note_id, $lead_id ) {
-
 		$entry = GFAPI::get_entry( $lead_id );
 		$form  = GFAPI::get_form( $entry['form_id'] );
 		$note  = GFAPI::get_note( $note_id );
@@ -1003,7 +1008,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 		} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
 			$entry_name = rgar( $entry, '3' );
 		} else {
-			$entry_name = 'Not found';
+			$entry_name = esc_html__( 'Not found', 'wsal-gravity-forms' );
 		}
 
 		$editor_link = esc_url(
@@ -1030,8 +1035,14 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 	}
 
+	/**
+	 * Handle global settings changes.
+	 *
+	 * @param string $option_name - Option being changed.
+	 * @param string $old_value   - Old value.
+	 * @param string $value       - New value.
+	 */
 	public function event_settings_updated( $option_name, $old_value, $value ) {
-
 		if ( ( strpos( $option_name, 'gform' ) !== false || strpos( $option_name, 'gravityforms' ) !== false ) && ( 'gform_version_info' !== $option_name ) || strpos( $option_name, 'gravityformsaddon' ) !== false ) {
 
 			// Skip settings we dont want.
@@ -1087,9 +1098,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 				$option_name = 'Gravity Forms API Settings';
 				$value       = ( 1 == $value['enabled'] ) ? 'On' : 'Off';
 				$old_value   = ( 1 == $old_value['enabled'] ) ? 'On' : 'Off';
-			}
-
-			elseif ( 'rg_gforms_enable_akismet' === $option_name ) {
+			} elseif ( 'rg_gforms_enable_akismet' === $option_name ) {
 				$option_name = 'Enable akisment';
 				$value       = ( 1 == $value['enabled'] ) ? 'On' : 'Off';
 				$old_value   = ( 1 == $old_value['enabled'] ) ? 'On' : 'Off';
@@ -1104,6 +1113,48 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 			);
 			$this->plugin->alerts->Trigger( $alert_code, $variables );
 		}
+	}
+
+	/**
+	 * Handle form submission.
+	 *
+	 * @param string $option_name - Option being changed.
+	 * @param string $old_value   - Old value.
+	 * @param string $value       - New value.
+	 */
+	public function event_form_submitted( $entry, $form ) {
+
+		// Determine from address by validating entry items.
+		$from_addresss = '';
+		foreach ( $entry as $entry => $item ) {
+			if ( filter_var( $item, FILTER_VALIDATE_EMAIL ) ) {
+				$from_addresss = $item;
+			}
+		}
+
+		if ( empty( $from_addresss ) ) {
+			$from_addresss = esc_html__( 'Not provided', 'wsal-gravity-forms' );
+		}
+
+		$editor_link = esc_url(
+			add_query_arg(
+				array(
+					'view' => 'entry',
+					'id'   => $entry['id'],
+				),
+				admin_url( 'admin.php?page=gf_entries' )
+			)
+		);
+
+		$alert_code = 5709;
+		$variables  = array(
+			'EventType'   => 'submitted',
+			'form_name'   => $form['title'],
+			'form_id'     => $form['id'],
+			'email'       => $from_addresss,
+			'EntryLink'   => $editor_link,
+		);
+		$this->plugin->alerts->Trigger( $alert_code, $variables );
 	}
 
 	/**
