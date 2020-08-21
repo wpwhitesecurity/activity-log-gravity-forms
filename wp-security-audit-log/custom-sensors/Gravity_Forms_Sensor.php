@@ -949,43 +949,44 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 	}
 
 	public function event_form_entry_note_added( $insert_id, $entry_id, $user_id, $user_name, $note, $note_type ) {
+		
+		if ( 'user' === $note_type ) {
+			$entry = GFAPI::get_entry( $entry_id );
+			$form  = GFAPI::get_form( $entry['form_id'] );
 
-		$entry = GFAPI::get_entry( $entry_id );
-		$form  = GFAPI::get_form( $entry['form_id'] );
+			// Get the 1st field with a value so we can use it as the name.
+			if ( ! empty( rgar( $entry, '1' ) ) ) {
+				$entry_name = rgar( $entry, '1' );
+			} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
+				$entry_name = rgar( $entry, '2' );
+			} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
+				$entry_name = rgar( $entry, '3' );
+			} else {
+				$entry_name = 'Not found';
+			}
 
-		// Get the 1st field with a value so we can use it as the name.
-		if ( ! empty( rgar( $entry, '1' ) ) ) {
-			$entry_name = rgar( $entry, '1' );
-		} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
-			$entry_name = rgar( $entry, '2' );
-		} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
-			$entry_name = rgar( $entry, '3' );
-		} else {
-			$entry_name = 'Not found';
+			$editor_link = esc_url(
+				add_query_arg(
+					array(
+						'view' => 'entry',
+						'id'   => $entry['form_id'],
+						'lid'  => $entry_id,
+					),
+					admin_url( 'admin.php?page=gf_entries' )
+				)
+			);
+
+			$alert_code = 5714;
+			$variables  = array(
+				'EventType'   => 'added',
+				'entry_note'  => $note,
+				'entry_title' => $entry_name,
+				'form_name'   => $form['title'],
+				'form_id'     => $form['id'],
+				'EntryLink'   => $editor_link,
+			);
+			$this->plugin->alerts->Trigger( $alert_code, $variables );
 		}
-
-		$editor_link = esc_url(
-			add_query_arg(
-				array(
-					'view' => 'entry',
-					'id'   => $entry['form_id'],
-					'lid'  => $entry_id,
-				),
-				admin_url( 'admin.php?page=gf_entries' )
-			)
-		);
-
-		$alert_code = 5714;
-		$variables  = array(
-			'EventType'   => 'added',
-			'entry_note'  => $note,
-			'entry_title' => $entry_name,
-			'form_name'   => $form['title'],
-			'form_id'     => $form['id'],
-			'EntryLink'   => $editor_link,
-		);
-		$this->plugin->alerts->Trigger( $alert_code, $variables );
-
 	}
 
 	public function event_form_entry_note_deleted( $note_id, $lead_id ) {
@@ -1034,7 +1035,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 		if ( ( strpos( $option_name, 'gform' ) !== false || strpos( $option_name, 'gravityforms' ) !== false ) && ( 'gform_version_info' !== $option_name ) || strpos( $option_name, 'gravityformsaddon' ) !== false ) {
 
 			// Skip settings we dont want.
-			if ( 'rg_gforms_key' === $option_name || 'rg_gforms_message' === $option_name || 'gform_sticky_admin_messages' === $option_name ) {
+			if ( 'rg_gforms_key' === $option_name || 'rg_gforms_message' === $option_name || 'gform_sticky_admin_messages' === $option_name || 'gform_email_count' === $option_name ) {
 				return;
 			}
 
