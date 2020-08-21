@@ -1126,7 +1126,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 		// Determine from address by validating entry items.
 		$from_addresss = '';
-		foreach ( $entry as $entry => $item ) {
+		foreach ( $entry as $entry_item => $item ) {
 			if ( filter_var( $item, FILTER_VALIDATE_EMAIL ) ) {
 				$from_addresss = $item;
 			}
@@ -1140,7 +1140,8 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 			add_query_arg(
 				array(
 					'view' => 'entry',
-					'id'   => $entry['id'],
+					'id'   => $form['id'],
+					'lid'  => $entry['id'],
 				),
 				admin_url( 'admin.php?page=gf_entries' )
 			)

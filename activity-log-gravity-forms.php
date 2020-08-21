@@ -119,6 +119,7 @@ function wsal_extension_core_add_custom_ignored_cpt( $post_types ) {
 		'unstarred' => __( 'Unstarred', 'wsal-gravity-forms' ),
 		'read'      => __( 'Read', 'wsal-gravity-forms' ),
 		'unread'    => __( 'Unread', 'wsal-gravity-forms' ),
+		'submitted' => __( 'Submitted', 'wsal-gravity-forms' ),
  	);
 
  	// combine the two arrays.
@@ -134,3 +135,8 @@ add_filter( 'wsal_event_objects', 'wsal_extension_core_add_custom_event_objects'
 add_filter( 'wsal_event_type_data', 'wsal_extension_core_add_custom_event_type', 10, 2 );
 add_filter( 'wsal_link_filter', 'wsal_extension_core_add_custom_meta_format', 10, 2 );
 add_filter( 'wsal_meta_formatter_custom_formatter', 'wsal_extension_core_add_custom_meta_format', 10, 2 );
+
+/*
+	Ensure custom events are always avaiable.
+ */
+add_filter( 'wsal_custom_alerts_dirs', array( $wsal_extension, 'add_custom_events_path' ) );

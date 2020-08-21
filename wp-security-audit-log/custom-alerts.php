@@ -53,7 +53,7 @@ $custom_alerts = array(
 				5709,
 				WSAL_LOW,
 				__( 'A form was submitted', 'wsal-gravity-forms' ),
-				__( 'Form name %new_form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EditorLinkForm%', 'wsal-gravity-forms' ),
+				__( 'Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% Submission email: %email% %LineBreak% %EntryLink%', 'wsal-gravity-forms' ),
 				'gravityforms_forms',
 				'duplicated',
 			),
