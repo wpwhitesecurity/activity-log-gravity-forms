@@ -216,23 +216,25 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 					foreach ( $changed_items as $confirmation ) {
 
-						if ( empty( $confirmation['isActive'] ) ) {
-							$active_state = 'deactivated';
-						} else {
-							$active_state = 'activated';
+						if ( ! $this->was_triggered_recently( 5705 ) ) {
+							if ( empty( $confirmation['isActive'] ) ) {
+								$active_state = 'deactivated';
+							} else {
+								$active_state = 'activated';
+							}
+
+							$variables = array(
+								'EventType'            => $active_state,
+								'form_name'            => sanitize_text_field( $form['title'] ),
+								'form_id'              => $form['id'],
+								'confirmation_name'    => sanitize_text_field( $confirmation['name'] ),
+								'confirmation_type'    => $confirmation['type'],
+								'confirmation_message' => $confirmation['message'],
+								'EditorLinkForm'       => $editor_link,
+							);
+
+							$this->plugin->alerts->TriggerIf( $alert_code, $variables, array( $this, 'check_if_new_confirmation' ) );
 						}
-
-						$variables = array(
-							'EventType'            => $active_state,
-							'form_name'            => sanitize_text_field( $form['title'] ),
-							'form_id'              => $form['id'],
-							'confirmation_name'    => sanitize_text_field( $confirmation['name'] ),
-							'confirmation_type'    => $confirmation['type'],
-							'confirmation_message' => $confirmation['message'],
-							'EditorLinkForm'       => $editor_link,
-						);
-
-						$this->plugin->alerts->Trigger( $alert_code, $variables );
 					}
 				}
 
@@ -527,11 +529,21 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 	}
 
 	public function must_not_duplicated_form( WSAL_AlertManager $manager ) {
-		if ( $manager->WillOrHasTriggered( 5704) ) {
+		if ( $manager->WillOrHasTriggered( 5704 ) ) {
+			return false;
+		}
+		if ( $manager->WillOrHasTriggered( 5705 ) ) {
 			return false;
 		}
 		return true;
 	}
+
+	public function check_if_new_confirmation( WSAL_AlertManager $manager ) {
+	if ( $manager->WillOrHasTriggered( 5705 ) ) {
+		return false;
+	}
+	return true;
+}
 
 	public function event_form_confirmation_saved( $confirmation, $form ) {
 
