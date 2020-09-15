@@ -174,7 +174,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 			'original_form_name' => sanitize_text_field( $original_form['title'] ),
 			'new_form_name'      => sanitize_text_field( $new_form['title'] ),
 			'original_form_id'   => sanitize_text_field( $original_form['id'] ),
-			'new_form_id'        => sanitize_text_field( $new_form['title'] ),
+			'new_form_id'        => sanitize_text_field( $new_form['id'] ),
 			'EditorLinkForm'     => $editor_link,
 		);
 
