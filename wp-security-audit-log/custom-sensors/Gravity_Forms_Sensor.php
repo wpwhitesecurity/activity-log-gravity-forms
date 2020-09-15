@@ -184,7 +184,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 	public function event_form_meta_updated( $form_meta, $form_id, $meta_name ) {
 
 		if ( isset( $this->_old_form ) ) {
-			$form = GFAPI::get_form( $form_id );
+			$form = (array) GFAPI::get_form( $form_id );
 			// Compare the 2 arrays and create array of changed.
 			$compare_changed_items = array_diff_assoc(
 				array_map( 'serialize', $form ),
@@ -321,7 +321,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 									'EditorLinkForm' => $editor_link,
 								);
 
-								$this->plugin->alerts->Trigger( $alert_code, $variables );
+								$this->plugin->alerts->TriggerIf( $alert_code, $variables, array( $this, 'must_not_duplicated_form' ) );
 							}
 						}
 					}
@@ -356,7 +356,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 									'EditorLinkForm' => $editor_link,
 								);
 
-								$this->plugin->alerts->Trigger( $alert_code, $variables );
+								$this->plugin->alerts->TriggerIf( $alert_code, $variables, array( $this, 'must_not_duplicated_form' ) );
 							}
 						}
 					}
@@ -518,12 +518,19 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 							'form_id'        => $form_id,
 							'EditorLinkForm' => $editor_link,
 						);
-						$this->plugin->alerts->Trigger( $alert_code, $variables );
+						$this->plugin->alerts->TriggerIf( $alert_code, $variables, array( $this, 'must_not_duplicated_form' ) );
 					}
 				}
 			}
 		}
 
+	}
+
+	public function must_not_duplicated_form( WSAL_AlertManager $manager ) {
+		if ( $manager->WillOrHasTriggered( 5704) ) {
+			return false;
+		}
+		return true;
 	}
 
 	public function event_form_confirmation_saved( $confirmation, $form ) {
@@ -1046,7 +1053,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 		if ( ( strpos( $option_name, 'gform' ) !== false || strpos( $option_name, 'gravityforms' ) !== false ) && ( 'gform_version_info' !== $option_name ) || strpos( $option_name, 'gravityformsaddon' ) !== false ) {
 
 			// Skip settings we dont want.
-			if ( 'rg_gforms_key' === $option_name || 'rg_gforms_message' === $option_name || 'gform_sticky_admin_messages' === $option_name || 'gform_email_count' === $option_name ) {
+			if ( 'rg_gforms_key' === $option_name || 'rg_gforms_message' === $option_name || 'gform_sticky_admin_messages' === $option_name || 'gform_email_count' === $option_name || 'gform_installation_wizard_license_key' === $option_name || 'gform_pending_installation' === $option_name ) {
 				return;
 			}
 
