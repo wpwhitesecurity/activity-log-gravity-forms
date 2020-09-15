@@ -32,11 +32,15 @@
 */
 
 /*
-	REQUIRED. Here we include and fire up the main core class. This will be needed regardless so be sure to leave line 37-39 in tact.
+ REQUIRED. Here we include and fire up the main core class. This will be needed regardless so be sure to leave line 37-39 in tact.
 */
 require_once plugin_dir_path( __FILE__ ) . 'core/class-extension-core.php';
-$plugin_text_domain =  'wsal-gravity-forms';
-$wsal_extension = new \WPWhiteSecurity\ActivityLog\Extensions\Common\Core( $plugin_text_domain );
+$core_settings = array(
+	'text_domain'      => 'wsal-gravityforms',
+	'custom_alert_path' => trailingslashit( dirname( __FILE__ ) ) . 'wp-security-audit-log',
+	'custom_sensor_path' => trailingslashit( trailingslashit( dirname( __FILE__ ) ) . 'wp-security-audit-log' . DIRECTORY_SEPARATOR . 'custom-sensors' ),
+);
+$wsal_extension = new WPWhiteSecurity\ActivityLog\Extensions\Common\Core( $core_settings );
 
 /*
 	From here, you may now place your custom code. Examples of the functions
@@ -52,7 +56,7 @@ $wsal_extension = new \WPWhiteSecurity\ActivityLog\Extensions\Common\Core( $plug
  *
  * @param array $objects array of objects current registered within WSAL.
  */
-function wsal_extension_core_add_custom_event_objects( $objects ) {
+function wsal_gravityforms_add_custom_event_objects( $objects ) {
 	$new_objects = array(
 		'gravityforms_forms'         => esc_html__( 'Forms in Gravity Forms', 'wsal-gravity-forms' ),
 		'gravityforms_confirmations' => esc_html__( 'Confirmations in Gravity Forms', 'wsal-gravity-forms' ),
@@ -68,25 +72,6 @@ function wsal_extension_core_add_custom_event_objects( $objects ) {
 }
 
 /**
- * Add a custom post type to the ignored list.
- * If your plugin uses a CPT, you may wish to ensure WSAL does not treat
- * the post as a regular post (reporting updates, creation etc). Use your
- * CPTs slug to add it to the list of "igored post types".
- *
- * @param array $post_types Current list of post types to ignore.
- */
-function wsal_extension_core_add_custom_ignored_cpt( $post_types ) {
-	// $new_post_types = array(
-	// 	'my_cpt_slug',    // Your custom post types slug.
-	// );
-	//
-	// // combine the two arrays.
-	// $post_types = array_merge( $post_types, $new_post_types );
-	//
-	// return $post_types;
-}
-
-/**
  * Add our own meta formatter. If you wish to create your own custom variable to be
  * used within your custom event message etc, you can register the variable here as well
  * as specify how to handle it.
@@ -94,7 +79,7 @@ function wsal_extension_core_add_custom_ignored_cpt( $post_types ) {
  * @param string $value Value of variable.
  * @param string $name  Variable name we wish to change.
  */
- function wsal_extension_core_add_custom_meta_format( $value, $name ) {
+ function wsal_gravityforms_add_custom_meta_format( $value, $name ) {
  	$check_value = (string) $value;
 	if ( '%EditorLinkForm%' === $name ) {
  		if ( 'NULL' !== $check_value ) {
@@ -113,7 +98,7 @@ function wsal_extension_core_add_custom_ignored_cpt( $post_types ) {
  	return $value;
  }
 
- function wsal_extension_core_add_custom_event_type( $types ) {
+ function wsal_gravityforms_add_custom_event_type( $types ) {
  	$new_types = array(
 		'starred'   => __( 'Starred', 'wsal-gravity-forms' ),
 		'unstarred' => __( 'Unstarred', 'wsal-gravity-forms' ),
@@ -128,13 +113,71 @@ function wsal_extension_core_add_custom_ignored_cpt( $post_types ) {
  	return $types;
  }
 
+ /**
+ * Add specific events so we can use them for category titles.
+ */
+function wsal_gravityforms_extension_togglealerts_sub_category_events( $sub_category_events ) {
+	$new_events          = array( 5700, 5705, 5706, 5710 );
+	$sub_category_events = array_merge( $sub_category_events, $new_events );
+	return $sub_category_events;
+}
+
+/**
+ * Add sub cateogry titles to ToggleView page in WSAL.
+ */
+function wsal_gravityforms_extension_togglealerts_sub_category_titles( $alert_id ) {
+	$title = '';
+	if ( 5700 === $alert_id ) {
+		$title = esc_html_e( 'Forms', 'wp-security-audit-log' );
+	}
+	if ( 5705 === $alert_id ) {
+		$title = esc_html_e( 'Form confirmations', 'wp-security-audit-log' );
+	}
+	if ( 5706 === $alert_id ) {
+		$title = esc_html_e( 'Form notifications', 'wp-security-audit-log' );
+	}
+	if ( 5710 === $alert_id ) {
+		$title = esc_html_e( 'Entries', 'wp-security-audit-log' );
+	}
+	return $title;
+}
+
+/**
+ * If a user is running an older version of WSAL, they will see a "duplicate event" error.
+ * This function checks and runs a filter to replace that notice. Its done via JS as we cant
+ * currently give this notice a neat ID/class.
+ */
+function wsal_gravityforms_extension_replace_duplicate_event_notice() {
+	$wsal_version = get_site_option( 'wsal_version' );
+	if ( version_compare( $wsal_version, '4.1.3.2', '<=' ) ) {
+		add_action( 'admin_footer', 'wsal_gravityforms_extension_replacement_duplicate_event_notice' );
+	}
+}
+
+/**
+ * Replacement "duplicate event" notice text.
+ */
+function wsal_gravityforms_extension_replacement_duplicate_event_notice() {
+	$replacement_text = __( 'You are running an old version of WP Activity Log. Please update the plugin to run it alongside this extension: GravityForms', 'wp-security-audit-log' );
+	?>
+	<script type="text/javascript">
+		if ( jQuery( '.notice.notice-error span[style="color:#dc3232; font-weight:bold;"]' ).length ) {
+			jQuery( '.notice.notice-error span[style="color:#dc3232; font-weight:bold;"]' ).parent().text( '<?php echo esc_html( $replacement_text ); ?>' );
+		}
+	</script>
+<?php
+}
+
 /*
 	Filter in our custom functions into WSAL.
  */
-add_filter( 'wsal_event_objects', 'wsal_extension_core_add_custom_event_objects', 10, 2 );
-add_filter( 'wsal_event_type_data', 'wsal_extension_core_add_custom_event_type', 10, 2 );
-add_filter( 'wsal_link_filter', 'wsal_extension_core_add_custom_meta_format', 10, 2 );
-add_filter( 'wsal_meta_formatter_custom_formatter', 'wsal_extension_core_add_custom_meta_format', 10, 2 );
+add_filter( 'wsal_event_objects', 'wsal_gravityforms_add_custom_event_objects', 10, 2 );
+add_filter( 'wsal_event_type_data', 'wsal_gravityforms_add_custom_event_type', 10, 2 );
+add_filter( 'wsal_link_filter', 'wsal_gravityforms_add_custom_meta_format', 10, 2 );
+add_filter( 'wsal_meta_formatter_custom_formatter', 'wsal_gravityforms_add_custom_meta_format', 10, 2 );
+add_filter( 'wsal_togglealerts_sub_category_events', 'wsal_gravityforms_extension_togglealerts_sub_category_events' );
+add_filter( 'wsal_togglealerts_sub_category_titles', 'wsal_gravityforms_extension_togglealerts_sub_category_titles' );
+add_filter( 'admin_init', 'wsal_gravityforms_extension_replace_duplicate_event_notice' );
 
 /*
 	Ensure custom events are always avaiable.
