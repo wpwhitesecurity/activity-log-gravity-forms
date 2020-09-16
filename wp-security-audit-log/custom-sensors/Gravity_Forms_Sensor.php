@@ -480,45 +480,46 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 							)
 						);
 
-						if ( is_array( $value ) ) {
-							$value_string = '';
+						$old_value = $this->_old_form[ $changed_setting ];
 
-							/*
-							 * Here we create the string which is shwon in in the event output. We habdle all options here,
-							 * some of which are arrays within arrays (or deeper nested), hence the loops.
-							 */
-							foreach ( $value as $value_name => $val ) {
-								if ( is_array( $val ) ) {
-									foreach ( $val as $label => $setting_value ) {
-										if ( is_array( $setting_value ) ) {
-											foreach ( $setting_value as $name => $value ) {
-												if ( is_array( $value ) ) {
-													foreach ( $value as $sub_value_name => $sub_value ) {
-														$value_string .= ucfirst( $sub_value_name ) . ': ' . ucfirst( $sub_value ) . ' | ';
-													}
-												} else {
-													$value_string .= ucfirst( $name ) . ': ' . ucfirst( $value ) . ' | ';
-												}
-											}
-										} else {
-											$value_string .= ucfirst( $label ) . ': ' . ucfirst( $setting_value ) . ' | ';
-										}
-									}
-								} elseif ( ! empty( $val ) ) {
-									$value_string .= ucfirst( $value_name ) . ': ' . ucfirst( $val ) . ' | ';
-								}
-							}
-							// Remove last | from string.
-							$value = substr( $value_string, 0, -2 );
+						if ( is_array( $value ) ) {
+							$value = $this->recursive_implode( $value, ' | ', true, false );
+						}
+
+						if ( is_array( $old_value ) ) {
+							$old_value = $this->recursive_implode( $old_value, ' | ', true, false );
+						}
+
+						if ( ! $old_value && 1 == $value || 1 == $old_value && ! $value ) {
+							$old_value = __( 'Disabled', 'wsal-gravityforms' );
+							$value     = __( 'Enabled', 'wsal-gravityforms' );
+						}
+
+						switch ( $changed_setting ) {
+							case 'title':
+								$setting_name = __( 'Form title', 'wsal-gravityforms' );
+								break;
+
+							case 'cssClass':
+								$setting_name = __( 'CSS Class', 'wsal-gravityforms' );
+								break;
+
+							case 'description':
+								$setting_name = __( 'Form title', 'wsal-gravityforms' );
+								break;
+
+							default:
+								$setting_name = sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $changed_setting ) ) ) );
 						}
 
 						$variables = array(
-							'EventType'      => 'modified',
-							'setting_name'   => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $changed_setting ) ) ) ),
-							'setting_value'  => sanitize_text_field( str_replace( '_', '', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $value ) ) ) ),
-							'form_name'      => sanitize_text_field( $form['title'] ),
-							'form_id'        => $form_id,
-							'EditorLinkForm' => $editor_link,
+							'EventType'         => 'modified',
+							'setting_name'      => $setting_name,
+							'old_setting_value' => $old_value,
+							'setting_value'     => $value,
+							'form_name'         => sanitize_text_field( $form['title'] ),
+							'form_id'           => $form_id,
+							'EditorLinkForm'    => $editor_link,
 						);
 						$this->plugin->alerts->TriggerIf( $alert_code, $variables, array( $this, 'must_not_duplicated_form' ) );
 					}
@@ -539,11 +540,11 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 	}
 
 	public function check_if_new_confirmation( WSAL_AlertManager $manager ) {
-	if ( $manager->WillOrHasTriggered( 5705 ) ) {
-		return false;
+		if ( $manager->WillOrHasTriggered( 5705 ) ) {
+			return false;
+		}
+		return true;
 	}
-	return true;
-}
 
 	public function event_form_confirmation_saved( $confirmation, $form ) {
 
@@ -1171,11 +1172,11 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 		$alert_code = 5709;
 		$variables  = array(
-			'EventType'   => 'submitted',
-			'form_name'   => $form['title'],
-			'form_id'     => $form['id'],
-			'email'       => $from_addresss,
-			'EntryLink'   => $editor_link,
+			'EventType' => 'submitted',
+			'form_name' => $form['title'],
+			'form_id'   => $form['id'],
+			'email'     => $from_addresss,
+			'EntryLink' => $editor_link,
 		);
 		$this->plugin->alerts->Trigger( $alert_code, $variables );
 	}
@@ -1213,5 +1214,40 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 		// once we know the answer to this don't check again to avoid queries.
 		$this->cached_alert_checks[ $alert_id ] = $known_to_trigger;
 		return $known_to_trigger;
+	}
+
+	/**
+	 * Recursively implodes an array with optional key inclusion
+	 *
+	 * Example of $include_keys output: key, value, key, value, key, value
+	 *
+	 * @access  public
+	 * @param   array $array         multi-dimensional array to recursively implode
+	 * @param   bool  $include_keys  include keys before their values
+	 * @param   bool  $trim_all      trim ALL whitespace from string
+	 * @return  string  imploded array
+	 */
+	function recursive_implode( array $array, $glue = ',', $include_keys = false, $trim_all = true ) {
+		$glued_string = '';
+
+		// Recursively iterates array and adds key/value to glued string
+		array_walk_recursive(
+			$array,
+			function( $value, $key ) use ( $glue, $include_keys, &$glued_string ) {
+				if ( $value ) {
+					$tidy_key                        = str_replace( ',', '', str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $key ) ) ) ) . ': ';
+					$include_keys and $glued_string .= $tidy_key;
+					$glued_string                   .= $value . $glue;
+				}
+			}
+		);
+
+		// Removes last $glue from string
+		strlen( $glue ) > 0 and $glued_string = substr( $glued_string, 0, -strlen( $glue ) );
+
+		// Trim ALL whitespace
+		$trim_all and $glued_string = preg_replace( '/(\s)/ixsm', '', $glued_string );
+
+		return (string) $glued_string;
 	}
 }

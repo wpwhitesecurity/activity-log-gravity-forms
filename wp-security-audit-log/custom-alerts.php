@@ -35,7 +35,7 @@ $custom_alerts = array(
 				5703,
 				WSAL_MEDIUM,
 				__( 'A form setting was enabled, modified or disabled', 'wsal-gravity-forms' ),
-				__( 'Setting name %setting_name% %LineBreak% Setting value %setting_value% %LineBreak% Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EditorLinkForm%', 'wsal-gravity-forms' ),
+				__( 'Setting name %setting_name% %LineBreak% Old value %old_setting_value% %LineBreak% New value %setting_value% %LineBreak% Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EditorLinkForm%', 'wsal-gravity-forms' ),
 				'gravityforms_forms',
 				'modified',
 			),
