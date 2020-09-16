@@ -1118,9 +1118,12 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 				$value       = ( 1 == $value['enabled'] ) ? 'On' : 'Off';
 				$old_value   = ( 1 == $old_value['enabled'] ) ? 'On' : 'Off';
 			} elseif ( 'rg_gforms_enable_akismet' === $option_name ) {
+				if ( ! isset( $old_value['enabled'] ) ) {
+					return;
+				}
 				$option_name = 'Enable akisment';
-				$value       = ( 1 == $value['enabled'] ) ? 'On' : 'Off';
-				$old_value   = ( 1 == $old_value['enabled'] ) ? 'On' : 'Off';
+				$value       = ( isset( $value['enabled'] ) && 1 == $alue['enabled'] ) ? 'On' : 'Off';
+				$old_value   = ( isset( $old_value['enabled'] ) && 1 == $old_value['enabled'] ) ? 'On' : 'Off';
 			}
 
 			$alert_code = 5716;
