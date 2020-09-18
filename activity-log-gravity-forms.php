@@ -63,6 +63,7 @@ function wsal_gravityforms_add_custom_event_objects( $objects ) {
 		'gravityforms_notifications' => esc_html__( 'Notifications in Gravity Forms', 'wsal-gravity-forms' ),
 		'gravityforms_entries'       => esc_html__( 'Notifications in Gravity Forms', 'wsal-gravity-forms' ),
 		'gravityforms_fields'        => esc_html__( 'Fields in Gravity Forms', 'wsal-gravity-forms' ),
+		'gravityforms_settings'      => esc_html__( 'Settings in Gravity Forms', 'wsal-gravity-forms' ),
 	);
 
 	// combine the two arrays.
@@ -117,7 +118,7 @@ function wsal_gravityforms_add_custom_event_objects( $objects ) {
  * Add specific events so we can use them for category titles.
  */
 function wsal_gravityforms_extension_togglealerts_sub_category_events( $sub_category_events ) {
-	$new_events          = array( 5700, 5705, 5706, 5710 );
+	$new_events          = array( 5700, 5705, 5706, 5710, 5716 );
 	$sub_category_events = array_merge( $sub_category_events, $new_events );
 	return $sub_category_events;
 }
@@ -138,6 +139,9 @@ function wsal_gravityforms_extension_togglealerts_sub_category_titles( $alert_id
 	}
 	if ( 5710 === $alert_id ) {
 		$title = esc_html_e( 'Entries', 'wp-security-audit-log' );
+	}
+	if ( 5716 === $alert_id ) {
+		$title = esc_html_e( 'Settings', 'wp-security-audit-log' );
 	}
 	return $title;
 }
