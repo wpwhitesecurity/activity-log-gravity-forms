@@ -98,7 +98,7 @@ $custom_alerts = array(
 				5707,
 				WSAL_MEDIUM,
 				__( 'A form notification was activated or deactivated', 'wsal-gravity-forms' ),
-				__( 'Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% Notification name: %notification_name% %LineBreak% %EditorLinkForm%', 'wsal-gravity-forms' ),
+				__( 'Notification name: %notification_name% %LineBreak% Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EditorLinkForm%', 'wsal-gravity-forms' ),
 				'gravityforms_notifications',
 				'activated',
 			),
