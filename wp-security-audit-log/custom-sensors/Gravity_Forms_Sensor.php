@@ -1101,20 +1101,25 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 				return;
 			}
 
+			$event_type = 'modified';
+
 			if ( 'rg_gforms_disable_css' === $option_name ) {
 				$option_name = 'Output CSS';
+				$event_type  = ( 1 == $value['enabled'] ) ? 'enabled' : 'disabled';
 				$value       = ( 1 == $value ) ? 'No' : 'Yes';
 				$old_value   = ( 1 == $old_value ) ? 'No' : 'Yes';
 			}
 
 			if ( 'rg_gforms_enable_html5' === $option_name ) {
 				$option_name = 'Output HTML5';
+				$event_type  = ( 1 == $value['enabled'] ) ? 'enabled' : 'disabled';
 				$value       = ( 1 == $value ) ? 'Yes' : 'No';
 				$old_value   = ( 1 == $old_value ) ? 'Yes' : 'No';
 			}
 
 			if ( 'gform_enable_noconflict' === $option_name ) {
 				$option_name = 'No-Conflict Mode';
+				$event_type  = ( 1 == $value['enabled'] ) ? 'enabled' : 'disabled';
 				$value       = ( 1 == $value ) ? 'On' : 'Off';
 				$old_value   = ( 1 == $old_value ) ? 'On' : 'Off';
 			}
@@ -1125,18 +1130,21 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 			if ( 'gform_enable_background_updates' === $option_name ) {
 				$option_name = 'Background updates';
+				$event_type  = ( 1 == $value['enabled'] ) ? 'enabled' : 'disabled';
 				$value       = ( 1 == $value ) ? 'On' : 'Off';
 				$old_value   = ( 1 == $old_value ) ? 'On' : 'Off';
 			}
 
 			if ( 'gform_enable_toolbar_menu' === $option_name ) {
 				$option_name = 'Toolbar menu';
+				$event_type  = ( 1 == $value['enabled'] ) ? 'enabled' : 'disabled';
 				$value       = ( 1 == $value ) ? 'On' : 'Off';
 				$old_value   = ( 1 == $old_value ) ? 'On' : 'Off';
 			}
 
 			if ( 'gform_enable_logging' === $option_name ) {
 				$option_name = 'Logging';
+				$event_type  = ( 1 == $value['enabled'] ) ? 'enabled' : 'disabled';
 				$value       = ( 1 == $value ) ? 'On' : 'Off';
 				$old_value   = ( 1 == $old_value ) ? 'On' : 'Off';
 			}
@@ -1147,20 +1155,24 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 			if ( 'gravityformsaddon_gravityformswebapi_settings' === $option_name ) {
 				$option_name = 'Gravity Forms API Settings';
+				$event_type  = ( 1 == $value['enabled'] ) ? 'enabled' : 'disabled';
 				$value       = ( 1 == $value['enabled'] ) ? 'On' : 'Off';
 				$old_value   = ( 1 == $old_value['enabled'] ) ? 'On' : 'Off';
-			} elseif ( 'rg_gforms_enable_akismet' === $option_name ) {
+			}
+
+			if ( 'rg_gforms_enable_akismet' === $option_name ) {
 				if ( ! isset( $old_value['enabled'] ) ) {
 					return;
 				}
 				$option_name = 'Enable akisment';
-				$value       = ( isset( $value['enabled'] ) && 1 == $alue['enabled'] ) ? 'On' : 'Off';
+				$event_type  = ( 1 == $value['enabled'] ) ? 'enabled' : 'disabled';
+				$value       = ( isset( $value['enabled'] ) && 1 == $value['enabled'] ) ? 'On' : 'Off';
 				$old_value   = ( isset( $old_value['enabled'] ) && 1 == $old_value['enabled'] ) ? 'On' : 'Off';
 			}
 
 			$alert_code = 5716;
 			$variables  = array(
-				'EventType'    => 'modified',
+				'EventType'    => $event_type,
 				'setting_name' => $option_name,
 				'old_value'    => $old_value,
 				'new_value'    => $value,
