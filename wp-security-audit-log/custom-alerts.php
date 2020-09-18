@@ -50,6 +50,15 @@ $custom_alerts = array(
 			),
 
 			array(
+				5715,
+				WSAL_MEDIUM,
+				__( 'A field was created, modified or deleted', 'wsal-gravity-forms' ),
+				__( 'Field name %field_name% %LineBreak% Field type %field_type% %LineBreak% Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EditorLinkForm%', 'wsal-gravity-forms' ),
+				'gravityforms_fields',
+				'created',
+			),
+
+			array(
 				5709,
 				WSAL_LOW,
 				__( 'A form was submitted', 'wsal-gravity-forms' ),
@@ -71,7 +80,7 @@ $custom_alerts = array(
 				5708,
 				WSAL_MEDIUM,
 				__( 'A form confirmation was activated or deactivated', 'wsal-gravity-forms' ),
-				__( 'Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% Confirmation name: %confirmation_name% %LineBreak% %EditorLinkForm%', 'wsal-gravity-forms' ),
+				__( 'Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% Confirmation name: %confirmation_name% %LineBreak% Confirmation type: %confirmation_type% %LineBreak% %EditorLinkForm%', 'wsal-gravity-forms' ),
 				'gravityforms_confirmations',
 				'created',
 			),
@@ -137,15 +146,6 @@ $custom_alerts = array(
 				__( 'Note %entry_note% %LineBreak% Entry title %entry_title% %LineBreak% Form name: %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EntryLink%', 'wsal-gravity-forms' ),
 				'gravityforms_entries',
 				'read',
-			),
-
-			array(
-				5715,
-				WSAL_MEDIUM,
-				__( 'A field created, modified or deleted', 'wsal-gravity-forms' ),
-				__( 'Field name %field_name% %LineBreak% Field type %field_type% %LineBreak% Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EditorLinkForm%', 'wsal-gravity-forms' ),
-				'gravityforms_fields',
-				'created',
 			),
 
 			array(
