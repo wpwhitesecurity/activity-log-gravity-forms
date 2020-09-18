@@ -436,11 +436,24 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 							$value = $value['enabled'];
 						}
 
+						$event_type = 'modified';
+						$old_value  = $this->_old_form[ $changed_setting ];
+
+						if ( is_array( $value ) ) {
+							$value = $this->recursive_implode( $value, ' | ', true, false );
+						}
+
+						if ( is_array( $old_value ) ) {
+							$old_value = $this->recursive_implode( $old_value, ' | ', true, false );
+						}
+
 						// Give the value a more useful label.
 						if ( empty( $value ) || 0 === $value ) {
-							$value = 'disabled';
+							$value = 'Disabled';
+							$event_type = 'disabled';
 						} elseif ( 1 == $value ) {
-							$value = 'enabled';
+							$value      = 'Enabled';
+							$event_type = 'enabled';
 						} elseif ( 'retain' === $value ) {
 							$value = 'Retain entries indefinitely';
 						} elseif ( 'trash' === $value ) {
@@ -451,8 +464,9 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 
 						if ( ! $this->was_triggered_recently( 5703 ) ) {
 							$variables = array(
-								'EventType'      => 'modified',
+								'EventType'      => $event_type,
 								'setting_name'   => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $name ) ) ) ),
+								'old_setting_value' => ( isset( $this->_old_form[ $changed_setting ] ) && $this->_old_form[ $changed_setting ] ) ? $old_value : 'N/A',
 								'setting_value'  => sanitize_text_field( $value ),
 								'form_name'      => sanitize_text_field( $form['title'] ),
 								'form_id'        => $form_id,
@@ -480,7 +494,8 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 							)
 						);
 
-						$old_value = $this->_old_form[ $changed_setting ];
+						$old_value        = $this->_old_form[ $changed_setting ];
+						$value_unmodified = $value;
 
 						if ( is_array( $value ) ) {
 							$value = $this->recursive_implode( $value, ' | ', true, false );
@@ -490,10 +505,7 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 							$old_value = $this->recursive_implode( $old_value, ' | ', true, false );
 						}
 
-						if ( ! $old_value && 1 == $value || 1 == $old_value && ! $value ) {
-							$old_value = __( 'Disabled', 'wsal-gravityforms' );
-							$value     = __( 'Enabled', 'wsal-gravityforms' );
-						}
+						$event_type = 'modified';
 
 						switch ( $changed_setting ) {
 							case 'title':
@@ -508,15 +520,34 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 								$setting_name = __( 'Form title', 'wsal-gravityforms' );
 								break;
 
+							case 'enableAnimation':
+							case 'enableHoneypot':
+							case 'requireLogin':
+							case 'scheduleForm':
+								$setting_name = str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $changed_setting ) ) );
+								$event_type   = ( 1 == $value ) ? 'enabled' : 'disabled';
+								// Tidy up bools.
+								if ( ! $old_value && 1 == $value || 1 == $old_value && ! $value ) {
+									$old_value  = __( 'Disabled', 'wsal-gravityforms' );
+									$value      = __( 'Enabled', 'wsal-gravityforms' );
+								}
+								break;
+
+							case 'save':
+								$setting_name = str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $changed_setting ) ) );
+								$event_type   = ( isset( $value_unmodified['enabled'] ) && $value_unmodified['enabled'] ) ? 'enabled' : 'disabled';
+								break;
+
 							default:
 								$setting_name = sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $changed_setting ) ) ) );
 						}
 
+
 						$variables = array(
-							'EventType'         => 'modified',
+							'EventType'         => $event_type,
 							'setting_name'      => $setting_name,
-							'old_setting_value' => $old_value,
-							'setting_value'     => $value,
+							'old_setting_value' => ( $old_value ) ? $old_value : 'N/A',
+							'setting_value'     => ( $value ) ? $value : 'N/A',
 							'form_name'         => sanitize_text_field( $form['title'] ),
 							'form_id'           => $form_id,
 							'EditorLinkForm'    => $editor_link,
