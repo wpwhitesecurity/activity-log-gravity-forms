@@ -151,10 +151,10 @@ $custom_alerts = array(
 			array(
 				5716,
 				WSAL_LOW,
-				__( 'A setting was modified', 'wsal-gravity-forms' ),
+				__( 'A plugin setting was changed.', 'wsal-gravity-forms' ),
 				__( 'Setting name %setting_name% %LineBreak% Old value %old_value% %LineBreak% New value %new_value% %LineBreak%', 'wsal-gravity-forms' ),
-				'gravityforms_notifications',
-				'created',
+				'gravityforms_settings',
+				'modified',
 			),
 
 		),
