@@ -7,7 +7,7 @@ $custom_alerts = array(
 			array(
 				5700,
 				WSAL_LOW,
-				__( 'A form was created, modified or deleted', 'wsal-gravity-forms' ),
+				__( 'A form was created, modified', 'wsal-gravity-forms' ),
 				__( 'Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EditorLinkForm%', 'wsal-gravity-forms' ),
 				'gravityforms_forms',
 				'created',
