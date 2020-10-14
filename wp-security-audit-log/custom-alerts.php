@@ -70,7 +70,7 @@ $custom_alerts = array(
 			array(
 				5705,
 				WSAL_MEDIUM,
-				__( 'A form confirmation was created, modified or deleted', 'wsal-gravity-forms' ),
+				__( 'A confirmation was created, modified or deleted', 'wsal-gravity-forms' ),
 				__( 'Confirmation name: %confirmation_name% %LineBreak% Confirmation type: %confirmation_type% %LineBreak% Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EditorLinkForm%', 'wsal-gravity-forms' ),
 				'gravityforms_confirmations',
 				'created',
@@ -79,7 +79,7 @@ $custom_alerts = array(
 			array(
 				5708,
 				WSAL_LOW,
-				__( 'A form confirmation was activated or deactivated', 'wsal-gravity-forms' ),
+				__( 'A confirmation was activated or deactivated', 'wsal-gravity-forms' ),
 				__( 'Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% Confirmation name: %confirmation_name% %LineBreak% Confirmation type: %confirmation_type% %LineBreak% %EditorLinkForm%', 'wsal-gravity-forms' ),
 				'gravityforms_confirmations',
 				'created',
@@ -88,7 +88,7 @@ $custom_alerts = array(
 			array(
 				5706,
 				WSAL_MEDIUM,
-				__( 'A form notification was created, modified or deleted', 'wsal-gravity-forms' ),
+				__( 'A notification was created, modified or deleted', 'wsal-gravity-forms' ),
 				__( 'Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% Notification name: %notification_name% %LineBreak% %EditorLinkForm%', 'wsal-gravity-forms' ),
 				'gravityforms_notifications',
 				'created',
@@ -97,7 +97,7 @@ $custom_alerts = array(
 			array(
 				5707,
 				WSAL_LOW,
-				__( 'A form notification was activated or deactivated', 'wsal-gravity-forms' ),
+				__( 'A notification was activated or deactivated', 'wsal-gravity-forms' ),
 				__( 'Notification name: %notification_name% %LineBreak% Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EditorLinkForm%', 'wsal-gravity-forms' ),
 				'gravityforms_notifications',
 				'activated',
@@ -106,7 +106,7 @@ $custom_alerts = array(
 			array(
 				5710,
 				WSAL_LOW,
-				__( 'A form entry was starred or unstarred', 'wsal-gravity-forms' ),
+				__( 'An entry was starred or unstarred', 'wsal-gravity-forms' ),
 				__( 'Entry title %entry_title% %LineBreak% Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EntryLink%', 'wsal-gravity-forms' ),
 				'gravityforms_entries',
 				'starred',
@@ -115,7 +115,7 @@ $custom_alerts = array(
 			array(
 				5711,
 				WSAL_LOW,
-				__( 'A form entry was marked as read or unread', 'wsal-gravity-forms' ),
+				__( 'An entry was marked as read or unread', 'wsal-gravity-forms' ),
 				__( 'Entry title %entry_title% %LineBreak% Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EntryLink%', 'wsal-gravity-forms' ),
 				'gravityforms_entries',
 				'read',
@@ -124,8 +124,8 @@ $custom_alerts = array(
 			array(
 				5712,
 				WSAL_MEDIUM,
-				__( 'A form entry was moved to trash', 'wsal-gravity-forms' ),
-				__( 'A form entry was %event_desc% %LineBreak% Entry title %entry_title% %LineBreak% Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EntryLink%', 'wsal-gravity-forms' ),
+				__( 'An entry was moved to trash', 'wsal-gravity-forms' ),
+				__( 'An entry was %event_desc% %LineBreak% Entry title %entry_title% %LineBreak% Form name %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EntryLink%', 'wsal-gravity-forms' ),
 				'gravityforms_entries',
 				'read',
 			),
@@ -133,8 +133,8 @@ $custom_alerts = array(
 			array(
 				5713,
 				WSAL_MEDIUM,
-				__( 'A form entry was permanently deleted', 'wsal-gravity-forms' ),
-				__( 'A form entry was permanently deleted %LineBreak% Entry title %entry_title% %LineBreak% Form name %form_name% %LineBreak% Form ID: %form_id%', 'wsal-gravity-forms' ),
+				__( 'An entry was permanently deleted', 'wsal-gravity-forms' ),
+				__( 'An entry was permanently deleted %LineBreak% Entry title %entry_title% %LineBreak% Form name %form_name% %LineBreak% Form ID: %form_id%', 'wsal-gravity-forms' ),
 				'gravityforms_entries',
 				'read',
 			),
@@ -142,7 +142,7 @@ $custom_alerts = array(
 			array(
 				5714,
 				WSAL_MEDIUM,
-				__( 'A form entry note was created or deleted', 'wsal-gravity-forms' ),
+				__( 'An entry note was created or deleted', 'wsal-gravity-forms' ),
 				__( 'Note %entry_note% %LineBreak% Entry title %entry_title% %LineBreak% Form name: %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EntryLink%', 'wsal-gravity-forms' ),
 				'gravityforms_entries',
 				'read',
