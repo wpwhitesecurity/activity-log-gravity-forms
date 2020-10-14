@@ -7,7 +7,7 @@
  * @since   1.0.0
  * @package Wsal
  */
-class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
+class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 	/**
 	 * Holds a cached value if the checked alert has recently fired.
@@ -22,35 +22,37 @@ class WSAL_Sensors_Gravity_Forms_Sensor extends WSAL_AbstractSensor {
 	 * @since 1.0.0
 	 */
 	public function HookEvents() {
-		add_action( 'gform_form_post_get_meta', array( $this, 'get_before_post_edit_data' ) );
+		if ( is_user_logged_in() ) {
+			add_action( 'gform_form_post_get_meta', array( $this, 'get_before_post_edit_data' ) );
 
-		// Forms.
-		add_action( 'gform_after_save_form', array( $this, 'event_form_saved' ), 10, 2 );
-		add_action( 'gform_post_form_trashed', array( $this, 'event_form_trashed' ), 10, 1 );
-		add_action( 'gform_before_delete_form', array( $this, 'event_form_deleted' ) );
-		add_action( 'gform_post_form_duplicated', array( $this, 'event_form_duplicated' ), 10, 2 );
-		add_action( 'gform_post_update_form_meta', array( $this, 'event_form_meta_updated' ), 10, 3 );
+			// Forms.
+			add_action( 'gform_after_save_form', array( $this, 'event_form_saved' ), 10, 2 );
+			add_action( 'gform_post_form_trashed', array( $this, 'event_form_trashed' ), 10, 1 );
+			add_action( 'gform_before_delete_form', array( $this, 'event_form_deleted' ) );
+			add_action( 'gform_post_form_duplicated', array( $this, 'event_form_duplicated' ), 10, 2 );
+			add_action( 'gform_post_update_form_meta', array( $this, 'event_form_meta_updated' ), 10, 3 );
 
-		// Confirmations.
-		add_action( 'gform_pre_confirmation_save', array( $this, 'event_form_confirmation_saved' ), 10, 3 );
-		add_action( 'gform_pre_confirmation_deleted', array( $this, 'event_form_confirmation_deleted' ), 10, 2 );
+			// Confirmations.
+			add_action( 'gform_pre_confirmation_save', array( $this, 'event_form_confirmation_saved' ), 10, 3 );
+			add_action( 'gform_pre_confirmation_deleted', array( $this, 'event_form_confirmation_deleted' ), 10, 2 );
 
-		// Notifications.
-		add_action( 'gform_post_notification_save', array( $this, 'event_form_notification_saved' ), 10, 3 );
-		add_action( 'gform_pre_notification_deleted', array( $this, 'event_form_notification_deleted' ), 10, 2 );
-		add_action( 'gform_pre_notification_activated', array( $this, 'event_form_notification_activated' ), 10, 2 );
-		add_action( 'gform_pre_notification_deactivated', array( $this, 'event_form_notification_deactivated' ), 10, 2 );
+			// Notifications.
+			add_action( 'gform_post_notification_save', array( $this, 'event_form_notification_saved' ), 10, 3 );
+			add_action( 'gform_pre_notification_deleted', array( $this, 'event_form_notification_deleted' ), 10, 2 );
+			add_action( 'gform_pre_notification_activated', array( $this, 'event_form_notification_activated' ), 10, 2 );
+			add_action( 'gform_pre_notification_deactivated', array( $this, 'event_form_notification_deactivated' ), 10, 2 );
 
-		// Entries.
-		add_action( 'gform_update_is_starred', array( $this, 'event_form_entry_starred' ), 10, 3 );
-		add_action( 'gform_update_is_read', array( $this, 'event_form_entry_read' ), 10, 3 );
-		add_action( 'gform_delete_entry', array( $this, 'event_form_entry_deleted' ), 10, 1 );
-		add_action( 'gform_update_status', array( $this, 'event_form_entry_trashed' ), 10, 3 );
-		add_action( 'gform_post_note_added', array( $this, 'event_form_entry_note_added' ), 10, 6 );
-		add_action( 'gform_pre_note_deleted', array( $this, 'event_form_entry_note_deleted' ), 10, 2 );
+			// Entries.
+			add_action( 'gform_update_is_starred', array( $this, 'event_form_entry_starred' ), 10, 3 );
+			add_action( 'gform_update_is_read', array( $this, 'event_form_entry_read' ), 10, 3 );
+			add_action( 'gform_delete_entry', array( $this, 'event_form_entry_deleted' ), 10, 1 );
+			add_action( 'gform_update_status', array( $this, 'event_form_entry_trashed' ), 10, 3 );
+			add_action( 'gform_post_note_added', array( $this, 'event_form_entry_note_added' ), 10, 6 );
+			add_action( 'gform_pre_note_deleted', array( $this, 'event_form_entry_note_deleted' ), 10, 2 );
 
-		// Global Settings.
-		add_action( 'updated_option', array( $this, 'event_settings_updated' ), 10, 3 );
+			// Global Settings.
+			add_action( 'updated_option', array( $this, 'event_settings_updated' ), 10, 3 );
+		}
 
 		// Form submitted.
 		add_action( 'gform_after_submission', array( $this, 'event_form_submitted' ), 10, 2 );
