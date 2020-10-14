@@ -47,7 +47,7 @@ function append_content_to_toggle( $alert_id ) {
       <td>
         <input name="gravityforms-frontend-events" type="checkbox" id="gravityforms-frontend-events" value="1" <?php checked( $enable_for_visitors ); ?> />
       </td>
-      <td colspan="2"><?php esc_html_e( 'Keep a log when website visitors submits a form (by default the plugin only keeps a log when logged in users submit a form).', 'wsal-woocommerce' ); ?></td>
+      <td colspan="2"><label for="gravityforms-frontend-events"><?php esc_html_e( 'Keep a log when website visitors submits a form (by default the plugin only keeps a log when logged in users submit a form).', 'wsal-woocommerce' ); ?></label></td>
     </tr>
     <?php
   }
