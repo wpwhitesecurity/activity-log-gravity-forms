@@ -12,7 +12,7 @@ add_filter( 'admin_init', 'wsal_gravityforms_extension_replace_duplicate_event_n
 add_filter( 'wsal_load_public_sensors', 'wsal_gravityforms_extension_load_public_sensors' );
 add_action( 'wsal_togglealerts_append_content_to_toggle', 'append_content_to_toggle' );
 add_action( 'wsal_togglealerts_process_save_settings', 'togglealerts_process_save_settings', 10, 1 );
-add_filter( 'wsal_load_on_frontend', 'wsal_gravityforms_allow_sensor_on_frontend' );
+add_filter( 'wsal_load_on_frontend', 'wsal_gravityforms_allow_sensor_on_frontend', 10, 2 );
 
 function togglealerts_process_save_settings( $post_data ) {
   $wsal   = WpSecurityAuditLog::GetInstance();
@@ -25,7 +25,7 @@ function wsal_gravityforms_extension_load_public_sensors( $value ) {
  return $value;
 }
 
-function wsal_gravityforms_allow_sensor_on_frontend() {
+function wsal_gravityforms_allow_sensor_on_frontend( $default, $frontend_events ) {
   $wsal                = WpSecurityAuditLog::GetInstance();
   $gf_frontend         = $wsal->GetGlobalBooleanSetting( 'gf-log-frontend-events' );
   $enable_for_visitors = ( isset( $gf_frontend ) && $gf_frontend ) ? true : false;
