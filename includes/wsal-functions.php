@@ -84,12 +84,19 @@ function wsal_gravityforms_add_custom_event_objects( $objects ) {
  */
  function wsal_gravityforms_add_custom_meta_format( $value, $name ) {
  	$check_value = (string) $value;
-	if ( '%EditorLinkForm%' === $name ) {
+  if ( '%EditorLinkForm%' === $name ) {
  		if ( 'NULL' !== $check_value ) {
  			return '<a target="_blank" href="' . esc_url( $value ) . '">' . __( 'View form in the editor', 'wsal-gravity-forms' ) . '</a>';
  		}
  		return $value;
  	}
+
+  if ( '%EditorLinkFormDuplicated%' === $name ) {
+    if ( 'NULL' !== $check_value ) {
+      return '<a target="_blank" href="' . esc_url( $value ) . '">' . __( 'View new duplicated form in the editor', 'wsal-gravity-forms' ) . '</a>';
+    }
+    return $value;
+  }
 
 	if ( '%EntryLink%' === $name ) {
 		if ( 'NULL' !== $check_value ) {
