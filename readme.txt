@@ -43,7 +43,7 @@ Below are some of the user and Gravity Forms plugin changes you keep a log of wh
 * Modifies, or deletes a field from a form
 * Deletes or modifies an entry (lead)
 * Adds, enables, modifies or disable notifications in forms
-* Someone submits a form
+* Someone submits a form (user and visitor (optional))
 * Changes in the plugin's settings
 
 Refer to the [activity logs event IDs for WPForms](https://wpactivitylog.com/support/kb/list-wordpress-activity-log-event-ids/#gravity-forms?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description)) for a complete list of the changes the plugin can keep a log of.
@@ -76,8 +76,8 @@ Please refer to our [Support & Documentation pages](https://wpactivitylog.com/su
 
 == Screenshots ==
 
-1. The easiest way to install the extension is from within the WP Activity Log plugin.
-1. Forms, entries, notifications and other WPForms plugin changes reported in the WordPress activity log.
+1. Forms, entries, notifications and other Gravity Forms plugin changes reported in the WordPress activity log.
+1. The list of forms, notifications, entries and other Gravity Form plugin changes the WP Activity Log plugin can keep a log of.
 
 == Changelog ==
 
