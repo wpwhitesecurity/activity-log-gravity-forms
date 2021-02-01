@@ -37,7 +37,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			add_action( 'gform_pre_confirmation_deleted', array( $this, 'event_form_confirmation_deleted' ), 10, 2 );
 
 			// Notifications.
-			add_action( 'gform_post_notification_save', array( $this, 'event_form_notification_saved' ), 10, 3 );
 			add_action( 'gform_pre_notification_deleted', array( $this, 'event_form_notification_deleted' ), 10, 2 );
 			add_action( 'gform_pre_notification_activated', array( $this, 'event_form_notification_activated' ), 10, 2 );
 			add_action( 'gform_pre_notification_deactivated', array( $this, 'event_form_notification_deactivated' ), 10, 2 );
@@ -240,33 +239,43 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					}
 				}
 
-				// Handle form duplicated
+				// Handle form notifications.
 				if ( 'notifications' === $changed_setting ) {
-					$old_fields = $this->_old_form[ $changed_setting ];
-					if ( count( $value ) > count( $old_fields ) ) {
-						$alert_code  = 5706;
-						$editor_link = esc_url(
-							add_query_arg(
-								array(
-									'id' => $form['id'],
-								),
-								admin_url( 'admin.php?page=gf_edit_forms' )
-							)
-						);
+					$old_fields  = $this->_old_form[ $changed_setting ];
+					$alert_code  = 5706;
+					$editor_link = esc_url(
+						add_query_arg(
+							array(
+								'id' => $form['id'],
+							),
+							admin_url( 'admin.php?page=gf_edit_forms' )
+						)
+					);
+					$notification = end( $value );
+					$event_type   = false;
 
-						$notification = end( $value );
+					if ( count( json_decode( $form_meta, true ) ) > count( $old_fields ) ) {
+						$event_type = 'created';
+					}
 
-						$variables = array(
-							'EventType'         => 'duplicated',
-							'form_name'         => sanitize_text_field( $form['title'] ),
-							'form_id'           => $form['id'],
-							'notification_name' => sanitize_text_field( $notification['name'] ),
-							'EditorLinkForm'    => $editor_link,
-						);
+					if ( count( json_decode( $form_meta, true ) ) === count( $old_fields ) ) {
+						$event_type = 'modified';
+					}
 
-						if ( isset( $_REQUEST['action'] ) && 'duplicate' === $_REQUEST['action'] ) {
-							$this->plugin->alerts->Trigger( $alert_code, $variables );
-						}
+					if ( isset( $_REQUEST['action'] ) && 'duplicate' === $_REQUEST['action'] && count( $value ) > count( $old_fields ) ) {
+						$event_type = 'duplicated';
+					}
+
+					$variables = array(
+						'EventType'         => $event_type,
+						'form_name'         => sanitize_text_field( $form['title'] ),
+						'form_id'           => $form['id'],
+						'notification_name' => sanitize_text_field( $notification['name'] ),
+						'EditorLinkForm'    => $editor_link,
+					);
+
+					if ( $event_type ) {
+						$this->plugin->alerts->Trigger( $alert_code, $variables );
 					}
 				}
 
@@ -667,52 +676,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		$this->plugin->alerts->Trigger( $alert_code, $variables );
 
 		return $confirmation;
-	}
-
-	public function event_form_notification_saved( $notification, $form, $is_new_notification ) {
-
-		if ( $is_new_notification ) {
-			$alert_code  = 5706;
-			$editor_link = esc_url(
-				add_query_arg(
-					array(
-						'id' => $form['id'],
-					),
-					admin_url( 'admin.php?page=gf_edit_forms' )
-				)
-			);
-
-			$variables = array(
-				'EventType'         => 'created',
-				'form_name'         => sanitize_text_field( $form['title'] ),
-				'form_id'           => $form['id'],
-				'notification_name' => sanitize_text_field( $notification['name'] ),
-				'EditorLinkForm'    => $editor_link,
-			);
-
-			$this->plugin->alerts->Trigger( $alert_code, $variables );
-		} else {
-			$alert_code  = 5706;
-			$editor_link = esc_url(
-				add_query_arg(
-					array(
-						'id' => $form['id'],
-					),
-					admin_url( 'admin.php?page=gf_edit_forms' )
-				)
-			);
-
-			$variables = array(
-				'EventType'         => 'modified',
-				'form_name'         => sanitize_text_field( $form['title'] ),
-				'form_id'           => $form['id'],
-				'notification_name' => sanitize_text_field( $notification['name'] ),
-				'EditorLinkForm'    => $editor_link,
-			);
-
-			$this->plugin->alerts->Trigger( $alert_code, $variables );
-		}
-
 	}
 
 	public function event_form_notification_deleted( $notification, $form ) {
