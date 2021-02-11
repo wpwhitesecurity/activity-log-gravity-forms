@@ -21,14 +21,21 @@ function togglealerts_process_save_settings( $post_data ) {
 }
 
 function wsal_gravityforms_extension_load_public_sensors( $value ) {
- $value[] = 'Gravity_Forms';
- return $value;
+  $wsal        = WpSecurityAuditLog::GetInstance();
+  $gf_frontend = $wsal->GetGlobalBooleanSetting( 'gf-log-frontend-events' );
+
+  // Events are enabled so lets add our sensor.
+  if ( isset( $gf_frontend ) && $gf_frontend ) {
+    $value[] = 'Gravity_Forms';
+  }
+
+  return $value;
 }
 
 function wsal_gravityforms_allow_sensor_on_frontend( $default, $frontend_events ) {
   $wsal                = WpSecurityAuditLog::GetInstance();
   $gf_frontend         = $wsal->GetGlobalBooleanSetting( 'gf-log-frontend-events' );
-  $enable_for_visitors = ( isset( $gf_frontend ) && $gf_frontend ) ? true : false;
+  $enable_for_visitors = ( $default || isset( $gf_frontend ) && $gf_frontend ) ? true : false;
   return $enable_for_visitors;
 }
 
