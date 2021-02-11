@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: WP Activity Log Extension for Gravity Forms
+ * Plugin Name: WP Activity Log for Gravity Forms
  * Plugin URI: https://wpactivitylog.com/extensions/
  * Description: A WP Activity Log plugin extension for Gravity Forms.
  * Text Domain: wsal-gravity-forms
