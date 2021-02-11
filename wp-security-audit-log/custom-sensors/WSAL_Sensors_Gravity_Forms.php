@@ -253,12 +253,14 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					);
 					$notification = end( $value );
 					$event_type   = false;
+					$new_fields_count = count( json_decode( $form_meta, true ) );
+					$old_fields_count = count( $old_fields );
 
-					if ( count( json_decode( $form_meta, true ) ) > count( $old_fields ) ) {
+					if ( $new_fields_count > $old_fields_count ) {
 						$event_type = 'created';
 					}
 
-					if ( count( json_decode( $form_meta, true ) ) === count( $old_fields ) ) {
+					if ( $new_fields_count === $old_fields_count ) {
 						$event_type = 'modified';
 					}
 
