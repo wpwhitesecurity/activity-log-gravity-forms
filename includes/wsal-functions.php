@@ -30,8 +30,7 @@ function wsal_gravityforms_allow_sensor_on_frontend( $default, $frontend_events 
 function append_content_to_toggle( $alert_id ) {
 
   if ( 5709 === $alert_id ) {
-    $settings            = WpSecurityAuditLog::GetInstance()->settings();
-    $frontend_events     = $settings::get_frontend_events();
+    $frontend_events     = WSAL_Settings::get_frontend_events();
     $enable_for_visitors = ( isset( $frontend_events['gravityforms'] ) && $frontend_events['gravityforms'] ) ? true : false;
     ?>
     <tr>
