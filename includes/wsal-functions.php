@@ -11,32 +11,17 @@ add_filter( 'wsal_togglealerts_sub_category_titles', 'wsal_gravityforms_extensio
 add_filter( 'admin_init', 'wsal_gravityforms_extension_replace_duplicate_event_notice' );
 add_filter( 'wsal_load_public_sensors', 'wsal_gravityforms_extension_load_public_sensors' );
 add_action( 'wsal_togglealerts_append_content_to_toggle', 'append_content_to_toggle' );
-add_action( 'wsal_togglealerts_process_save_settings', 'togglealerts_process_save_settings', 10, 1 );
 add_filter( 'wsal_load_on_frontend', 'wsal_gravityforms_allow_sensor_on_frontend', 10, 2 );
 
-function togglealerts_process_save_settings( $post_data ) {
-  $wsal   = WpSecurityAuditLog::GetInstance();
-  $enable = ( isset( $post_data['gravityforms-frontend-events'] ) && ! empty( $post_data['gravityforms-frontend-events'] ) ) ? true : false;
-  $wsal->SetGlobalBooleanSetting( 'gf-log-frontend-events', $enable );
-}
 
 function wsal_gravityforms_extension_load_public_sensors( $value ) {
-  $wsal        = WpSecurityAuditLog::GetInstance();
-  $gf_frontend = $wsal->GetGlobalBooleanSetting( 'gf-log-frontend-events' );
-
-  // Events are enabled so lets add our sensor.
-  if ( isset( $gf_frontend ) && $gf_frontend ) {
-    $value[] = 'Gravity_Forms';
-  }
-
+  $value[] = 'Gravity_Forms';
   return $value;
 }
 
 function wsal_gravityforms_allow_sensor_on_frontend( $default, $frontend_events ) {
-  $wsal                = WpSecurityAuditLog::GetInstance();
-  $gf_frontend         = $wsal->GetGlobalBooleanSetting( 'gf-log-frontend-events' );
-  $enable_for_visitors = ( $default || isset( $gf_frontend ) && $gf_frontend ) ? true : false;
-  return $enable_for_visitors;
+  $should_load = ( $default || ! empty( $frontend_events['gravityforms'] ) ) ? true : false;;
+  return $should_load;
 }
 
 /**
@@ -45,16 +30,16 @@ function wsal_gravityforms_allow_sensor_on_frontend( $default, $frontend_events 
 function append_content_to_toggle( $alert_id ) {
 
   if ( 5709 === $alert_id ) {
-    $wsal                = WpSecurityAuditLog::GetInstance();
-    $gf_frontend         = $wsal->GetGlobalBooleanSetting( 'gf-log-frontend-events' );
-    $enable_for_visitors = ( isset( $gf_frontend ) && $gf_frontend ) ? true : false;
+    $settings            = WpSecurityAuditLog::GetInstance()->settings();
+    $frontend_events     = $settings::get_frontend_events();
+    $enable_for_visitors = ( isset( $frontend_events['gravityforms'] ) && $frontend_events['gravityforms'] ) ? true : false;
     ?>
     <tr>
       <td></td>
       <td>
-        <input name="gravityforms-frontend-events" type="checkbox" id="gravityforms-frontend-events" value="1" <?php checked( $enable_for_visitors ); ?> />
+        <input name="frontend-events[gravityforms]" type="checkbox" id="frontend-events[woocommerce]" value="1" <?php checked( $enable_for_visitors ); ?> />
       </td>
-      <td colspan="2"><label for="gravityforms-frontend-events"><?php esc_html_e( 'Keep a log when website visitors submits a form (by default the plugin only keeps a log when logged in users submit a form).', 'wsal-woocommerce' ); ?></label></td>
+      <td colspan="2"><?php esc_html_e( 'Keep a log when website visitors submits a form (by default the plugin only keeps a log when logged in users submit a form).', 'wsal-gravity-forms' ); ?></td>
     </tr>
     <?php
   }
