@@ -4,7 +4,6 @@
  */
 add_filter( 'wsal_event_objects', 'wsal_gravityforms_add_custom_event_objects', 10, 2 );
 add_filter( 'wsal_event_type_data', 'wsal_gravityforms_add_custom_event_type', 10, 2 );
-add_filter( 'wsal_link_filter', 'wsal_gravityforms_add_custom_meta_format', 10, 2 );
 add_filter( 'wsal_meta_formatter_custom_formatter', 'wsal_gravityforms_add_custom_meta_format', 10, 2 );
 add_filter( 'wsal_togglealerts_sub_category_events', 'wsal_gravityforms_extension_togglealerts_sub_category_events' );
 add_filter( 'wsal_togglealerts_sub_category_titles', 'wsal_gravityforms_extension_togglealerts_sub_category_titles', 10, 2 );
