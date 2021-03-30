@@ -4,7 +4,6 @@
  */
 add_filter( 'wsal_event_objects', 'wsal_gravityforms_add_custom_event_objects', 10, 2 );
 add_filter( 'wsal_event_type_data', 'wsal_gravityforms_add_custom_event_type', 10, 2 );
-add_filter( 'wsal_meta_formatter_custom_formatter', 'wsal_gravityforms_add_custom_meta_format', 10, 2 );
 add_filter( 'wsal_togglealerts_sub_category_events', 'wsal_gravityforms_extension_togglealerts_sub_category_events' );
 add_filter( 'wsal_togglealerts_sub_category_titles', 'wsal_gravityforms_extension_togglealerts_sub_category_titles', 10, 2 );
 add_filter( 'admin_init', 'wsal_gravityforms_extension_replace_duplicate_event_notice' );
@@ -63,40 +62,6 @@ function wsal_gravityforms_add_custom_event_objects( $objects ) {
 
 	return $objects;
 }
-
-/**
- * Add our own meta formatter. If you wish to create your own custom variable to be
- * used within your custom event message etc, you can register the variable here as well
- * as specify how to handle it.
- *
- * @param string $value Value of variable.
- * @param string $name  Variable name we wish to change.
- */
- function wsal_gravityforms_add_custom_meta_format( $value, $name ) {
- 	$check_value = (string) $value;
-  if ( '%EditorLinkForm%' === $name ) {
- 		if ( 'NULL' !== $check_value ) {
- 			return '<a target="_blank" href="' . esc_url( $value ) . '">' . __( 'View form in the editor', 'wsal-gravity-forms' ) . '</a>';
- 		}
- 		return $value;
- 	}
-
-  if ( '%EditorLinkFormDuplicated%' === $name ) {
-    if ( 'NULL' !== $check_value ) {
-      return '<a target="_blank" href="' . esc_url( $value ) . '">' . __( 'View new duplicated form in the editor', 'wsal-gravity-forms' ) . '</a>';
-    }
-    return $value;
-  }
-
-	if ( '%EntryLink%' === $name ) {
-		if ( 'NULL' !== $check_value ) {
-			return '<a target="_blank" href="' . esc_url( $value ) . '">' . __( 'View entry', 'wsal-gravity-forms' ) . '</a>';
-		}
-		return $value;
-	}
-
- 	return $value;
- }
 
  function wsal_gravityforms_add_custom_event_type( $types ) {
  	$new_types = array(

@@ -15,7 +15,7 @@ $custom_alerts = [
                     __( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
                 ],
                 [
-                    '%EditorLinkForm%',
+                    __( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
                 ],
                 'gravityforms_forms',
                 'created',
@@ -31,7 +31,7 @@ $custom_alerts = [
                     __( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
                 ],
                 [
-                    '%EditorLinkForm%',
+                    __( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
                 ],
                 'gravityforms_forms',
                 'created',
@@ -62,7 +62,7 @@ $custom_alerts = [
                     __( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
                 ],
                 [
-                    '%EditorLinkForm%',
+                    __( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
                 ],
                 'gravityforms_forms',
                 'modified',
@@ -80,7 +80,7 @@ $custom_alerts = [
                     __( 'New form ID', 'wsal-gravity-forms' ) => '%new_form_id%',
                 ],
                 [
-                    '%EditorLinkFormDuplicated%',
+                    __( 'View new duplicated form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkFormDuplicated%',
                 ],
                 'gravityforms_forms',
                 'duplicated',
@@ -98,7 +98,7 @@ $custom_alerts = [
                     __( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
                 ],
                 [
-                    '%EditorLinkForm%',
+                    __( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
                 ],
                 'gravityforms_fields',
                 'created',
@@ -115,7 +115,7 @@ $custom_alerts = [
                     __( 'Submission email', 'wsal-gravity-forms' ) => '%email%',
                 ],
                 [
-                    '%EntryLink%',
+                    __( 'View entry', 'wsal-gravity-forms' ) => '%EntryLink%',
                 ],
                 'gravityforms_forms',
                 'duplicated',
@@ -137,7 +137,7 @@ $custom_alerts = [
                     __( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
                 ],
                 [
-                    '%EditorLinkForm%',
+                    __( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
                 ],
                 'gravityforms_confirmations',
                 'created',
@@ -152,7 +152,7 @@ $custom_alerts = [
                     __( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
                 ],
                 [
-                    '%EditorLinkForm%',
+                    __( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
                 ],
                 'gravityforms_confirmations',
                 'created',
@@ -172,7 +172,7 @@ $custom_alerts = [
                     __( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
                 ],
                 [
-                    '%EditorLinkForm%',
+                    __( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
                 ],
                 'gravityforms_notifications',
                 'created',
@@ -189,7 +189,7 @@ $custom_alerts = [
                     __( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
                 ],
                 [
-                    '%EditorLinkForm%',
+                    __( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
                 ],
                 'gravityforms_notifications',
                 'activated',
@@ -209,7 +209,7 @@ $custom_alerts = [
                     __( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
                 ],
                 [
-                    '%EntryLink%',
+                    __( 'View entry', 'wsal-gravity-forms' ) => '%EntryLink%',
                 ],
                 'gravityforms_entries',
                 'starred',
@@ -226,7 +226,7 @@ $custom_alerts = [
                     __( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
                 ],
                 [
-                    '%EntryLink%',
+                    __( 'View entry', 'wsal-gravity-forms' ) => '%EntryLink%',
                 ],
                 'gravityforms_entries',
                 'read',
@@ -243,7 +243,7 @@ $custom_alerts = [
                     __( 'Form ID ', 'wsal-gravity-forms' ) => '%form_id%',
                 ],
                 [
-                    '%EntryLink%',
+                    __( 'View entry', 'wsal-gravity-forms' ) => '%EntryLink%',
                 ],
                 'gravityforms_entries',
                 'read',
@@ -276,7 +276,7 @@ $custom_alerts = [
                     __( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
                 ],
                 [
-                    '%EntryLink%',
+                    __( 'View entry', 'wsal-gravity-forms' ) => '%EntryLink%',
                 ],
                 'gravityforms_entries',
                 'read',
