@@ -43,7 +43,7 @@ $custom_alerts = [
                 __( 'A form was permanently deleted', 'wsal-gravity-forms' ),
                 __( 'A form was permanently deleted', 'wsal-gravity-forms' ),
                 [
-                    __( 'Permanently deleted the form ', 'wsal-gravity-forms' ) => '%form_name%',
+                    __( 'Permanently deleted the form', 'wsal-gravity-forms' ) => '%form_name%',
                     __( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
                 ],
                 [],
@@ -164,6 +164,7 @@ $custom_alerts = [
             [
                 5706,
                 WSAL_MEDIUM,
+                __( 'A notification was created, modified or deleted', 'wsal-gravity-forms' ),
                 __( 'A notification was created, modified or deleted', 'wsal-gravity-forms' ),
                 [
                     __( 'Notification name', 'wsal-gravity-forms' ) => '%notification_name%',
