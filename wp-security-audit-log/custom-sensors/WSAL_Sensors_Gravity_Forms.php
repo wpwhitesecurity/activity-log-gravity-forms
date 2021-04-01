@@ -580,6 +580,9 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		if ( $manager->WillOrHasTriggered( 5705 ) ) {
 			return false;
 		}
+		if ( $manager->WillOrHasTriggered( 5706 ) ) {
+			return false;
+		}
 		return true;
 	}
 
