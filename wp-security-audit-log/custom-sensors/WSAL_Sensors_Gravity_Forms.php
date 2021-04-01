@@ -264,20 +264,29 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 						$event_type = 'modified';
 					}
 
-					if ( isset( $_REQUEST['action'] ) && 'duplicate' === $_REQUEST['action'] && count( $value ) > count( $old_fields ) ) {
-						$event_type = 'duplicated';
+					$continue = true;
+					if ( $event_type &&
+					 	'modified' === $event_type &&
+						$this->was_triggered_recently( 5707 ) ) {
+							$continue = false;
 					}
 
-					$variables = array(
-						'EventType'         => $event_type,
-						'form_name'         => sanitize_text_field( $form['title'] ),
-						'form_id'           => $form['id'],
-						'notification_name' => sanitize_text_field( $notification['name'] ),
-						'EditorLinkForm'    => $editor_link,
-					);
+					if ( $continue ) {
+						if ( isset( $_REQUEST['action'] ) && 'duplicate' === $_REQUEST['action'] && count( $value ) > count( $old_fields ) ) {
+							$event_type = 'duplicated';
+						}
 
-					if ( $event_type ) {
-						$this->plugin->alerts->Trigger( $alert_code, $variables );
+						$variables = array(
+							'EventType'         => $event_type,
+							'form_name'         => sanitize_text_field( $form['title'] ),
+							'form_id'           => $form['id'],
+							'notification_name' => sanitize_text_field( $notification['name'] ),
+							'EditorLinkForm'    => $editor_link,
+						);
+
+						if ( $event_type ) {
+							$this->plugin->alerts->Trigger( $alert_code, $variables );
+						}
 					}
 				}
 
