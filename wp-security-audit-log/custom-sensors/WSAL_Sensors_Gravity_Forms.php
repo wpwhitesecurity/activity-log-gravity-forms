@@ -716,7 +716,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	}
 
 	/**
-	 * Undocumented function
+	 * Process and triggers the event loging
 	 *
 	 * @param array $notification
 	 * @param GFFormsModel $form
