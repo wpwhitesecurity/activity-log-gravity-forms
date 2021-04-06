@@ -277,7 +277,18 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					);
 
 					if ( $event_type ) {
-						$this->plugin->alerts->Trigger( $alert_code, $variables );
+						$this->plugin->alerts->TriggerIf(
+							$alert_code,
+							$variables,
+							/**
+							 * @param WSAL_AlertManager $manager
+							 * @return bool
+							 */
+							function ( $manager ) {
+								//  don't fire if there's already an event 5707
+								return ! $manager->WillOrHasTriggered( 5707 );
+							}
+					 );
 					}
 				}
 
@@ -704,7 +715,16 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		return $notification;
 	}
 
-	public function event_form_notification_activated( $notification, $form ) {
+	/**
+	 * Process and triggers the event loging
+	 *
+	 * @param array $notification
+	 * @param GFFormsModel $form
+	 * @param string $eventType
+	 *
+	 * @return void
+	 */
+	private function formActivationDeactivationEventLog( $notification, $form, string $eventType ) {
 		$alert_code  = 5707;
 		$editor_link = esc_url(
 			add_query_arg(
@@ -716,40 +736,24 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		);
 
 		$variables = array(
-			'EventType'         => 'activated',
+			'EventType'         => $eventType,
 			'form_name'         => sanitize_text_field( $form['title'] ),
 			'form_id'           => $form['id'],
 			'notification_name' => sanitize_text_field( $notification['name'] ),
 			'EditorLinkForm'    => $editor_link,
 		);
 
-		$this->plugin->alerts->Trigger( $alert_code, $variables );
+		$this->plugin->alerts->Trigger( $alert_code, $variables, true );
 
 		return $notification;
 	}
 
+	public function event_form_notification_activated( $notification, $form ) {
+		return $this->formActivationDeactivationEventLog( $notification, $form, 'activated' );
+	}
+
 	public function event_form_notification_deactivated( $notification, $form ) {
-		$alert_code  = 5707;
-		$editor_link = esc_url(
-			add_query_arg(
-				array(
-					'id' => $form['id'],
-				),
-				admin_url( 'admin.php?page=gf_edit_forms' )
-			)
-		);
-
-		$variables = array(
-			'EventType'         => 'deactivated',
-			'form_name'         => sanitize_text_field( $form['title'] ),
-			'form_id'           => $form['id'],
-			'notification_name' => sanitize_text_field( $notification['name'] ),
-			'EditorLinkForm'    => $editor_link,
-		);
-
-		$this->plugin->alerts->Trigger( $alert_code, $variables );
-
-		return $notification;
+		return $this->formActivationDeactivationEventLog( $notification, $form, 'deactivated' );
 	}
 
 	public function event_form_entry_starred( $entry_id, $property_value, $previous_value ) {
