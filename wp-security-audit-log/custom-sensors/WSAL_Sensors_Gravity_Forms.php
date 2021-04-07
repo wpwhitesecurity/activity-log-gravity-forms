@@ -243,15 +243,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				if ( 'notifications' === $changed_setting ) {
 					$old_fields  = $this->_old_form[ $changed_setting ];
 					$alert_code  = 5706;
-					$editor_link = esc_url(
-						add_query_arg(
-							array(
-								'id' => $form['id'],
-							),
-							admin_url( 'admin.php?page=gf_edit_forms' )
-						)
-					);
-					$notification = end( $value );
+
 					$event_type   = false;
 					$new_fields_count = count( json_decode( $form_meta, true ) );
 					$old_fields_count = count( $old_fields );
@@ -262,6 +254,27 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 					if ( $new_fields_count === $old_fields_count ) {
 						$event_type = 'modified';
+					}
+
+					$notificationId = ( 'created' != $event_type ) ? rgpost( 'gform_notification_id' ) : key( array_slice( $value, -1, 1, true ) );
+
+					$editor_link = esc_url(
+						add_query_arg(
+							array(
+								'id' => $form['id'],
+								'nid' => $notificationId,
+								'view'    => 'settings',
+								'subview' => 'notification',
+							),
+							admin_url( 'admin.php?page=gf_edit_forms' )
+						)
+					);
+
+					if ( 'created' == $event_type ) {
+						$notification = $value[ $notificationId ];
+					} else {
+						// If there is no such notification (notificationId is the key) then notification has been deleted, that event wont be triggered and array with empy name is just to fulfill the logic later on
+						$notification = ( isset( $value[ $notificationId ] ) ) ? $value[ $notificationId ] : [ 'name' => '' ];
 					}
 
 					if ( isset( $_REQUEST['action'] ) && 'duplicate' === $_REQUEST['action'] && count( $value ) > count( $old_fields ) ) {
@@ -293,6 +306,12 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				}
 
 				if ( 'fields' === $changed_setting ) {
+
+					$notificationId = rgpost( 'gform_notification_id' );
+					$notificationData = [];
+					if ( $notificationId && '' != trim( $notificationId ) && isset( $form['notifications'][ $notificationId ] ) ) {
+						$notificationData = $form['notifications'][ $notificationId ];
+					}
 
 					$old_fields     = $this->_old_form['fields'];
 					$current_fields = $value;
@@ -332,19 +351,23 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 								$editor_link = esc_url(
 									add_query_arg(
 										array(
-											'id' => $form_id,
+											'id'      => $form_id,
+											'nid'     => ( isset( $notificationData['id'] ) ) ? $notificationData['id']  : '',
+											'view'    => 'settings',
+											'subview' => 'notification',
 										),
 										admin_url( 'admin.php?page=gf_edit_forms' )
 									)
 								);
 
 								$variables = array(
-									'EventType'      => 'added',
-									'field_name'     => $item->label,
-									'field_type'     => $item->type,
-									'form_name'      => sanitize_text_field( $form['title'] ),
-									'form_id'        => $form_id,
-									'EditorLinkForm' => $editor_link,
+									'EventType'         => 'added',
+									'field_name'        => $item->label,
+									'field_type'        => $item->type,
+									'form_name'         => sanitize_text_field( $form['title'] ),
+									'form_id'           => $form_id,
+									'notification_name' => ( isset( $notificationData['name'] ) ) ? sanitize_text_field( $notificationData['name'] ) : '',
+									'EditorLinkForm'    => $editor_link,
 								);
 
 								$this->plugin->alerts->TriggerIf( $alert_code, $variables, array( $this, 'must_not_duplicated_form' ) );
@@ -367,19 +390,23 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 								$editor_link = esc_url(
 									add_query_arg(
 										array(
-											'id' => $form_id,
+											'id'      => $form_id,
+											'nid'     => ( isset( $notificationData['id'] ) ) ? $notificationData['id']  : '',
+											'view'    => 'settings',
+											'subview' => 'notification',
 										),
 										admin_url( 'admin.php?page=gf_edit_forms' )
 									)
 								);
 
 								$variables = array(
-									'EventType'      => 'modified',
-									'field_name'     => $item->label,
-									'field_type'     => $item->type,
-									'form_name'      => sanitize_text_field( $form['title'] ),
-									'form_id'        => $form_id,
-									'EditorLinkForm' => $editor_link,
+									'EventType'         => 'modified',
+									'field_name'        => $item->label,
+									'field_type'        => $item->type,
+									'form_name'         => sanitize_text_field( $form['title'] ),
+									'form_id'           => $form_id,
+									'notification_name' => ( isset( $notificationData['name'] ) ) ? sanitize_text_field( $notificationData['name'] ) : '',
+									'EditorLinkForm'    => $editor_link,
 								);
 
 								$this->plugin->alerts->TriggerIf( $alert_code, $variables, array( $this, 'must_not_duplicated_form' ) );

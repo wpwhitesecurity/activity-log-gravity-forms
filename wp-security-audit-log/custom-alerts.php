@@ -96,6 +96,7 @@ $custom_alerts = [
                     __( 'Field type', 'wsal-gravity-forms' ) => '%field_type%',
                     __( 'Form name', 'wsal-gravity-forms' ) => '%form_name%',
                     __( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+                    __( 'Notification Name', 'wsal-gravity-forms' ) => '%notification_name%',
                 ],
                 [
                     __( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
