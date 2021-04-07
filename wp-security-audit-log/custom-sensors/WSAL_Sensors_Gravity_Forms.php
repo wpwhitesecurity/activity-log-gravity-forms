@@ -366,7 +366,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 									'field_type'        => $item->type,
 									'form_name'         => sanitize_text_field( $form['title'] ),
 									'form_id'           => $form_id,
-									'notification_name' =>  ( ( isset( $notificationData['name'] ) ) ? sanitize_text_field( $notificationData['name'] ) : '' ),
+									'notification_name' => ( isset( $notificationData['name'] ) ) ? sanitize_text_field( $notificationData['name'] ) : '',
 									'EditorLinkForm'    => $editor_link,
 								);
 
@@ -405,7 +405,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 									'field_type'        => $item->type,
 									'form_name'         => sanitize_text_field( $form['title'] ),
 									'form_id'           => $form_id,
-									'notification_name' => ( ( isset( $notificationData['name'] ) ) ? sanitize_text_field( $notificationData['name'] ) : '' ),
+									'notification_name' => ( isset( $notificationData['name'] ) ) ? sanitize_text_field( $notificationData['name'] ) : '',
 									'EditorLinkForm'    => $editor_link,
 								);
 
