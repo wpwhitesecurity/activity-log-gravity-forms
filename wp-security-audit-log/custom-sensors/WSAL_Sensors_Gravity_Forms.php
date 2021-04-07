@@ -352,7 +352,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 									add_query_arg(
 										array(
 											'id'      => $form_id,
-											'nid'     => ( ( isset( $notificationData['id'] ) ) ? $notificationData['id']  : '' ),
+											'nid'     => ( isset( $notificationData['id'] ) ) ? $notificationData['id']  : '',
 											'view'    => 'settings',
 											'subview' => 'notification',
 										),
@@ -391,7 +391,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 									add_query_arg(
 										array(
 											'id'      => $form_id,
-											'nid'     => ( ( isset( $notificationData['id'] ) ) ? $notificationData['id']  : '' ),
+											'nid'     => ( isset( $notificationData['id'] ) ) ? $notificationData['id']  : '',
 											'view'    => 'settings',
 											'subview' => 'notification',
 										),
