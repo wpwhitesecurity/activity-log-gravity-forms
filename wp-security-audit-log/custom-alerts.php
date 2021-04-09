@@ -80,7 +80,7 @@ $custom_alerts = [
                     __( 'New form ID', 'wsal-gravity-forms' ) => '%new_form_id%',
                 ],
                 [
-                    __( 'View new duplicated form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkFormDuplicated%',
+                    __( 'View new duplicated form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
                 ],
                 'gravityforms_forms',
                 'duplicated',
