@@ -55,7 +55,7 @@ $custom_alerts = [
                 5703,
                 WSAL_MEDIUM,
                 __( 'A form setting was modified', 'wsal-gravity-forms' ),
-                __( 'The setting %1$setting_name% in form %2$form_name%', 'wsal-gravity-forms' ),
+                __( 'The setting %setting_name% in form %form_name%', 'wsal-gravity-forms' ),
                 [
                     __( 'Previous value', 'wsal-gravity-forms' ) => '%old_setting_value%',
                     __( 'New value', 'wsal-gravity-forms' ) => '%setting_value%',
@@ -147,7 +147,7 @@ $custom_alerts = [
                 5708,
                 WSAL_LOW,
                 __( 'A confirmation was activated or deactivated', 'wsal-gravity-forms' ),
-                __( 'The confirmation %1$confirmation_name% in the form %2$form_name%', 'wsal-gravity-forms' ),
+                __( 'The confirmation %confirmation_name% in the form %form_name%', 'wsal-gravity-forms' ),
                 [
                     __( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
                 ],

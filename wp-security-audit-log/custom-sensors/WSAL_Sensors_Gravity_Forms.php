@@ -653,13 +653,18 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					)
 				);
 
+				$message = $confirmation['message'];
+				if ( '' === trim( $message ) ) {
+					$message = __( '-- NO MESSAGE TEXT --', 'wsal-gravityforms' );
+				}
+
 				$variables = array(
 					'EventType'            => 'modified',
 					'form_name'            => sanitize_text_field( $form['title'] ),
 					'form_id'              => $form['id'],
 					'confirmation_name'    => sanitize_text_field( $confirmation['name'] ),
 					'confirmation_type'    => $confirmation['type'],
-					'confirmation_message' => $confirmation['message'],
+					'confirmation_message' => $message,
 					'EditorLinkForm'       => $editor_link,
 				);
 
@@ -675,13 +680,18 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					)
 				);
 
+				$message = $confirmation['message'];
+				if ( '' === trim( $message ) ) {
+					$message = __( '-- NO MESSAGE TEXT --', 'wsal-gravityforms' );
+				}
+
 				$variables = array(
 					'EventType'            => 'created',
 					'form_name'            => sanitize_text_field( $form['title'] ),
 					'form_id'              => $form['id'],
 					'confirmation_name'    => sanitize_text_field( $confirmation['name'] ),
 					'confirmation_type'    => $confirmation['type'],
-					'confirmation_message' => $confirmation['message'],
+					'confirmation_message' => $message,
 					'EditorLinkForm'       => $editor_link,
 				);
 
@@ -704,13 +714,19 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			)
 		);
 
+		$message = $confirmation['message'];
+		if ( '' === trim( $message ) ) {
+			$message = __( '-- NO MESSAGE TEXT --', 'wsal-gravityforms' );
+		}
+
 		$variables = array(
-			'EventType'         => 'deleted',
-			'form_name'         => sanitize_text_field( $form['title'] ),
-			'form_id'           => $form['id'],
-			'confirmation_name' => sanitize_text_field( $confirmation['name'] ),
-			'confirmation_type' => $confirmation['type'],
-			'EditorLinkForm'    => $editor_link,
+			'EventType'            => 'deleted',
+			'form_name'            => sanitize_text_field( $form['title'] ),
+			'form_id'              => $form['id'],
+			'confirmation_name'    => sanitize_text_field( $confirmation['name'] ),
+			'confirmation_type'    => $confirmation['type'],
+			'confirmation_message' => $message,
+			'EditorLinkForm'       => $editor_link,
 		);
 
 		$this->plugin->alerts->Trigger( $alert_code, $variables );
