@@ -281,11 +281,16 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 						$event_type = 'duplicated';
 					}
 
+					$title = $notification['name'];
+					if ( '' === trim( $title ) ) {
+						$title = __( '-- UNTITLED --', 'wsal-gravityforms' );
+					}
+
 					$variables = array(
 						'EventType'         => $event_type,
 						'form_name'         => sanitize_text_field( $form['title'] ),
 						'form_id'           => $form['id'],
-						'notification_name' => sanitize_text_field( $notification['name'] ),
+						'notification_name' => sanitize_text_field( $title ),
 						'EditorLinkForm'    => $editor_link,
 					);
 
@@ -352,9 +357,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 									add_query_arg(
 										array(
 											'id'      => $form_id,
-											'nid'     => ( isset( $notificationData['id'] ) ) ? $notificationData['id']  : '',
-											'view'    => 'settings',
-											'subview' => 'notification',
 										),
 										admin_url( 'admin.php?page=gf_edit_forms' )
 									)
@@ -366,7 +368,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 									'field_type'        => $item->type,
 									'form_name'         => sanitize_text_field( $form['title'] ),
 									'form_id'           => $form_id,
-									'notification_name' => ( isset( $notificationData['name'] ) ) ? sanitize_text_field( $notificationData['name'] ) : '',
 									'EditorLinkForm'    => $editor_link,
 								);
 
@@ -391,9 +392,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 									add_query_arg(
 										array(
 											'id'      => $form_id,
-											'nid'     => ( isset( $notificationData['id'] ) ) ? $notificationData['id']  : '',
-											'view'    => 'settings',
-											'subview' => 'notification',
 										),
 										admin_url( 'admin.php?page=gf_edit_forms' )
 									)
@@ -405,7 +403,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 									'field_type'        => $item->type,
 									'form_name'         => sanitize_text_field( $form['title'] ),
 									'form_id'           => $form_id,
-									'notification_name' => ( isset( $notificationData['name'] ) ) ? sanitize_text_field( $notificationData['name'] ) : '',
 									'EditorLinkForm'    => $editor_link,
 								);
 
@@ -732,11 +729,16 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			)
 		);
 
+		$title = $notification['name'];
+		if ( '' === trim( $title ) ) {
+			$title = __( '-- UNTITLED --', 'wsal-gravityforms' );
+		}
+
 		$variables = array(
 			'EventType'         => 'deleted',
 			'form_name'         => sanitize_text_field( $form['title'] ),
 			'form_id'           => $form['id'],
-			'notification_name' => sanitize_text_field( $notification['name'] ),
+			'notification_name' => sanitize_text_field( $title ),
 			'EditorLinkForm'    => $editor_link,
 		);
 
