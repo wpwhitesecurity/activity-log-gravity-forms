@@ -280,6 +280,32 @@ $custom_alerts = array(
 				'gravityforms_settings',
 				'modified',
 			),
+            array(
+				5718,
+				WSAL_HIGH,
+				__( 'Form entries were imported / exported.', 'wsal-gravity-forms' ),
+				__( 'The entries from the form %form_name%.', 'wsal-gravity-forms' ),
+				array(
+					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					__( 'Date range start', 'wsal-gravity-forms' ) => '%start%',
+					__( 'Date range end', 'wsal-gravity-forms' ) => '%end%',
+				),
+				array(),
+				'gravityforms_settings',
+				'exported',
+			),
+            array(
+				5719,
+				WSAL_HIGH,
+				__( 'A form was imported / exported.', 'wsal-gravity-forms' ),
+				__( 'The form %form_name%.', 'wsal-gravity-forms' ),
+				array(
+					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+				),
+				array(),
+				'gravityforms_settings',
+				'imported',
+			),
 		),
 	),
 );

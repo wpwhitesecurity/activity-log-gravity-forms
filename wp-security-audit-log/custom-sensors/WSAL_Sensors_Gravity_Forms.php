@@ -52,11 +52,29 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 			// Global Settings.
 			add_action( 'updated_option', array( $this, 'event_settings_updated' ), 10, 3 );
+            add_action( 'wp_ajax_gf_process_export', array( $this, 'event_process_export' ), 10, 1 );          
 		}
 
 		// Form submitted.
 		add_action( 'gform_after_submission', array( $this, 'event_form_submitted' ), 10, 2 );
 	}
+
+    public function event_process_export() {
+        if ( isset( $_POST['export_form'] ) && check_admin_referer( 'rg_start_export', 'rg_start_export_nonce' ) ) {
+     
+            $form       = GFAPI::get_form( $_POST['export_form'] );
+            $alert_code = 5718;
+
+            $variables = array(
+                'form_name'      => sanitize_text_field( $form['title'] ),
+                'form_id'        => $_POST['export_form'],
+                'start'          => ( isset( $_POST['export_date_start'] ) && ! empty( $_POST['export_date_start'] ) ) ? $_POST['export_date_start'] : __( 'Not supplied', 'wsal-gravityforms' ),
+                'end'            => ( isset( $_POST['export_date_end'] ) && ! empty( $_POST['export_date_end'] ) ) ? $_POST['export_date_end'] : __( 'Not supplied', 'wsal-gravityforms' ),
+            );
+    
+            $this->plugin->alerts->Trigger( $alert_code, $variables );
+        }
+    }
 
 	public function get_before_post_edit_data( $form ) {
 
