@@ -1,20 +1,20 @@
 <?php // phpcs:disable WordPress.WP.I18n.UnorderedPlaceholdersText
 
 $custom_alerts = array(
-	__( 'Gravity Forms', 'wsal-gravity-forms' ) => array(
-		__( 'Monitor Gravity Forms', 'wsal-gravity-forms' ) => array(
+	esc_html__( 'Gravity Forms', 'wsal-gravity-forms' ) => array(
+		esc_html__( 'Monitor Gravity Forms', 'wsal-gravity-forms' ) => array(
 
 			array(
 				5700,
 				WSAL_LOW,
-				__( 'A form was created, modified', 'wsal-gravity-forms' ),
-				__( 'The Form called %form_name%.', 'wsal-gravity-forms' ),
+				esc_html__( 'A form was created, modified', 'wsal-gravity-forms' ),
+				esc_html__( 'The Form called %form_name%.', 'wsal-gravity-forms' ),
 
 				array(
-					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
 				),
 				array(
-					__( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
+					esc_html__( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
 				),
 				'gravityforms_forms',
 				'created',
@@ -23,14 +23,14 @@ $custom_alerts = array(
 			array(
 				5701,
 				WSAL_MEDIUM,
-				__( 'A form was moved to trash', 'wsal-gravity-forms' ),
-				__( 'Moved the form to trash.', 'wsal-gravity-forms' ),
+				esc_html__( 'A form was moved to trash', 'wsal-gravity-forms' ),
+				esc_html__( 'Moved the form to trash.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Form name', 'wsal-gravity-forms' ) => '%form_name%',
-					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Form name', 'wsal-gravity-forms' ) => '%form_name%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
 				),
 				array(
-					__( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
+					esc_html__( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
 				),
 				'gravityforms_forms',
 				'created',
@@ -39,10 +39,10 @@ $custom_alerts = array(
 			array(
 				5702,
 				WSAL_MEDIUM,
-				__( 'A form was permanently deleted', 'wsal-gravity-forms' ),
-				__( 'Permanently deleted the form %form_name%.', 'wsal-gravity-forms' ),
+				esc_html__( 'A form was permanently deleted', 'wsal-gravity-forms' ),
+				esc_html__( 'Permanently deleted the form %form_name%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
 				),
 				array(),
 				'gravityforms_forms',
@@ -52,15 +52,15 @@ $custom_alerts = array(
 			array(
 				5703,
 				WSAL_MEDIUM,
-				__( 'A form setting was modified', 'wsal-gravity-forms' ),
-				__( 'The setting %setting_name% in form %form_name%.', 'wsal-gravity-forms' ),
+				esc_html__( 'A form setting was modified', 'wsal-gravity-forms' ),
+				esc_html__( 'The setting %setting_name% in form %form_name%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Previous value', 'wsal-gravity-forms' ) => '%old_setting_value%',
-					__( 'New value', 'wsal-gravity-forms' ) => '%setting_value%',
-					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Previous value', 'wsal-gravity-forms' ) => '%old_setting_value%',
+					esc_html__( 'New value', 'wsal-gravity-forms' ) => '%setting_value%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
 				),
 				array(
-					__( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
+					esc_html__( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
 				),
 				'gravityforms_forms',
 				'modified',
@@ -69,15 +69,15 @@ $custom_alerts = array(
 			array(
 				5704,
 				WSAL_LOW,
-				__( 'A form was duplicated', 'wsal-gravity-forms' ),
-				__( 'Duplicated the form %original_form_name%.', 'wsal-gravity-forms' ),
+				esc_html__( 'A form was duplicated', 'wsal-gravity-forms' ),
+				esc_html__( 'Duplicated the form %original_form_name%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'New form name', 'wsal-gravity-forms' ) => '%new_form_name%',
-					__( 'Source form ID', 'wsal-gravity-forms' ) => '%original_form_id%',
-					__( 'New form ID', 'wsal-gravity-forms' ) => '%new_form_id%',
+					esc_html__( 'New form name', 'wsal-gravity-forms' ) => '%new_form_name%',
+					esc_html__( 'Source form ID', 'wsal-gravity-forms' ) => '%original_form_id%',
+					esc_html__( 'New form ID', 'wsal-gravity-forms' ) => '%new_form_id%',
 				),
 				array(
-					__( 'View new duplicated form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
+					esc_html__( 'View new duplicated form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
 				),
 				'gravityforms_forms',
 				'duplicated',
@@ -86,14 +86,14 @@ $custom_alerts = array(
 			array(
 				5715,
 				WSAL_MEDIUM,
-				__( 'A field was created, modified or deleted', 'wsal-gravity-forms' ),
-				__( 'The Field called %field_name% in the form %form_name%.', 'wsal-gravity-forms' ),
+				esc_html__( 'A field was created, modified or deleted', 'wsal-gravity-forms' ),
+				esc_html__( 'The Field called %field_name% in the form %form_name%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Field type', 'wsal-gravity-forms' ) => '%field_type%',
-					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Field type', 'wsal-gravity-forms' ) => '%field_type%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
 				),
 				array(
-					__( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
+					esc_html__( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
 				),
 				'gravityforms_fields',
 				'created',
@@ -102,14 +102,14 @@ $custom_alerts = array(
 			array(
 				5709,
 				WSAL_LOW,
-				__( 'A form was submitted', 'wsal-gravity-forms' ),
-				__( 'Submitted the form %form_name%.', 'wsal-gravity-forms' ),
+				esc_html__( 'A form was submitted', 'wsal-gravity-forms' ),
+				esc_html__( 'Submitted the form %form_name%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
-					__( 'Submission email', 'wsal-gravity-forms' ) => '%email%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Submission email', 'wsal-gravity-forms' ) => '%email%',
 				),
 				array(
-					__( 'View entry', 'wsal-gravity-forms' ) => '%EntryLink%',
+					esc_html__( 'View entry', 'wsal-gravity-forms' ) => '%EntryLink%',
 				),
 				'gravityforms_forms',
 				'duplicated',
@@ -121,15 +121,15 @@ $custom_alerts = array(
 			array(
 				5705,
 				WSAL_MEDIUM,
-				__( 'A confirmation was created, modified or deleted', 'wsal-gravity-forms' ),
-				__( 'The Confirmation called %confirmation_name% in the form %form_name%.', 'wsal-gravity-forms' ),
+				esc_html__( 'A confirmation was created, modified or deleted', 'wsal-gravity-forms' ),
+				esc_html__( 'The Confirmation called %confirmation_name% in the form %form_name%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Confirmation type', 'wsal-gravity-forms' ) => '%confirmation_type%',
-					__( 'Confirmation message', 'wsal-gravity-forms' ) => '%confirmation_message%',
-					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Confirmation type', 'wsal-gravity-forms' ) => '%confirmation_type%',
+					esc_html__( 'Confirmation message', 'wsal-gravity-forms' ) => '%confirmation_message%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
 				),
 				array(
-					__( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
+					esc_html__( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
 				),
 				'gravityforms_confirmations',
 				'created',
@@ -138,13 +138,13 @@ $custom_alerts = array(
 			array(
 				5708,
 				WSAL_LOW,
-				__( 'A confirmation was activated or deactivated', 'wsal-gravity-forms' ),
-				__( 'The confirmation %confirmation_name% in the form %form_name%.', 'wsal-gravity-forms' ),
+				esc_html__( 'A confirmation was activated or deactivated', 'wsal-gravity-forms' ),
+				esc_html__( 'The confirmation %confirmation_name% in the form %form_name%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
 				),
 				array(
-					__( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
+					esc_html__( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
 				),
 				'gravityforms_confirmations',
 				'created',
@@ -156,13 +156,13 @@ $custom_alerts = array(
 			array(
 				5706,
 				WSAL_MEDIUM,
-				__( 'A notification was created, modified or deleted', 'wsal-gravity-forms' ),
-				__( 'The Notification called %notification_name% in the form %form_name%.', 'wsal-gravity-forms' ),
+				esc_html__( 'A notification was created, modified or deleted', 'wsal-gravity-forms' ),
+				esc_html__( 'The Notification called %notification_name% in the form %form_name%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
 				),
 				array(
-					__( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
+					esc_html__( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
 				),
 				'gravityforms_notifications',
 				'created',
@@ -171,13 +171,13 @@ $custom_alerts = array(
 			array(
 				5707,
 				WSAL_LOW,
-				__( 'A notification was activated or deactivated', 'wsal-gravity-forms' ),
-				__( 'Changed the status of the Notification called %notification_name% in the form %form_name%.', 'wsal-gravity-forms' ),
+				esc_html__( 'A notification was activated or deactivated', 'wsal-gravity-forms' ),
+				esc_html__( 'Changed the status of the Notification called %notification_name% in the form %form_name%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
 				),
 				array(
-					__( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
+					esc_html__( 'View form in the editor', 'wsal-gravity-forms' ) => '%EditorLinkForm%',
 				),
 				'gravityforms_notifications',
 				'activated',
@@ -189,14 +189,14 @@ $custom_alerts = array(
 			array(
 				5710,
 				WSAL_LOW,
-				__( 'An entry was starred or unstarred', 'wsal-gravity-forms' ),
-				__( 'Entry title: %entry_title%.', 'wsal-gravity-forms' ),
+				esc_html__( 'An entry was starred or unstarred', 'wsal-gravity-forms' ),
+				esc_html__( 'Entry title: %entry_title%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Form name', 'wsal-gravity-forms' ) => '%form_name%',
-					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Form name', 'wsal-gravity-forms' ) => '%form_name%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
 				),
 				array(
-					__( 'View entry', 'wsal-gravity-forms' ) => '%EntryLink%',
+					esc_html__( 'View entry', 'wsal-gravity-forms' ) => '%EntryLink%',
 				),
 				'gravityforms_entries',
 				'starred',
@@ -205,13 +205,13 @@ $custom_alerts = array(
 			array(
 				5711,
 				WSAL_LOW,
-				__( 'An entry was marked as read or unread', 'wsal-gravity-forms' ),
-				__( 'The entry called %entry_title% from form %form_name%.', 'wsal-gravity-forms' ),
+				esc_html__( 'An entry was marked as read or unread', 'wsal-gravity-forms' ),
+				esc_html__( 'The entry called %entry_title% from form %form_name%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
 				),
 				array(
-					__( 'View entry', 'wsal-gravity-forms' ) => '%EntryLink%',
+					esc_html__( 'View entry', 'wsal-gravity-forms' ) => '%EntryLink%',
 				),
 				'gravityforms_entries',
 				'read',
@@ -220,14 +220,14 @@ $custom_alerts = array(
 			array(
 				5712,
 				WSAL_MEDIUM,
-				__( 'An entry was moved to trash', 'wsal-gravity-forms' ),
-				__( 'Deleted the entry %event_desc%.', 'wsal-gravity-forms' ),
+				esc_html__( 'An entry was moved to trash', 'wsal-gravity-forms' ),
+				esc_html__( 'Deleted the entry %event_desc%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Form name', 'wsal-gravity-forms' ) => '%form_name%',
-					__( 'Form ID ', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Form name', 'wsal-gravity-forms' ) => '%form_name%',
+					esc_html__( 'Form ID ', 'wsal-gravity-forms' ) => '%form_id%',
 				),
 				array(
-					__( 'View entry', 'wsal-gravity-forms' ) => '%EntryLink%',
+					esc_html__( 'View entry', 'wsal-gravity-forms' ) => '%EntryLink%',
 				),
 				'gravityforms_entries',
 				'read',
@@ -236,11 +236,11 @@ $custom_alerts = array(
 			array(
 				5713,
 				WSAL_MEDIUM,
-				__( 'An entry was permanently deleted', 'wsal-gravity-forms' ),
-				__( 'Permanently deleted the entry %entry_title%.', 'wsal-gravity-forms' ),
+				esc_html__( 'An entry was permanently deleted', 'wsal-gravity-forms' ),
+				esc_html__( 'Permanently deleted the entry %entry_title%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Form name', 'wsal-gravity-forms' ) => '%form_name%',
-					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Form name', 'wsal-gravity-forms' ) => '%form_name%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
 				),
 				array(),
 				'gravityforms_entries',
@@ -250,15 +250,15 @@ $custom_alerts = array(
 			array(
 				5714,
 				WSAL_MEDIUM,
-				__( 'An entry note was created or deleted', 'wsal-gravity-forms' ),
-				__( 'The entry note %entry_note%.', 'wsal-gravity-forms' ),
+				esc_html__( 'An entry note was created or deleted', 'wsal-gravity-forms' ),
+				esc_html__( 'The entry note %entry_note%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Entry title', 'wsal-gravity-forms' ) => '%entry_title%',
-					__( 'Form name', 'wsal-gravity-forms' ) => '%form_name%',
-					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Entry title', 'wsal-gravity-forms' ) => '%entry_title%',
+					esc_html__( 'Form name', 'wsal-gravity-forms' ) => '%form_name%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
 				),
 				array(
-					__( 'View entry', 'wsal-gravity-forms' ) => '%EntryLink%',
+					esc_html__( 'View entry', 'wsal-gravity-forms' ) => '%EntryLink%',
 				),
 				'gravityforms_entries',
 				'read',
@@ -270,37 +270,37 @@ $custom_alerts = array(
 			array(
 				5716,
 				WSAL_HIGH,
-				__( 'A plugin setting was changed.', 'wsal-gravity-forms' ),
-				__( 'Changed the plugin setting %setting_name%.', 'wsal-gravity-forms' ),
+				esc_html__( 'A plugin setting was changed.', 'wsal-gravity-forms' ),
+				esc_html__( 'Changed the plugin setting %setting_name%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Previous value', 'wsal-gravity-forms' ) => '%old_value%',
-					__( 'New value', 'wsal-gravity-forms' ) => '%new_value%',
+					esc_html__( 'Previous value', 'wsal-gravity-forms' ) => '%old_value%',
+					esc_html__( 'New value', 'wsal-gravity-forms' ) => '%new_value%',
 				),
 				array(),
 				'gravityforms_settings',
 				'modified',
 			),
-            array(
+			array(
 				5718,
 				WSAL_LOW,
-				__( 'Form entries were imported / exported.', 'wsal-gravity-forms' ),
-				__( 'The entries from the form %form_name%.', 'wsal-gravity-forms' ),
+				esc_html__( 'Form entries were imported / exported.', 'wsal-gravity-forms' ),
+				esc_html__( 'The entries from the form %form_name%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
-					__( 'Date range start', 'wsal-gravity-forms' ) => '%start%',
-					__( 'Date range end', 'wsal-gravity-forms' ) => '%end%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Date range start', 'wsal-gravity-forms' ) => '%start%',
+					esc_html__( 'Date range end', 'wsal-gravity-forms' ) => '%end%',
 				),
 				array(),
 				'gravityforms_settings',
 				'exported',
 			),
-            array(
+			array(
 				5719,
 				WSAL_LOW,
-				__( 'A form was imported / exported.', 'wsal-gravity-forms' ),
-				__( 'The form %form_name%.', 'wsal-gravity-forms' ),
+				esc_html__( 'A form was imported / exported.', 'wsal-gravity-forms' ),
+				esc_html__( 'The form %form_name%.', 'wsal-gravity-forms' ),
 				array(
-					__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
 				),
 				array(),
 				'gravityforms_settings',

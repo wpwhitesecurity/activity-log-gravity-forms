@@ -67,13 +67,13 @@ function wsal_gravityforms_add_custom_event_objects( $objects ) {
 
 function wsal_gravityforms_add_custom_event_type( $types ) {
 	$new_types = array(
-		'starred'   => __( 'Starred', 'wsal-gravity-forms' ),
-		'unstarred' => __( 'Unstarred', 'wsal-gravity-forms' ),
-		'read'      => __( 'Read', 'wsal-gravity-forms' ),
-		'unread'    => __( 'Unread', 'wsal-gravity-forms' ),
-		'submitted' => __( 'Submitted', 'wsal-gravity-forms' ),
-		'imported'  => __( 'Imported', 'wsal-gravity-forms' ),
-		'exported'  => __( 'Exported', 'wsal-gravity-forms' ),
+		'starred'   => esc_html__( 'Starred', 'wsal-gravity-forms' ),
+		'unstarred' => esc_html__( 'Unstarred', 'wsal-gravity-forms' ),
+		'read'      => esc_html__( 'Read', 'wsal-gravity-forms' ),
+		'unread'    => esc_html__( 'Unread', 'wsal-gravity-forms' ),
+		'submitted' => esc_html__( 'Submitted', 'wsal-gravity-forms' ),
+		'imported'  => esc_html__( 'Imported', 'wsal-gravity-forms' ),
+		'exported'  => esc_html__( 'Exported', 'wsal-gravity-forms' ),
 	);
 
 	// combine the two arrays.
@@ -129,7 +129,7 @@ function wsal_gravityforms_extension_replace_duplicate_event_notice() {
  * Replacement "duplicate event" notice text.
  */
 function wsal_gravityforms_extension_replacement_duplicate_event_notice() {
-	$replacement_text = __( 'You are running an old version of WP Activity Log. Please update the plugin to run it alongside this extension: GravityForms', 'wp-security-audit-log' );
+	$replacement_text = esc_html__( 'You are running an old version of WP Activity Log. Please update the plugin to run it alongside this extension: GravityForms', 'wp-security-audit-log' );
 	?>
 	<script type="text/javascript">
 		if ( jQuery( '.notice.notice-error span[style="color:#dc3232; font-weight:bold;"]' ).length ) {
@@ -144,12 +144,12 @@ function wsal_gravityforms_extension_replacement_duplicate_event_notice() {
  * Exactly like event 9099 within the WooCommerce extension and quite rare.
  */
 function wsal_gravityforms_init() {
-    if ( isset( $_POST['export_forms'] ) && check_admin_referer( 'gf_export_forms', 'gf_export_forms_nonce' ) ) {
-        $form_ids = isset( $_POST['gf_form_id'] ) ? $_POST['gf_form_id'] : array();
-        if ( ! empty( $form_ids  ) ) {
-            wsal_gravityforms_event_process_export_forms( $form_ids );
-        }
-    }
+	if ( isset( $_POST['export_forms'] ) && check_admin_referer( 'gf_export_forms', 'gf_export_forms_nonce' ) ) {
+		$form_ids = isset( $_POST['gf_form_id'] ) ? $_POST['gf_form_id'] : array();
+		if ( ! empty( $form_ids ) ) {
+			wsal_gravityforms_event_process_export_forms( $form_ids );
+		}
+	}
 }
 
 /**
@@ -158,22 +158,22 @@ function wsal_gravityforms_init() {
  * @param  array $form_ids - Array of form IDs being exported.
  */
 function wsal_gravityforms_event_process_export_forms( $form_ids ) {
-    foreach ( $form_ids as $form_id ) {
-        $form       = GFAPI::get_form( $form_id );
-        $alert_code = 5719;
+	foreach ( $form_ids as $form_id ) {
+		$form       = GFAPI::get_form( $form_id );
+		$alert_code = 5719;
 
-        $wsal = WpSecurityAuditLog::GetInstance();
+		$wsal = WpSecurityAuditLog::GetInstance();
 
-        if ( ! isset( $wsal->alerts ) ) {
-            $wsal->alerts = new WSAL_AlertManager( $wsal );
-        }
+		if ( ! isset( $wsal->alerts ) ) {
+			$wsal->alerts = new WSAL_AlertManager( $wsal );
+		}
 
-        $variables = array(
-            'EventType'      => 'exported',
-            'form_name'      => sanitize_text_field( $form['title'] ),
-            'form_id'        => $form_id,
-        );
+		$variables = array(
+			'EventType' => 'exported',
+			'form_name' => sanitize_text_field( $form['title'] ),
+			'form_id'   => $form_id,
+		);
 
-        $wsal->alerts->Trigger( $alert_code, $variables );
-    }
+		$wsal->alerts->Trigger( $alert_code, $variables );
+	}
 }

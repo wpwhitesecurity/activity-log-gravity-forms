@@ -33,7 +33,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			add_action( 'gform_post_form_duplicated', array( $this, 'event_form_duplicated' ), 10, 2 );
 			add_action( 'gform_post_update_form_meta', array( $this, 'event_form_meta_updated' ), 10, 3 );
 			add_action( 'gform_forms_post_import', array( $this, 'event_forms_imported' ), 10, 1 );
-            
+
 			// Confirmations.
 			add_action( 'gform_pre_confirmation_save', array( $this, 'event_form_confirmation_saved' ), 10, 3 );
 			add_action( 'gform_pre_confirmation_deleted', array( $this, 'event_form_confirmation_deleted' ), 10, 2 );
@@ -53,59 +53,58 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 			// Global Settings.
 			add_action( 'updated_option', array( $this, 'event_settings_updated' ), 10, 3 );
-            add_action( 'wp_ajax_gf_process_export', array( $this, 'event_process_export' ), 10, 1 );          
+			add_action( 'wp_ajax_gf_process_export', array( $this, 'event_process_export' ), 10, 1 );
 		}
 
 		// Form submitted.
 		add_action( 'gform_after_submission', array( $this, 'event_form_submitted' ), 10, 2 );
 	}
 
-    /**
-     * Handles forms being imported.
-     *
-     * @param  array $forms - new form data.
-     * @return void
-     */
-    public function event_forms_imported( $forms ) {
-        foreach ( $forms as $form ) {
-            $alert_code = 5719;
-    
-            $wsal = WpSecurityAuditLog::GetInstance();
-    
-            if ( ! isset( $wsal->alerts ) ) {
-                $wsal->alerts = new WSAL_AlertManager( $wsal );
-            }
-    
-            $variables = array(
-                'EventType'      => 'imported',
-                'form_name'      => sanitize_text_field( $form['title'] ),
-                'form_id'        => $form['id'],
-            );
-    
-            $wsal->alerts->Trigger( $alert_code, $variables );
-        }
-    }
+	/**
+	 * Handles forms being imported.
+	 *
+	 * @param  array $forms - new form data.
+	 * @return void
+	 */
+	public function event_forms_imported( $forms ) {
+		foreach ( $forms as $form ) {
+			$alert_code = 5719;
 
-    /**
-     * Handles triggering an event during export of fields
-     *
-     */
-    public function event_process_export() {
-        if ( isset( $_POST['export_form'] ) && check_admin_referer( 'rg_start_export', 'rg_start_export_nonce' ) ) {
-     
-            $form       = GFAPI::get_form( $_POST['export_form'] );
-            $alert_code = 5718;
+			$wsal = WpSecurityAuditLog::GetInstance();
 
-            $variables = array(
-                'form_name'      => sanitize_text_field( $form['title'] ),
-                'form_id'        => $_POST['export_form'],
-                'start'          => ( isset( $_POST['export_date_start'] ) && ! empty( $_POST['export_date_start'] ) ) ? $_POST['export_date_start'] : __( 'Not supplied', 'wsal-gravityforms' ),
-                'end'            => ( isset( $_POST['export_date_end'] ) && ! empty( $_POST['export_date_end'] ) ) ? $_POST['export_date_end'] : __( 'Not supplied', 'wsal-gravityforms' ),
-            );
-    
-            $this->plugin->alerts->Trigger( $alert_code, $variables );
-        }
-    }
+			if ( ! isset( $wsal->alerts ) ) {
+				$wsal->alerts = new WSAL_AlertManager( $wsal );
+			}
+
+			$variables = array(
+				'EventType' => 'imported',
+				'form_name' => sanitize_text_field( $form['title'] ),
+				'form_id'   => $form['id'],
+			);
+
+			$wsal->alerts->Trigger( $alert_code, $variables );
+		}
+	}
+
+	/**
+	 * Handles triggering an event during export of fields
+	 */
+	public function event_process_export() {
+		if ( isset( $_POST['export_form'] ) && check_admin_referer( 'rg_start_export', 'rg_start_export_nonce' ) ) {
+
+			$form       = GFAPI::get_form( $_POST['export_form'] );
+			$alert_code = 5718;
+
+			$variables = array(
+				'form_name' => sanitize_text_field( $form['title'] ),
+				'form_id'   => $_POST['export_form'],
+				'start'     => ( isset( $_POST['export_date_start'] ) && ! empty( $_POST['export_date_start'] ) ) ? $_POST['export_date_start'] : esc_html__( 'Not supplied', 'wsal-gravityforms' ),
+				'end'       => ( isset( $_POST['export_date_end'] ) && ! empty( $_POST['export_date_end'] ) ) ? $_POST['export_date_end'] : esc_html__( 'Not supplied', 'wsal-gravityforms' ),
+			);
+
+			$this->plugin->alerts->Trigger( $alert_code, $variables );
+		}
+	}
 
 	public function get_before_post_edit_data( $form ) {
 
@@ -306,7 +305,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 						$event_type = 'modified';
 					}
 
-					$notification_id = ( 'created' != $event_type ) ? rgpost( 'gform_notification_id' ) : key( array_slice( $value, -1, 1, true ) );
+					$notification_id = ( 'created' !== $event_type ) ? rgpost( 'gform_notification_id' ) : key( array_slice( $value, -1, 1, true ) );
 
 					$editor_link = esc_url(
 						add_query_arg(
@@ -320,7 +319,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 						)
 					);
 
-					if ( 'created' == $event_type ) {
+					if ( 'created' === $event_type ) {
 						$notification = $value[ $notification_id ];
 					} else {
 						// If there is no such notification (notificationId is the key) then notification has been deleted, that event wont be triggered and array with empy name is just to fulfill the logic later on
@@ -333,7 +332,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 					$title = $notification['name'];
 					if ( '' === trim( $title ) ) {
-						$title = __( '-- UNTITLED --', 'wsal-gravityforms' );
+						$title = esc_html__( '-- UNTITLED --', 'wsal-gravityforms' );
 					}
 
 					$variables = array(
@@ -364,7 +363,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 					$notification_id   = rgpost( 'gform_notification_id' );
 					$notification_data = array();
-					if ( $notification_id && '' != trim( $notification_id ) && isset( $form['notifications'][ $notification_id ] ) ) {
+					if ( $notification_id && '' !== trim( $notification_id ) && isset( $form['notifications'][ $notification_id ] ) ) {
 						$notification_data = $form['notifications'][ $notification_id ];
 					}
 
@@ -549,7 +548,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 						if ( empty( $value ) || 0 === $value ) {
 							$value      = 'Disabled';
 							$event_type = 'disabled';
-						} elseif ( 1 == $value ) {
+						} elseif ( 1 === $value ) {
 							$value      = 'Enabled';
 							$event_type = 'enabled';
 						} elseif ( 'retain' === $value ) {
@@ -607,15 +606,15 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 						switch ( $changed_setting ) {
 							case 'title':
-								$setting_name = __( 'Form title', 'wsal-gravityforms' );
+								$setting_name = esc_html__( 'Form title', 'wsal-gravityforms' );
 								break;
 
 							case 'cssClass':
-								$setting_name = __( 'CSS Class', 'wsal-gravityforms' );
+								$setting_name = esc_html__( 'CSS Class', 'wsal-gravityforms' );
 								break;
 
 							case 'description':
-								$setting_name = __( 'Form title', 'wsal-gravityforms' );
+								$setting_name = esc_html__( 'Form title', 'wsal-gravityforms' );
 								break;
 
 							case 'enableAnimation':
@@ -623,11 +622,11 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 							case 'requireLogin':
 							case 'scheduleForm':
 								$setting_name = str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $changed_setting ) ) );
-								$event_type   = ( 1 == $value ) ? 'enabled' : 'disabled';
+								$event_type   = ( 1 === $value ) ? 'enabled' : 'disabled';
 								// Tidy up bools.
-								if ( ! $old_value && 1 == $value || 1 == $old_value && ! $value ) {
-									$old_value = __( 'Disabled', 'wsal-gravityforms' );
-									$value     = __( 'Enabled', 'wsal-gravityforms' );
+								if ( ! $old_value && 1 === $value || 1 === $old_value && ! $value ) {
+									$old_value = esc_html__( 'Disabled', 'wsal-gravityforms' );
+									$value     = esc_html__( 'Enabled', 'wsal-gravityforms' );
 								}
 								break;
 
@@ -686,7 +685,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			foreach ( $this->_old_form['confirmations'] as $old_confirmation ) {
 				$id_to_lookup = $old_confirmation['id'];
 				// Check if confirmation is found in old form, if so, we know its a modification.
-				if ( $id_to_lookup == $confirmation['id'] ) {
+				if ( $id_to_lookup === $confirmation['id'] ) {
 					$is_an_update = true;
 				}
 			}
@@ -704,7 +703,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 				$message = $confirmation['message'];
 				if ( '' === trim( $message ) ) {
-					$message = __( '-- NO MESSAGE TEXT --', 'wsal-gravityforms' );
+					$message = esc_html__( '-- NO MESSAGE TEXT --', 'wsal-gravityforms' );
 				}
 
 				$variables = array(
@@ -731,7 +730,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 				$message = $confirmation['message'];
 				if ( '' === trim( $message ) ) {
-					$message = __( '-- NO MESSAGE TEXT --', 'wsal-gravityforms' );
+					$message = esc_html__( '-- NO MESSAGE TEXT --', 'wsal-gravityforms' );
 				}
 
 				$variables = array(
@@ -765,7 +764,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 		$message = $confirmation['message'];
 		if ( '' === trim( $message ) ) {
-			$message = __( '-- NO MESSAGE TEXT --', 'wsal-gravityforms' );
+			$message = esc_html__( '-- NO MESSAGE TEXT --', 'wsal-gravityforms' );
 		}
 
 		$variables = array(
@@ -796,7 +795,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 		$title = $notification['name'];
 		if ( '' === trim( $title ) ) {
-			$title = __( '-- UNTITLED --', 'wsal-gravityforms' );
+			$title = esc_html__( '-- UNTITLED --', 'wsal-gravityforms' );
 		}
 
 		$variables = array(
@@ -881,7 +880,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		);
 
 		// Starred.
-		if ( $previous_value != $property_value && 1 == $property_value ) {
+		if ( $previous_value !== $property_value && 1 === $property_value ) {
 			$alert_code = 5710;
 			$variables  = array(
 				'EventType'   => 'starred',
@@ -894,7 +893,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		}
 
 		// Unstarred.
-		if ( $previous_value != $property_value && 0 == $property_value  ) {
+		if ( $previous_value !== $property_value && 0 === $property_value ) {
 			$alert_code = 5710;
 			$variables  = array(
 				'EventType'   => 'unstarred',
@@ -935,7 +934,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		);
 
 		// Starred.
-		if ( $property_value == 1 ) {
+		if ( 1 === $property_value ) {
 			$alert_code = 5711;
 			$variables  = array(
 				'EventType'   => 'read',
@@ -948,7 +947,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		}
 
 		// Unstarred.
-		if ( $property_value == 0 ) {
+		if ( 0 === $property_value ) {
 			$alert_code = 5711;
 			$variables  = array(
 				'EventType'   => 'unread',
@@ -1173,23 +1172,23 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 			if ( 'rg_gforms_disable_css' === $option_name ) {
 				$option_name = 'Output CSS';
-				$event_type  = ( 1 == $value['enabled'] ) ? 'enabled' : 'disabled';
-				$value       = ( 1 == $value ) ? 'No' : 'Yes';
-				$old_value   = ( 1 == $old_value ) ? 'No' : 'Yes';
+				$event_type  = ( 1 === $value['enabled'] ) ? 'enabled' : 'disabled';
+				$value       = ( 1 === $value ) ? 'No' : 'Yes';
+				$old_value   = ( 1 === $old_value ) ? 'No' : 'Yes';
 			}
 
 			if ( 'rg_gforms_enable_html5' === $option_name ) {
 				$option_name = 'Output HTML5';
-				$event_type  = ( 1 == $value['enabled'] ) ? 'enabled' : 'disabled';
-				$value       = ( 1 == $value ) ? 'Yes' : 'No';
-				$old_value   = ( 1 == $old_value ) ? 'Yes' : 'No';
+				$event_type  = ( 1 === $value['enabled'] ) ? 'enabled' : 'disabled';
+				$value       = ( 1 === $value ) ? 'Yes' : 'No';
+				$old_value   = ( 1 === $old_value ) ? 'Yes' : 'No';
 			}
 
 			if ( 'gform_enable_noconflict' === $option_name ) {
 				$option_name = 'No-Conflict Mode';
-				$event_type  = ( 1 == $value['enabled'] ) ? 'enabled' : 'disabled';
-				$value       = ( 1 == $value ) ? 'On' : 'Off';
-				$old_value   = ( 1 == $old_value ) ? 'On' : 'Off';
+				$event_type  = ( 1 === $value['enabled'] ) ? 'enabled' : 'disabled';
+				$value       = ( 1 === $value ) ? 'On' : 'Off';
+				$old_value   = ( 1 === $old_value ) ? 'On' : 'Off';
 			}
 
 			if ( 'rg_gforms_currency' === $option_name ) {
@@ -1198,23 +1197,23 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 			if ( 'gform_enable_background_updates' === $option_name ) {
 				$option_name = 'Background updates';
-				$event_type  = ( 1 == $value['enabled'] ) ? 'enabled' : 'disabled';
-				$value       = ( 1 == $value ) ? 'On' : 'Off';
-				$old_value   = ( 1 == $old_value ) ? 'On' : 'Off';
+				$event_type  = ( 1 === $value['enabled'] ) ? 'enabled' : 'disabled';
+				$value       = ( 1 === $value ) ? 'On' : 'Off';
+				$old_value   = ( 1 === $old_value ) ? 'On' : 'Off';
 			}
 
 			if ( 'gform_enable_toolbar_menu' === $option_name ) {
 				$option_name = 'Toolbar menu';
-				$event_type  = ( 1 == $value['enabled'] ) ? 'enabled' : 'disabled';
-				$value       = ( 1 == $value ) ? 'On' : 'Off';
-				$old_value   = ( 1 == $old_value ) ? 'On' : 'Off';
+				$event_type  = ( 1 === $value['enabled'] ) ? 'enabled' : 'disabled';
+				$value       = ( 1 === $value ) ? 'On' : 'Off';
+				$old_value   = ( 1 === $old_value ) ? 'On' : 'Off';
 			}
 
 			if ( 'gform_enable_logging' === $option_name ) {
 				$option_name = 'Logging';
-				$event_type  = ( 1 == $value['enabled'] ) ? 'enabled' : 'disabled';
-				$value       = ( 1 == $value ) ? 'On' : 'Off';
-				$old_value   = ( 1 == $old_value ) ? 'On' : 'Off';
+				$event_type  = ( 1 === $value['enabled'] ) ? 'enabled' : 'disabled';
+				$value       = ( 1 === $value ) ? 'On' : 'Off';
+				$old_value   = ( 1 === $old_value ) ? 'On' : 'Off';
 			}
 
 			if ( 'rg_gforms_captcha_type' === $option_name ) {
@@ -1223,9 +1222,9 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 			if ( 'gravityformsaddon_gravityformswebapi_settings' === $option_name ) {
 				$option_name = 'Gravity Forms API Settings';
-				$event_type  = ( 1 == $value['enabled'] ) ? 'enabled' : 'disabled';
-				$value       = ( 1 == $value['enabled'] ) ? 'On' : 'Off';
-				$old_value   = ( 1 == $old_value['enabled'] ) ? 'On' : 'Off';
+				$event_type  = ( 1 === $value['enabled'] ) ? 'enabled' : 'disabled';
+				$value       = ( 1 === $value['enabled'] ) ? 'On' : 'Off';
+				$old_value   = ( 1 === $old_value['enabled'] ) ? 'On' : 'Off';
 			}
 
 			if ( 'rg_gforms_enable_akismet' === $option_name ) {
@@ -1233,9 +1232,9 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					return;
 				}
 				$option_name = 'Enable akisment';
-				$event_type  = ( 1 == $value['enabled'] ) ? 'enabled' : 'disabled';
-				$value       = ( isset( $value['enabled'] ) && 1 == $value['enabled'] ) ? 'On' : 'Off';
-				$old_value   = ( isset( $old_value['enabled'] ) && 1 == $old_value['enabled'] ) ? 'On' : 'Off';
+				$event_type  = ( 1 === $value['enabled'] ) ? 'enabled' : 'disabled';
+				$value       = ( isset( $value['enabled'] ) && 1 === $value['enabled'] ) ? 'On' : 'Off';
+				$old_value   = ( isset( $old_value['enabled'] ) && 1 === $old_value['enabled'] ) ? 'On' : 'Off';
 			}
 
 			$alert_code = 5716;
