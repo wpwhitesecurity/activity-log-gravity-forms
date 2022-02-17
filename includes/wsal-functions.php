@@ -1,6 +1,6 @@
 <?php
 /*
-	Filter in our custom functions into WSAL.
+Filter in our custom functions into WSAL.
  */
 add_filter( 'wsal_event_objects', 'wsal_gravityforms_add_custom_event_objects', 10, 2 );
 add_filter( 'wsal_event_type_data', 'wsal_gravityforms_add_custom_event_type', 10, 2 );
@@ -13,13 +13,14 @@ add_filter( 'wsal_load_on_frontend', 'wsal_gravityforms_allow_sensor_on_frontend
 
 
 function wsal_gravityforms_extension_load_public_sensors( $value ) {
-  $value[] = 'Gravity_Forms';
-  return $value;
+	$value[] = 'Gravity_Forms';
+	return $value;
 }
 
 function wsal_gravityforms_allow_sensor_on_frontend( $default, $frontend_events ) {
-  $should_load = ( $default || ! empty( $frontend_events['gravityforms'] ) ) ? true : false;;
-  return $should_load;
+	$should_load = ( $default || ! empty( $frontend_events['gravityforms'] ) ) ? true : false;
+
+	return $should_load;
 }
 
 /**
@@ -27,19 +28,19 @@ function wsal_gravityforms_allow_sensor_on_frontend( $default, $frontend_events 
  */
 function append_content_to_toggle( $alert_id ) {
 
-  if ( 5709 === $alert_id ) {
-    $frontend_events     = WSAL_Settings::get_frontend_events();
-    $enable_for_visitors = ( isset( $frontend_events['gravityforms'] ) && $frontend_events['gravityforms'] ) ? true : false;
-    ?>
-    <tr>
-      <td></td>
-      <td>
-        <input name="frontend-events[gravityforms]" type="checkbox" id="frontend-events[woocommerce]" value="1" <?php checked( $enable_for_visitors ); ?> />
-      </td>
-      <td colspan="2"><?php esc_html_e( 'Keep a log when website visitors submits a form (by default the plugin only keeps a log when logged in users submit a form).', 'wsal-gravity-forms' ); ?></td>
-    </tr>
-    <?php
-  }
+	if ( 5709 === $alert_id ) {
+		$frontend_events     = WSAL_Settings::get_frontend_events();
+		$enable_for_visitors = ( isset( $frontend_events['gravityforms'] ) && $frontend_events['gravityforms'] ) ? true : false;
+		?>
+	<tr>
+	  <td></td>
+	  <td>
+		<input name="frontend-events[gravityforms]" type="checkbox" id="frontend-events[woocommerce]" value="1" <?php checked( $enable_for_visitors ); ?> />
+	  </td>
+	  <td colspan="2"><?php esc_html_e( 'Keep a log when website visitors submits a form (by default the plugin only keeps a log when logged in users submit a form).', 'wsal-gravity-forms' ); ?></td>
+	</tr>
+		<?php
+	}
 }
 
 /**
@@ -63,24 +64,24 @@ function wsal_gravityforms_add_custom_event_objects( $objects ) {
 	return $objects;
 }
 
- function wsal_gravityforms_add_custom_event_type( $types ) {
- 	$new_types = array(
+function wsal_gravityforms_add_custom_event_type( $types ) {
+	$new_types = array(
 		'starred'   => __( 'Starred', 'wsal-gravity-forms' ),
 		'unstarred' => __( 'Unstarred', 'wsal-gravity-forms' ),
 		'read'      => __( 'Read', 'wsal-gravity-forms' ),
 		'unread'    => __( 'Unread', 'wsal-gravity-forms' ),
 		'submitted' => __( 'Submitted', 'wsal-gravity-forms' ),
- 	);
+	);
 
- 	// combine the two arrays.
- 	$types = array_merge( $types, $new_types );
+	// combine the two arrays.
+	$types = array_merge( $types, $new_types );
 
- 	return $types;
- }
+	return $types;
+}
 
  /**
- * Add specific events so we can use them for category titles.
- */
+  * Add specific events so we can use them for category titles.
+  */
 function wsal_gravityforms_extension_togglealerts_sub_category_events( $sub_category_events ) {
 	$new_events          = array( 5700, 5705, 5706, 5710, 5716 );
 	$sub_category_events = array_merge( $sub_category_events, $new_events );
@@ -132,5 +133,5 @@ function wsal_gravityforms_extension_replacement_duplicate_event_notice() {
 			jQuery( '.notice.notice-error span[style="color:#dc3232; font-weight:bold;"]' ).parent().text( '<?php echo esc_html( $replacement_text ); ?>' );
 		}
 	</script>
-<?php
+	<?php
 }

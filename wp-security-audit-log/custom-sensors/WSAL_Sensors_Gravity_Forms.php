@@ -1,4 +1,5 @@
-<?php
+<?php // phpcs:disable WordPress.Files.FileName.NotHyphenatedLowercase
+
 /**
  * Custom Sensors for PLUGINNAME
  *
@@ -241,10 +242,10 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 				// Handle form notifications.
 				if ( 'notifications' === $changed_setting ) {
-					$old_fields  = $this->_old_form[ $changed_setting ];
-					$alert_code  = 5706;
+					$old_fields = $this->_old_form[ $changed_setting ];
+					$alert_code = 5706;
 
-					$event_type   = false;
+					$event_type       = false;
 					$new_fields_count = count( json_decode( $form_meta, true ) );
 					$old_fields_count = count( $old_fields );
 
@@ -256,13 +257,13 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 						$event_type = 'modified';
 					}
 
-					$notificationId = ( 'created' != $event_type ) ? rgpost( 'gform_notification_id' ) : key( array_slice( $value, -1, 1, true ) );
+					$notification_id = ( 'created' != $event_type ) ? rgpost( 'gform_notification_id' ) : key( array_slice( $value, -1, 1, true ) );
 
 					$editor_link = esc_url(
 						add_query_arg(
 							array(
-								'id' => $form['id'],
-								'nid' => $notificationId,
+								'id'      => $form['id'],
+								'nid'     => $notification_id,
 								'view'    => 'settings',
 								'subview' => 'notification',
 							),
@@ -271,10 +272,10 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					);
 
 					if ( 'created' == $event_type ) {
-						$notification = $value[ $notificationId ];
+						$notification = $value[ $notification_id ];
 					} else {
 						// If there is no such notification (notificationId is the key) then notification has been deleted, that event wont be triggered and array with empy name is just to fulfill the logic later on
-						$notification = ( isset( $value[ $notificationId ] ) ) ? $value[ $notificationId ] : [ 'name' => '' ];
+						$notification = ( isset( $value[ $notification_id ] ) ) ? $value[ $notification_id ] : array( 'name' => '' );
 					}
 
 					if ( isset( $_REQUEST['action'] ) && 'duplicate' === $_REQUEST['action'] && count( $value ) > count( $old_fields ) ) {
@@ -303,19 +304,19 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 							 * @return bool
 							 */
 							function ( $manager ) {
-								//  don't fire if there's already an event 5707
+								// don't fire if there's already an event 5707
 								return ! $manager->WillOrHasTriggered( 5707 );
 							}
-					 );
+						);
 					}
 				}
 
 				if ( 'fields' === $changed_setting ) {
 
-					$notificationId = rgpost( 'gform_notification_id' );
-					$notificationData = [];
-					if ( $notificationId && '' != trim( $notificationId ) && isset( $form['notifications'][ $notificationId ] ) ) {
-						$notificationData = $form['notifications'][ $notificationId ];
+					$notification_id   = rgpost( 'gform_notification_id' );
+					$notification_data = array();
+					if ( $notification_id && '' != trim( $notification_id ) && isset( $form['notifications'][ $notification_id ] ) ) {
+						$notification_data = $form['notifications'][ $notification_id ];
 					}
 
 					$old_fields     = $this->_old_form['fields'];
@@ -356,19 +357,19 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 								$editor_link = esc_url(
 									add_query_arg(
 										array(
-											'id'      => $form_id,
+											'id' => $form_id,
 										),
 										admin_url( 'admin.php?page=gf_edit_forms' )
 									)
 								);
 
 								$variables = array(
-									'EventType'         => 'added',
-									'field_name'        => $item->label,
-									'field_type'        => $item->type,
-									'form_name'         => sanitize_text_field( $form['title'] ),
-									'form_id'           => $form_id,
-									'EditorLinkForm'    => $editor_link,
+									'EventType'      => 'added',
+									'field_name'     => $item->label,
+									'field_type'     => $item->type,
+									'form_name'      => sanitize_text_field( $form['title'] ),
+									'form_id'        => $form_id,
+									'EditorLinkForm' => $editor_link,
 								);
 
 								$this->plugin->alerts->TriggerIf( $alert_code, $variables, array( $this, 'must_not_duplicated_form' ) );
@@ -391,19 +392,19 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 								$editor_link = esc_url(
 									add_query_arg(
 										array(
-											'id'      => $form_id,
+											'id' => $form_id,
 										),
 										admin_url( 'admin.php?page=gf_edit_forms' )
 									)
 								);
 
 								$variables = array(
-									'EventType'         => 'modified',
-									'field_name'        => $item->label,
-									'field_type'        => $item->type,
-									'form_name'         => sanitize_text_field( $form['title'] ),
-									'form_id'           => $form_id,
-									'EditorLinkForm'    => $editor_link,
+									'EventType'      => 'modified',
+									'field_name'     => $item->label,
+									'field_type'     => $item->type,
+									'form_name'      => sanitize_text_field( $form['title'] ),
+									'form_id'        => $form_id,
+									'EditorLinkForm' => $editor_link,
 								);
 
 								$this->plugin->alerts->TriggerIf( $alert_code, $variables, array( $this, 'must_not_duplicated_form' ) );
@@ -497,7 +498,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 						// Give the value a more useful label.
 						if ( empty( $value ) || 0 === $value ) {
-							$value = 'Disabled';
+							$value      = 'Disabled';
 							$event_type = 'disabled';
 						} elseif ( 1 == $value ) {
 							$value      = 'Enabled';
@@ -512,13 +513,13 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 						if ( ! $this->was_triggered_recently( 5703 ) ) {
 							$variables = array(
-								'EventType'      => $event_type,
-								'setting_name'   => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $name ) ) ) ),
+								'EventType'         => $event_type,
+								'setting_name'      => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $name ) ) ) ),
 								'old_setting_value' => ( isset( $this->_old_form[ $changed_setting ] ) && $this->_old_form[ $changed_setting ] ) ? $old_value : 'N/A',
-								'setting_value'  => sanitize_text_field( $value ),
-								'form_name'      => sanitize_text_field( $form['title'] ),
-								'form_id'        => $form_id,
-								'EditorLinkForm' => $editor_link,
+								'setting_value'     => sanitize_text_field( $value ),
+								'form_name'         => sanitize_text_field( $form['title'] ),
+								'form_id'           => $form_id,
+								'EditorLinkForm'    => $editor_link,
 							);
 							$this->plugin->alerts->Trigger( $alert_code, $variables );
 						}
@@ -576,8 +577,8 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 								$event_type   = ( 1 == $value ) ? 'enabled' : 'disabled';
 								// Tidy up bools.
 								if ( ! $old_value && 1 == $value || 1 == $old_value && ! $value ) {
-									$old_value  = __( 'Disabled', 'wsal-gravityforms' );
-									$value      = __( 'Enabled', 'wsal-gravityforms' );
+									$old_value = __( 'Disabled', 'wsal-gravityforms' );
+									$value     = __( 'Enabled', 'wsal-gravityforms' );
 								}
 								break;
 
@@ -589,7 +590,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 							default:
 								$setting_name = sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $changed_setting ) ) ) );
 						}
-
 
 						$variables = array(
 							'EventType'         => $event_type,
@@ -766,13 +766,13 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	/**
 	 * Process and triggers the event loging
 	 *
-	 * @param array $notification
+	 * @param array        $notification
 	 * @param GFFormsModel $form
-	 * @param string $eventType
+	 * @param string       $event_type
 	 *
 	 * @return void
 	 */
-	private function formActivationDeactivationEventLog( $notification, $form, string $eventType ) {
+	private function formActivationDeactivationEventLog( $notification, $form, string $event_type ) {
 		$alert_code  = 5707;
 		$editor_link = esc_url(
 			add_query_arg(
@@ -784,7 +784,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		);
 
 		$variables = array(
-			'EventType'         => $eventType,
+			'EventType'         => $event_type,
 			'form_name'         => sanitize_text_field( $form['title'] ),
 			'form_id'           => $form['id'],
 			'notification_name' => sanitize_text_field( $notification['name'] ),
@@ -832,7 +832,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		);
 
 		// Starred.
-		if ( $previous_value != $property_value && $property_value == 1 ) {
+		if ( $previous_value != $property_value && 1 == $property_value ) {
 			$alert_code = 5710;
 			$variables  = array(
 				'EventType'   => 'starred',
@@ -845,7 +845,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		}
 
 		// Unstarred.
-		if ( $previous_value != $property_value && $property_value == 0 ) {
+		if ( $previous_value != $property_value && 0 == $property_value  ) {
 			$alert_code = 5710;
 			$variables  = array(
 				'EventType'   => 'unstarred',
