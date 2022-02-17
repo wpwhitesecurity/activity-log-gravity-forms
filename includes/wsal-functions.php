@@ -72,6 +72,7 @@ function wsal_gravityforms_add_custom_event_type( $types ) {
 		'read'      => __( 'Read', 'wsal-gravity-forms' ),
 		'unread'    => __( 'Unread', 'wsal-gravity-forms' ),
 		'submitted' => __( 'Submitted', 'wsal-gravity-forms' ),
+		'imported'  => __( 'Imported', 'wsal-gravity-forms' ),
 		'exported'  => __( 'Exported', 'wsal-gravity-forms' ),
 	);
 

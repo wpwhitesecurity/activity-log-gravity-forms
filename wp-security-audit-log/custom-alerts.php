@@ -282,7 +282,7 @@ $custom_alerts = array(
 			),
             array(
 				5718,
-				WSAL_HIGH,
+				WSAL_LOW,
 				__( 'Form entries were imported / exported.', 'wsal-gravity-forms' ),
 				__( 'The entries from the form %form_name%.', 'wsal-gravity-forms' ),
 				array(
@@ -296,7 +296,7 @@ $custom_alerts = array(
 			),
             array(
 				5719,
-				WSAL_HIGH,
+				WSAL_LOW,
 				__( 'A form was imported / exported.', 'wsal-gravity-forms' ),
 				__( 'The form %form_name%.', 'wsal-gravity-forms' ),
 				array(

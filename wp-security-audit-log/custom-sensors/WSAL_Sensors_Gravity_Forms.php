@@ -32,7 +32,8 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			add_action( 'gform_before_delete_form', array( $this, 'event_form_deleted' ) );
 			add_action( 'gform_post_form_duplicated', array( $this, 'event_form_duplicated' ), 10, 2 );
 			add_action( 'gform_post_update_form_meta', array( $this, 'event_form_meta_updated' ), 10, 3 );
-
+			add_action( 'gform_forms_post_import', array( $this, 'event_forms_imported' ), 10, 1 );
+            
 			// Confirmations.
 			add_action( 'gform_pre_confirmation_save', array( $this, 'event_form_confirmation_saved' ), 10, 3 );
 			add_action( 'gform_pre_confirmation_deleted', array( $this, 'event_form_confirmation_deleted' ), 10, 2 );
@@ -59,6 +60,36 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		add_action( 'gform_after_submission', array( $this, 'event_form_submitted' ), 10, 2 );
 	}
 
+    /**
+     * Handles forms being imported.
+     *
+     * @param  array $forms - new form data.
+     * @return void
+     */
+    public function event_forms_imported( $forms ) {
+        foreach ( $forms as $form ) {
+            $alert_code = 5719;
+    
+            $wsal = WpSecurityAuditLog::GetInstance();
+    
+            if ( ! isset( $wsal->alerts ) ) {
+                $wsal->alerts = new WSAL_AlertManager( $wsal );
+            }
+    
+            $variables = array(
+                'EventType'      => 'imported',
+                'form_name'      => sanitize_text_field( $form['title'] ),
+                'form_id'        => $form['id'],
+            );
+    
+            $wsal->alerts->Trigger( $alert_code, $variables );
+        }
+    }
+
+    /**
+     * Handles triggering an event during export of fields
+     *
+     */
     public function event_process_export() {
         if ( isset( $_POST['export_form'] ) && check_admin_referer( 'rg_start_export', 'rg_start_export_nonce' ) ) {
      
