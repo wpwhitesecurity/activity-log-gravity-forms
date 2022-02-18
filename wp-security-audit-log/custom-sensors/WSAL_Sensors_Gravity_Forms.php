@@ -6,7 +6,7 @@
  * Class file for alert manager.
  *
  * @since   1.0.0
- * @package Wsal
+ * @package WSAL_GravityForms
  */
 class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
