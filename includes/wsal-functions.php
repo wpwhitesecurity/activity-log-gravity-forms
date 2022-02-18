@@ -19,7 +19,7 @@ function wsal_gravityforms_extension_load_public_sensors( $value ) {
 }
 
 function wsal_gravityforms_allow_sensor_on_frontend( $default, $frontend_events ) {
-	$should_load = ( $default || ! empty( $frontend_events['gravityforms'] ) ) ? true : false;
+	return ( $default || ! empty( $frontend_events['gravityforms'] );
 
 	return $should_load;
 }
