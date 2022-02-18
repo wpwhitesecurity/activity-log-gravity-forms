@@ -90,19 +90,26 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	public function event_process_export() {
 		if ( isset( $_POST['export_form'] ) && check_admin_referer( 'rg_start_export', 'rg_start_export_nonce' ) ) {
 
-			$form       = GFAPI::get_form( $_POST['export_form'] );
+			$form = GFAPI::get_form( sanitize_text_field( wp_unslash( $_POST['export_form'] ) ) );
 
 			$variables = array(
 				'form_name' => sanitize_text_field( $form['title'] ),
-				'form_id'   => $_POST['export_form'],
-				'start'     => ( isset( $_POST['export_date_start'] ) && ! empty( $_POST['export_date_start'] ) ) ? $_POST['export_date_start'] : esc_html__( 'Not supplied', 'wsal-gravityforms' ),
-				'end'       => ( isset( $_POST['export_date_end'] ) && ! empty( $_POST['export_date_end'] ) ) ? $_POST['export_date_end'] : esc_html__( 'Not supplied', 'wsal-gravityforms' ),
+				'form_id'   => sanitize_text_field( wp_unslash( $_POST['export_form'] ) ),
+				'start'     => ( isset( $_POST['export_date_start'] ) && ! empty( $_POST['export_date_start'] ) ) ? sanitize_text_field( wp_unslash( $_POST['export_date_start'] ) ) : esc_html__( 'Not supplied', 'wsal-gravityforms' ),
+				'end'       => ( isset( $_POST['export_date_end'] ) && ! empty( $_POST['export_date_end'] ) ) ? sanitize_text_field( wp_unslash( $_POST['export_date_end'] ) ) : esc_html__( 'Not supplied', 'wsal-gravityforms' ),
 			);
 
 			$this->plugin->alerts->Trigger( 5718, $variables );
 		}
 	}
 
+	/**
+	 * Gather form data during an edit so we know what the old form was.
+	 *
+	 * @param  object $form - Form data.
+	 *
+	 * @return object $form - Form data, passed back so things can continue as normal.
+	 */
 	public function get_before_post_edit_data( $form ) {
 
 		if ( isset( $form ) ) {
@@ -119,9 +126,10 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	/**
 	 * Forms created,
 	 *
-	 * @param  [type]  $form   [description]
-	 * @param  boolean $is_new [description]
-	 * @return [type]          [description]
+	 * @param  array   $form   New form data.
+	 * @param  boolean $is_new Is a new form or an update.
+	 *
+	 * @return void
 	 */
 	public function event_form_saved( $form, $is_new ) {
 
@@ -146,19 +154,21 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			$this->plugin->alerts->Trigger( 5700, $variables );
 		} else {
 			// Otherwise, the form has been edited, so lets see whats going on.
-
+			?>
+			<?php
 		}
 
 	}
 
 	/**
-	 * [event_form_trashed description]
+	 * Trigger event when a form is sent to trash.
 	 *
-	 * @param  [type] $form_id [description]
-	 * @return [type]          [description]
+	 * @param  int $form_id Form ID.
+	 *
+	 * @return int $form_id Form ID.
 	 */
 	public function event_form_trashed( $form_id ) {
-		$form       = GFAPI::get_form( $form_id );
+		$form = GFAPI::get_form( $form_id );
 
 		$editor_link = esc_url(
 			add_query_arg(
@@ -182,13 +192,13 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	}
 
 	/**
-	 * [event_form_deleted description]
+	 * Trigger an event when a form is deleted.
 	 *
-	 * @param  [type] $form_id [description]
-	 * @return [type]          [description]
+	 * @param  int $form_id Form ID.
+	 * @return void
 	 */
 	public function event_form_deleted( $form_id ) {
-		$form       = GFAPI::get_form( $form_id );
+		$form = GFAPI::get_form( $form_id );
 
 		$variables = array(
 			'EventType' => 'deleted',
@@ -199,6 +209,13 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		$this->plugin->alerts->Trigger( 5702, $variables );
 	}
 
+	/**
+	 * Trigger an event when a form is duplicated.
+	 *
+	 * @param  int $form_id Form ID.
+	 * @param  int $new_id New form ID.
+	 * @return void
+	 */
 	public function event_form_duplicated( $form_id, $new_id ) {
 		$original_form = GFAPI::get_form( $form_id );
 		$new_form      = GFAPI::get_form( $new_id );
@@ -223,6 +240,14 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		$this->plugin->alerts->Trigger( 5704, $variables );
 	}
 
+	/**
+	 * Trigger an event when a form us updated.
+	 *
+	 * @param array  $form_meta - Form metadata.
+	 * @param int    $form_id - Form id.
+	 * @param string $meta_name - Changes item name.
+	 * @return void
+	 */
 	public function event_form_meta_updated( $form_meta, $form_id, $meta_name ) {
 
 		if ( isset( $this->_old_form ) ) {
@@ -314,7 +339,8 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					if ( 'created' === $event_type ) {
 						$notification = $value[ $notification_id ];
 					} else {
-						// If there is no such notification (notificationId is the key) then notification has been deleted, that event wont be triggered and array with empy name is just to fulfill the logic later on
+						// If there is no such notification (notificationId is the key) then notification has been deleted,
+						// that event wont be triggered and array with empy name is just to fulfill the logic later on.
 						$notification = ( isset( $value[ $notification_id ] ) ) ? $value[ $notification_id ] : array( 'name' => '' );
 					}
 
@@ -340,11 +366,13 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 							$alert_code,
 							$variables,
 							/**
+							 * The WSAL alert manager.
+							 *
 							 * @param WSAL_AlertManager $manager
 							 * @return bool
 							 */
 							function ( $manager ) {
-								// don't fire if there's already an event 5707
+								// don't fire if there's already an event 5707.
 								return ! $manager->WillOrHasTriggered( 5707 );
 							}
 						);
@@ -380,7 +408,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					);
 					$changed_items         = array_map( 'unserialize', $compare_changed_items );
 
-					// Handle added items
+					// Handle added items.
 					if ( ! empty( $added_items ) && ( count( $current_fields ) > count( $old_fields ) ) ) {
 						foreach ( $added_items as $item ) {
 
@@ -462,25 +490,25 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 							}
 
 							if ( $ok_to_alert ) {
-                                $editor_link = esc_url(
-                                    add_query_arg(
-                                        array(
-                                            'id' => $form_id,
-                                        ),
-                                        admin_url( 'admin.php?page=gf_edit_forms' )
-                                    )
-                                );
+								$editor_link = esc_url(
+									add_query_arg(
+										array(
+											'id' => $form_id,
+										),
+										admin_url( 'admin.php?page=gf_edit_forms' )
+									)
+								);
 
-                                    $variables = array(
-                                        'EventType'  => 'removed',
-                                        'field_name' => $item->label,
-                                        'field_type' => $item->type,
-                                        'form_name'  => sanitize_text_field( $form['title'] ),
-                                        'form_id'    => $form_id,
-                                        'EditorLinkForm' => $editor_link,
-                                    );
+									$variables = array(
+										'EventType'      => 'removed',
+										'field_name'     => $item->label,
+										'field_type'     => $item->type,
+										'form_name'      => sanitize_text_field( $form['title'] ),
+										'form_id'        => $form_id,
+										'EditorLinkForm' => $editor_link,
+									);
 
-                                    $this->plugin->alerts->Trigger( 5715, $variables );
+									$this->plugin->alerts->Trigger( 5715, $variables );
 							}
 						}
 					}
@@ -643,6 +671,12 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 	}
 
+	/**
+	 * Check if another relevant event has triggered.
+	 *
+	 * @param WSAL_AlertManager $manager - The WSAL alert manager.
+	 * @return bool
+	 */
 	public function must_not_duplicated_form( WSAL_AlertManager $manager ) {
 		if ( $manager->WillOrHasTriggered( 5704 ) ) {
 			return false;
@@ -656,6 +690,12 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		return true;
 	}
 
+	/**
+	 * Check if 5705 specifical has been fired.
+	 *
+	 * @param WSAL_AlertManager $manager - The WSAL alert manager.
+	 * @return bool
+	 */
 	public function check_if_new_confirmation( WSAL_AlertManager $manager ) {
 		if ( $manager->WillOrHasTriggered( 5705 ) ) {
 			return false;
@@ -663,11 +703,18 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		return true;
 	}
 
+	/**
+	 * Trigger an event when a confirmation has been saved.
+	 *
+	 * @param array $confirmation - Confirmaiton data.
+	 * @param array $form - Form data.
+	 * @return array $confirmation - Confirmaiton data.
+	 */
 	public function event_form_confirmation_saved( $confirmation, $form ) {
 
 		$is_an_update = false;
 
-		// Handle modified confirmations
+		// Handle modified confirmations.
 		if ( isset( $this->_old_form['confirmations'] ) ) {
 			foreach ( $this->_old_form['confirmations'] as $old_confirmation ) {
 				$id_to_lookup = $old_confirmation['id'];
@@ -735,6 +782,13 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		return $confirmation;
 	}
 
+	/**
+	 * Trigger event if confirmation is deleted.
+	 *
+	 * @param array $confirmation - Confirmation data.
+	 * @param array $form - Form data.
+	 * @return array $confirmation - Confirmation data.
+	 */
 	public function event_form_confirmation_deleted( $confirmation, $form ) {
 
 		$editor_link = esc_url(
@@ -766,6 +820,13 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		return $confirmation;
 	}
 
+	/**
+	 * Trigger event if notification is deleted.
+	 *
+	 * @param array $notification - Notification data.
+	 * @param array $form - Form data.
+	 * @return array $notification - Notification data.
+	 */
 	public function event_form_notification_deleted( $notification, $form ) {
 		$editor_link = esc_url(
 			add_query_arg(
@@ -797,11 +858,11 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	/**
 	 * Process and triggers the event loging
 	 *
-	 * @param array        $notification
-	 * @param GFFormsModel $form
-	 * @param string       $event_type
+	 * @param array        $notification - Notification data.
+	 * @param GFFormsModel $form - Form data.
+	 * @param string       $event_type - Current event type.
 	 *
-	 * @return void
+	 * @return array $notification - Notification data.
 	 */
 	private function formActivationDeactivationEventLog( $notification, $form, string $event_type ) {
 		$editor_link = esc_url(
@@ -826,14 +887,38 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		return $notification;
 	}
 
+	/**
+	 * A notificationw as activated
+	 *
+	 * @param array        $notification - Notification data.
+	 * @param GFFormsModel $form - Form data.
+	 *
+	 * @return array $notification - Notification data.
+	 */
 	public function event_form_notification_activated( $notification, $form ) {
 		return $this->formActivationDeactivationEventLog( $notification, $form, 'activated' );
 	}
 
+	/**
+	 * A notificationw as deactivated
+	 *
+	 * @param array        $notification - Notification data.
+	 * @param GFFormsModel $form - Form data.
+	 *
+	 * @return array $notification - Notification data.
+	 */
 	public function event_form_notification_deactivated( $notification, $form ) {
 		return $this->formActivationDeactivationEventLog( $notification, $form, 'deactivated' );
 	}
 
+	/**
+	 * Trigger event when an entry is starred
+	 *
+	 * @param int    $entry_id - Entry ID.
+	 * @param string $property_value - New value.
+	 * @param string $previous_value - Old value.
+	 * @return void
+	 */
 	public function event_form_entry_starred( $entry_id, $property_value, $previous_value ) {
 
 		$entry = GFAPI::get_entry( $entry_id );
@@ -863,7 +948,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 		// Starred.
 		if ( $previous_value !== $property_value && 1 === $property_value ) {
-			$variables  = array(
+			$variables = array(
 				'EventType'   => 'starred',
 				'entry_title' => $entry_name,
 				'form_name'   => $form['title'],
@@ -875,7 +960,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 		// Unstarred.
 		if ( $previous_value !== $property_value && 0 === $property_value ) {
-			$variables  = array(
+			$variables = array(
 				'EventType'   => 'unstarred',
 				'entry_title' => $entry_name,
 				'form_name'   => $form['title'],
@@ -887,6 +972,14 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 	}
 
+	/**
+	 * Trigger event when an entry is read
+	 *
+	 * @param int    $entry_id - Entry ID.
+	 * @param string $property_value - New value.
+	 * @param string $previous_value - Old value.
+	 * @return void
+	 */
 	public function event_form_entry_read( $entry_id, $property_value, $previous_value ) {
 		$entry = GFAPI::get_entry( $entry_id );
 		$form  = GFAPI::get_form( $entry['form_id'] );
@@ -915,7 +1008,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 		// Starred.
 		if ( 1 === $property_value ) {
-			$variables  = array(
+			$variables = array(
 				'EventType'   => 'read',
 				'entry_title' => $entry_name,
 				'form_name'   => $form['title'],
@@ -927,7 +1020,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 		// Unstarred.
 		if ( 0 === $property_value ) {
-			$variables  = array(
+			$variables = array(
 				'EventType'   => 'unread',
 				'entry_title' => $entry_name,
 				'form_name'   => $form['title'],
@@ -939,6 +1032,12 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 	}
 
+	/**
+	 * Trigger event when an entry is deleted.
+	 *
+	 * @param  int $entry_id - Entry ID.
+	 * @return void
+	 */
 	public function event_form_entry_deleted( $entry_id ) {
 		$entry = GFAPI::get_entry( $entry_id );
 		$form  = GFAPI::get_form( $entry['form_id'] );
@@ -954,7 +1053,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			$entry_name = 'Not found';
 		}
 
-		$variables  = array(
+		$variables = array(
 			'EventType'   => 'deleted',
 			'entry_title' => $entry_name,
 			'form_name'   => $form['title'],
@@ -964,6 +1063,14 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 	}
 
+	/**
+	 * Trigger an event when an entry is trashed
+	 *
+	 * @param int    $entry_id - Entry ID.
+	 * @param string $property_value - New value.
+	 * @param string $previous_value - Old value.
+	 * @return void
+	 */
 	public function event_form_entry_trashed( $entry_id, $property_value, $previous_value ) {
 		if ( $previous_value !== $property_value && 'trash' === $property_value ) {
 			$entry = GFAPI::get_entry( $entry_id );
@@ -991,7 +1098,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				)
 			);
 
-			$variables  = array(
+			$variables = array(
 				'EventType'   => 'deleted',
 				'event_desc'  => esc_html__( 'moved to trash', 'wsal-gravity-forms' ),
 				'entry_title' => $entry_name,
@@ -1028,7 +1135,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				)
 			);
 
-			$variables  = array(
+			$variables = array(
 				'EventType'   => 'restored',
 				'event_desc'  => esc_html__( 'restored', 'wsal-gravity-forms' ),
 				'entry_title' => $entry_name,
@@ -1041,6 +1148,17 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 	}
 
+	/**
+	 * Trigger an event when a note is added to an entry.
+	 *
+	 * @param int    $insert_id - Note ID.
+	 * @param int    $entry_id - Entry ID.
+	 * @param int    $user_id - User ID.
+	 * @param string $user_name - User name.
+	 * @param string $note - Note content.
+	 * @param string $note_type - Note type.
+	 * @return void
+	 */
 	public function event_form_entry_note_added( $insert_id, $entry_id, $user_id, $user_name, $note, $note_type ) {
 
 		if ( 'user' === $note_type ) {
@@ -1069,7 +1187,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				)
 			);
 
-			$variables  = array(
+			$variables = array(
 				'EventType'   => 'added',
 				'entry_note'  => $note,
 				'entry_title' => $entry_name,
@@ -1114,7 +1232,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			)
 		);
 
-		$variables  = array(
+		$variables = array(
 			'EventType'   => 'deleted',
 			'entry_note'  => $note->value,
 			'entry_title' => $entry_name,
@@ -1224,9 +1342,8 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	/**
 	 * Handle form submission.
 	 *
-	 * @param string $option_name - Option being changed.
-	 * @param string $old_value   - Old value.
-	 * @param string $value       - New value.
+	 * @param string $entry - Entry data.
+	 * @param string $form   - From data.
 	 */
 	public function event_form_submitted( $entry, $form ) {
 
@@ -1253,7 +1370,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			)
 		);
 
-		$variables  = array(
+		$variables = array(
 			'EventType' => 'submitted',
 			'form_name' => $form['title'],
 			'form_id'   => $form['id'],
@@ -1304,31 +1421,32 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	 * Example of $include_keys output: key, value, key, value, key, value
 	 *
 	 * @access  public
-	 * @param   array $array         multi-dimensional array to recursively implode
-	 * @param   bool  $include_keys  include keys before their values
-	 * @param   bool  $trim_all      trim ALL whitespace from string
+	 * @param   array  $array         multi-dimensional array to recursively implode.
+	 * @param   string $glue          Thing to stick the results together with.
+	 * @param   bool   $include_keys  include keys before their values.
+	 * @param   bool   $trim_all      trim ALL whitespace from string.
 	 * @return  string  imploded array
 	 */
-	function recursive_implode( array $array, $glue = ',', $include_keys = false, $trim_all = true ) {
+	public function recursive_implode( array $array, $glue = ',', $include_keys = false, $trim_all = true ) {
 		$glued_string = '';
 
-		// Recursively iterates array and adds key/value to glued string
+		// Recursively iterates array and adds key/value to glued string.
 		array_walk_recursive(
 			$array,
 			function( $value, $key ) use ( $glue, $include_keys, &$glued_string ) {
 				if ( $value ) {
-					$tidy_key                        = str_replace( ',', '', str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $key ) ) ) ) . ': ';
-					$include_keys and $glued_string .= $tidy_key;
-					$glued_string                   .= $value . $glue;
+					$tidy_key                       = str_replace( ',', '', str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $key ) ) ) ) . ': ';
+					$include_keys && $glued_string .= $tidy_key;
+					$glued_string                  .= $value . $glue;
 				}
 			}
 		);
 
-		// Removes last $glue from string
-		strlen( $glue ) > 0 and $glued_string = substr( $glued_string, 0, -strlen( $glue ) );
+		// Removes last $glue from string.
+		strlen( $glue ) > 0 && $glued_string = substr( $glued_string, 0, -strlen( $glue ) );
 
-		// Trim ALL whitespace
-		$trim_all and $glued_string = preg_replace( '/(\s)/ixsm', '', $glued_string );
+		// Trim ALL whitespace.
+		$trim_all && $glued_string = preg_replace( '/(\s)/ixsm', '', $glued_string );
 
 		return (string) $glued_string;
 	}

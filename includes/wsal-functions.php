@@ -1,7 +1,10 @@
 <?php
-/*
-Filter in our custom functions into WSAL.
+/**
+ * Add our neccesary hooks and filters.
+ *
+ * @package WSAL_GravityForms
  */
+
 add_filter( 'wsal_event_objects', 'wsal_gravityforms_add_custom_event_objects', 10, 2 );
 add_filter( 'wsal_event_type_data', 'wsal_gravityforms_add_custom_event_type', 10, 2 );
 add_filter( 'wsal_togglealerts_sub_category_events', 'wsal_gravityforms_extension_togglealerts_sub_category_events' );
@@ -12,18 +15,35 @@ add_action( 'wsal_togglealerts_append_content_to_toggle', 'append_content_to_tog
 add_filter( 'wsal_load_on_frontend', 'wsal_gravityforms_allow_sensor_on_frontend', 10, 2 );
 add_action( 'init', 'wsal_gravityforms_init' );
 
-
+/**
+ * Addes our plugin to the list of allowed public sensors.
+ *
+ * @param  array ] $value - Allowed sensors.
+ * @return array
+ */
 function wsal_gravityforms_extension_load_public_sensors( $value ) {
 	$value[] = 'Gravity_Forms';
 	return $value;
 }
 
+/**
+ * Ensures front end sensor can load when needed.
+ *
+ * @param bool  $default - Current loading situation.
+ * @param array $frontend_events - Array of current front end events.
+ *
+ * @return bool
+ */
 function wsal_gravityforms_allow_sensor_on_frontend( $default, $frontend_events ) {
-    return ( $default || ! empty( $frontend_events['gravityforms'] ) );
+	return ( $default || ! empty( $frontend_events['gravityforms'] ) );
 }
 
 /**
  * Append some extra content below an event in the ToggleAlerts view.
+ *
+ * @param int $alert_id - Event ID.
+ *
+ * @return void
  */
 function append_content_to_toggle( $alert_id ) {
 
@@ -31,12 +51,11 @@ function append_content_to_toggle( $alert_id ) {
 		$frontend_events     = WSAL_Settings::get_frontend_events();
 		$enable_for_visitors = ( isset( $frontend_events['gravityforms'] ) && $frontend_events['gravityforms'] ) ? true : false;
 		?>
-	<tr>
-	  <td></td>
-	  <td>
-		<input name="frontend-events[gravityforms]" type="checkbox" id="frontend-events[woocommerce]" value="1" <?php checked( $enable_for_visitors ); ?> />
-	  </td>
-	  <td colspan="2"><?php esc_html_e( 'Keep a log when website visitors submits a form (by default the plugin only keeps a log when logged in users submit a form).', 'wsal-gravity-forms' ); ?></td>
+	<tr><td></td>
+	<td>
+	<input name="frontend-events[gravityforms]" type="checkbox" id="frontend-events[woocommerce]" value="1" <?php checked( $enable_for_visitors ); ?> />
+	</td>
+	<td colspan="2"><?php esc_html_e( 'Keep a log when website visitors submits a form (by default the plugin only keeps a log when logged in users submit a form).', 'wsal-gravity-forms' ); ?></td>
 	</tr>
 		<?php
 	}
@@ -63,6 +82,13 @@ function wsal_gravityforms_add_custom_event_objects( $objects ) {
 	return $objects;
 }
 
+/**
+ * Added our event types to the available list.
+ *
+ * @param  array $types - Current event types.
+ *
+ * @return array $types - Altered list.
+ */
 function wsal_gravityforms_add_custom_event_type( $types ) {
 	$new_types = array(
 		'starred'   => esc_html__( 'Starred', 'wsal-gravity-forms' ),
@@ -80,9 +106,13 @@ function wsal_gravityforms_add_custom_event_type( $types ) {
 	return $types;
 }
 
- /**
-  * Add specific events so we can use them for category titles.
-  */
+/**
+ * Lets WSAL know which events should have a sub category.
+ *
+ * @param  array $sub_category_events - Current list of events.
+ *
+ * @return array $sub_category_events - Appended list of events.
+ */
 function wsal_gravityforms_extension_togglealerts_sub_category_events( $sub_category_events ) {
 	$new_events          = array( 5700, 5705, 5706, 5710, 5716 );
 	$sub_category_events = array_merge( $sub_category_events, $new_events );
@@ -90,7 +120,12 @@ function wsal_gravityforms_extension_togglealerts_sub_category_events( $sub_cate
 }
 
 /**
- * Add sub cateogry titles to ToggleView page in WSAL.
+ * Adds the titles to the ToggleEvents view for the relevent events.
+ *
+ * @param string $title - Default title for this event.
+ * @param int    $alert_id - Alert ID we are determining the title for.
+ *
+ * @return string $title - Our new title.
  */
 function wsal_gravityforms_extension_togglealerts_sub_category_titles( $title, $alert_id ) {
 	if ( 5700 === $alert_id ) {
@@ -143,7 +178,7 @@ function wsal_gravityforms_extension_replacement_duplicate_event_notice() {
  */
 function wsal_gravityforms_init() {
 	if ( isset( $_POST['export_forms'] ) && check_admin_referer( 'gf_export_forms', 'gf_export_forms_nonce' ) ) {
-		$form_ids = isset( $_POST['gf_form_id'] ) ? $_POST['gf_form_id'] : array();
+		$form_ids = ( isset( $_POST['gf_form_id'] ) ) ? sanitize_text_field( wp_unslash( $_POST['gf_form_id'] ) ) : array();
 		if ( ! empty( $form_ids ) ) {
 			wsal_gravityforms_event_process_export_forms( $form_ids );
 		}
