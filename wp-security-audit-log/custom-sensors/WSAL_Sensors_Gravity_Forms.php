@@ -68,8 +68,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	 */
 	public function event_forms_imported( $forms ) {
 		foreach ( $forms as $form ) {
-			$alert_code = 5719;
-
 			$wsal = WpSecurityAuditLog::GetInstance();
 
 			if ( ! isset( $wsal->alerts ) ) {
@@ -82,7 +80,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'form_id'   => $form['id'],
 			);
 
-			$wsal->alerts->Trigger( $alert_code, $variables );
+			$wsal->alerts->Trigger( 5719, $variables );
 		}
 	}
 
@@ -93,7 +91,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		if ( isset( $_POST['export_form'] ) && check_admin_referer( 'rg_start_export', 'rg_start_export_nonce' ) ) {
 
 			$form       = GFAPI::get_form( $_POST['export_form'] );
-			$alert_code = 5718;
 
 			$variables = array(
 				'form_name' => sanitize_text_field( $form['title'] ),
@@ -102,7 +99,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'end'       => ( isset( $_POST['export_date_end'] ) && ! empty( $_POST['export_date_end'] ) ) ? $_POST['export_date_end'] : esc_html__( 'Not supplied', 'wsal-gravityforms' ),
 			);
 
-			$this->plugin->alerts->Trigger( $alert_code, $variables );
+			$this->plugin->alerts->Trigger( 5718, $variables );
 		}
 	}
 
@@ -139,8 +136,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 		if ( $is_new ) {
 			// If we are here, then the form being saved is fresh.
-			$alert_code = 5700;
-
 			$variables = array(
 				'EventType'      => 'created',
 				'form_name'      => sanitize_text_field( $form['title'] ),
@@ -148,7 +143,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'EditorLinkForm' => $editor_link,
 			);
 
-			$this->plugin->alerts->Trigger( $alert_code, $variables );
+			$this->plugin->alerts->Trigger( 5700, $variables );
 		} else {
 			// Otherwise, the form has been edited, so lets see whats going on.
 
@@ -164,7 +159,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	 */
 	public function event_form_trashed( $form_id ) {
 		$form       = GFAPI::get_form( $form_id );
-		$alert_code = 5701;
 
 		$editor_link = esc_url(
 			add_query_arg(
@@ -182,7 +176,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'EditorLinkForm' => $editor_link,
 		);
 
-		$this->plugin->alerts->Trigger( $alert_code, $variables );
+		$this->plugin->alerts->Trigger( 5701, $variables );
 
 		return $form_id;
 	}
@@ -195,7 +189,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	 */
 	public function event_form_deleted( $form_id ) {
 		$form       = GFAPI::get_form( $form_id );
-		$alert_code = 5702;
 
 		$variables = array(
 			'EventType' => 'deleted',
@@ -203,13 +196,12 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'form_id'   => $form['id'],
 		);
 
-		$this->plugin->alerts->Trigger( $alert_code, $variables );
+		$this->plugin->alerts->Trigger( 5702, $variables );
 	}
 
 	public function event_form_duplicated( $form_id, $new_id ) {
 		$original_form = GFAPI::get_form( $form_id );
 		$new_form      = GFAPI::get_form( $new_id );
-		$alert_code    = 5704;
 		$editor_link   = esc_url(
 			add_query_arg(
 				array(
@@ -228,7 +220,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'EditorLinkForm'     => $editor_link,
 		);
 
-		$this->plugin->alerts->Trigger( $alert_code, $variables );
+		$this->plugin->alerts->Trigger( 5704, $variables );
 	}
 
 	public function event_form_meta_updated( $form_meta, $form_id, $meta_name ) {
@@ -401,7 +393,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 							}
 
 							if ( $ok_to_alert ) {
-								$alert_code  = 5715;
 								$editor_link = esc_url(
 									add_query_arg(
 										array(
@@ -420,7 +411,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 									'EditorLinkForm' => $editor_link,
 								);
 
-								$this->plugin->alerts->TriggerIf( $alert_code, $variables, array( $this, 'must_not_duplicated_form' ) );
+								$this->plugin->alerts->TriggerIf( 5715, $variables, array( $this, 'must_not_duplicated_form' ) );
 							}
 						}
 					}
@@ -436,7 +427,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 							}
 
 							if ( $ok_to_alert ) {
-								$alert_code  = 5715;
 								$editor_link = esc_url(
 									add_query_arg(
 										array(
@@ -455,7 +445,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 									'EditorLinkForm' => $editor_link,
 								);
 
-								$this->plugin->alerts->TriggerIf( $alert_code, $variables, array( $this, 'must_not_duplicated_form' ) );
+								$this->plugin->alerts->TriggerIf( 5715, $variables, array( $this, 'must_not_duplicated_form' ) );
 							}
 						}
 					}
@@ -472,26 +462,25 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 							}
 
 							if ( $ok_to_alert ) {
-								$alert_code          = 5715;
-										$editor_link = esc_url(
-											add_query_arg(
-												array(
-													'id' => $form_id,
-												),
-												admin_url( 'admin.php?page=gf_edit_forms' )
-											)
-										);
+                                $editor_link = esc_url(
+                                    add_query_arg(
+                                        array(
+                                            'id' => $form_id,
+                                        ),
+                                        admin_url( 'admin.php?page=gf_edit_forms' )
+                                    )
+                                );
 
-										  $variables = array(
-											  'EventType'  => 'removed',
-											  'field_name' => $item->label,
-											  'field_type' => $item->type,
-											  'form_name'  => sanitize_text_field( $form['title'] ),
-											  'form_id'    => $form_id,
-											  'EditorLinkForm' => $editor_link,
-										  );
+                                    $variables = array(
+                                        'EventType'  => 'removed',
+                                        'field_name' => $item->label,
+                                        'field_type' => $item->type,
+                                        'form_name'  => sanitize_text_field( $form['title'] ),
+                                        'form_id'    => $form_id,
+                                        'EditorLinkForm' => $editor_link,
+                                    );
 
-										  $this->plugin->alerts->Trigger( $alert_code, $variables );
+                                    $this->plugin->alerts->Trigger( 5715, $variables );
 							}
 						}
 					}
@@ -499,7 +488,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 				// Handle personal data settings.
 				if ( 'personalData' === $changed_setting ) {
-					$alert_code  = 5703;
 					$editor_link = esc_url(
 						add_query_arg(
 							array(
@@ -569,7 +557,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 								'form_id'           => $form_id,
 								'EditorLinkForm'    => $editor_link,
 							);
-							$this->plugin->alerts->Trigger( $alert_code, $variables );
+							$this->plugin->alerts->Trigger( 5703, $variables );
 						}
 					}
 				} else {
@@ -581,7 +569,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 					// Handle everything else.
 					if ( isset( $this->_old_form[ $changed_setting ] ) ) {
-						$alert_code  = 5703;
 						$editor_link = esc_url(
 							add_query_arg(
 								array(
@@ -648,7 +635,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 							'form_id'           => $form_id,
 							'EditorLinkForm'    => $editor_link,
 						);
-						$this->plugin->alerts->TriggerIf( $alert_code, $variables, array( $this, 'must_not_duplicated_form' ) );
+						$this->plugin->alerts->TriggerIf( 5703, $variables, array( $this, 'must_not_duplicated_form' ) );
 					}
 				}
 			}
@@ -691,7 +678,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			}
 
 			if ( $is_an_update ) {
-				$alert_code  = 5705;
 				$editor_link = esc_url(
 					add_query_arg(
 						array(
@@ -716,9 +702,8 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					'EditorLinkForm'       => $editor_link,
 				);
 
-				$this->plugin->alerts->Trigger( $alert_code, $variables );
+				$this->plugin->alerts->Trigger( 5705, $variables );
 			} else {
-				$alert_code  = 5705;
 				$editor_link = esc_url(
 					add_query_arg(
 						array(
@@ -743,7 +728,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					'EditorLinkForm'       => $editor_link,
 				);
 
-				$this->plugin->alerts->TriggerIf( $alert_code, $variables );
+				$this->plugin->alerts->TriggerIf( 5705, $variables );
 			}
 		}
 
@@ -752,7 +737,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 	public function event_form_confirmation_deleted( $confirmation, $form ) {
 
-		$alert_code  = 5705;
 		$editor_link = esc_url(
 			add_query_arg(
 				array(
@@ -777,13 +761,12 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'EditorLinkForm'       => $editor_link,
 		);
 
-		$this->plugin->alerts->Trigger( $alert_code, $variables );
+		$this->plugin->alerts->Trigger( 5705, $variables );
 
 		return $confirmation;
 	}
 
 	public function event_form_notification_deleted( $notification, $form ) {
-		$alert_code  = 5706;
 		$editor_link = esc_url(
 			add_query_arg(
 				array(
@@ -806,7 +789,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'EditorLinkForm'    => $editor_link,
 		);
 
-		$this->plugin->alerts->Trigger( $alert_code, $variables );
+		$this->plugin->alerts->Trigger( 5706, $variables );
 
 		return $notification;
 	}
@@ -821,7 +804,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	 * @return void
 	 */
 	private function formActivationDeactivationEventLog( $notification, $form, string $event_type ) {
-		$alert_code  = 5707;
 		$editor_link = esc_url(
 			add_query_arg(
 				array(
@@ -839,7 +821,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'EditorLinkForm'    => $editor_link,
 		);
 
-		$this->plugin->alerts->Trigger( $alert_code, $variables, true );
+		$this->plugin->alerts->Trigger( 5707, $variables, true );
 
 		return $notification;
 	}
@@ -881,7 +863,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 		// Starred.
 		if ( $previous_value !== $property_value && 1 === $property_value ) {
-			$alert_code = 5710;
 			$variables  = array(
 				'EventType'   => 'starred',
 				'entry_title' => $entry_name,
@@ -889,12 +870,11 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'form_id'     => $form['id'],
 				'EntryLink'   => $editor_link,
 			);
-			$this->plugin->alerts->Trigger( $alert_code, $variables );
+			$this->plugin->alerts->Trigger( 5710, $variables );
 		}
 
 		// Unstarred.
 		if ( $previous_value !== $property_value && 0 === $property_value ) {
-			$alert_code = 5710;
 			$variables  = array(
 				'EventType'   => 'unstarred',
 				'entry_title' => $entry_name,
@@ -902,7 +882,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'form_id'     => $form['id'],
 				'EntryLink'   => $editor_link,
 			);
-			$this->plugin->alerts->Trigger( $alert_code, $variables );
+			$this->plugin->alerts->Trigger( 5710, $variables );
 		}
 
 	}
@@ -935,7 +915,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 		// Starred.
 		if ( 1 === $property_value ) {
-			$alert_code = 5711;
 			$variables  = array(
 				'EventType'   => 'read',
 				'entry_title' => $entry_name,
@@ -943,12 +922,11 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'form_id'     => $form['id'],
 				'EntryLink'   => $editor_link,
 			);
-			$this->plugin->alerts->Trigger( $alert_code, $variables );
+			$this->plugin->alerts->Trigger( 5711, $variables );
 		}
 
 		// Unstarred.
 		if ( 0 === $property_value ) {
-			$alert_code = 5711;
 			$variables  = array(
 				'EventType'   => 'unread',
 				'entry_title' => $entry_name,
@@ -956,7 +934,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'form_id'     => $form['id'],
 				'EntryLink'   => $editor_link,
 			);
-			$this->plugin->alerts->Trigger( $alert_code, $variables );
+			$this->plugin->alerts->Trigger( 5711, $variables );
 		}
 
 	}
@@ -976,14 +954,13 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			$entry_name = 'Not found';
 		}
 
-		$alert_code = 5713;
 		$variables  = array(
 			'EventType'   => 'deleted',
 			'entry_title' => $entry_name,
 			'form_name'   => $form['title'],
 			'form_id'     => $form['id'],
 		);
-		$this->plugin->alerts->Trigger( $alert_code, $variables );
+		$this->plugin->alerts->Trigger( 5713, $variables );
 
 	}
 
@@ -1014,7 +991,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				)
 			);
 
-			$alert_code = 5712;
 			$variables  = array(
 				'EventType'   => 'deleted',
 				'event_desc'  => esc_html__( 'moved to trash', 'wsal-gravity-forms' ),
@@ -1023,7 +999,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'form_id'     => $form['id'],
 				'EntryLink'   => $editor_link,
 			);
-			$this->plugin->alerts->Trigger( $alert_code, $variables );
+			$this->plugin->alerts->Trigger( 5712, $variables );
 		}
 
 		if ( $previous_value !== $property_value && 'active' === $property_value ) {
@@ -1052,7 +1028,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				)
 			);
 
-			$alert_code = 5712;
 			$variables  = array(
 				'EventType'   => 'restored',
 				'event_desc'  => esc_html__( 'restored', 'wsal-gravity-forms' ),
@@ -1061,7 +1036,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'form_id'     => $form['id'],
 				'EntryLink'   => $editor_link,
 			);
-			$this->plugin->alerts->Trigger( $alert_code, $variables );
+			$this->plugin->alerts->Trigger( 5712, $variables );
 		}
 
 	}
@@ -1094,7 +1069,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				)
 			);
 
-			$alert_code = 5714;
 			$variables  = array(
 				'EventType'   => 'added',
 				'entry_note'  => $note,
@@ -1103,7 +1077,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'form_id'     => $form['id'],
 				'EntryLink'   => $editor_link,
 			);
-			$this->plugin->alerts->Trigger( $alert_code, $variables );
+			$this->plugin->alerts->Trigger( 5714 $variables );
 		}
 	}
 
@@ -1140,7 +1114,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			)
 		);
 
-		$alert_code = 5714;
 		$variables  = array(
 			'EventType'   => 'deleted',
 			'entry_note'  => $note->value,
@@ -1149,7 +1122,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'form_id'     => $form['id'],
 			'EntryLink'   => $editor_link,
 		);
-		$this->plugin->alerts->Trigger( $alert_code, $variables );
+		$this->plugin->alerts->Trigger( 5714, $variables );
 
 	}
 
@@ -1280,7 +1253,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			)
 		);
 
-		$alert_code = 5709;
 		$variables  = array(
 			'EventType' => 'submitted',
 			'form_name' => $form['title'],
@@ -1288,7 +1260,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'email'     => $from_addresss,
 			'EntryLink' => $editor_link,
 		);
-		$this->plugin->alerts->Trigger( $alert_code, $variables );
+		$this->plugin->alerts->Trigger( 5709, $variables );
 	}
 
 	/**
