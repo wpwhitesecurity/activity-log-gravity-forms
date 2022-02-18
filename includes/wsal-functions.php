@@ -140,7 +140,7 @@ function wsal_gravityforms_extension_replacement_duplicate_event_notice() {
 }
 
 /**
- * Checks for exporing of form data and triggers an event if needed. We do this here has the sensor does not detect this change.
+ * Checks for exporing of form data and triggers an event if needed. We do this here as the sensor does not detect this change.
  * Exactly like event 9099 within the WooCommerce extension and quite rare.
  */
 function wsal_gravityforms_init() {
