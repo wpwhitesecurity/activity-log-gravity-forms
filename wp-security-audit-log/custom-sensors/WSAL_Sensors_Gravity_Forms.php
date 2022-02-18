@@ -1077,7 +1077,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'form_id'     => $form['id'],
 				'EntryLink'   => $editor_link,
 			);
-			$this->plugin->alerts->Trigger( 5714 $variables );
+			$this->plugin->alerts->Trigger( 5714, $variables );
 		}
 	}
 
