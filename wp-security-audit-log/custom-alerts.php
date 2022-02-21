@@ -2,7 +2,8 @@
 /**
  * Our list of events.
  *
- * @package WSAL_GravityForms
+ * @package wsal
+ * @subpackage wsal-gravity-forms
  */
 
 // phpcs:disable WordPress.WP.I18n.UnorderedPlaceholdersText 

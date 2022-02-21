@@ -10,8 +10,8 @@
  * License: GPL2
  * Network: true
  *
- * @package WSAL_GravityForms
- * @subpackage Wsal Custom Events Loader
+ * @package wsal
+ * @subpackage wsal-gravity-forms
  */
 
 /*

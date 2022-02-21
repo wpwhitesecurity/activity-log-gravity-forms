@@ -2,7 +2,8 @@
 /**
  * Add our neccesary hooks and filters.
  *
- * @package WSAL_GravityForms
+ * @package wsal
+ * @subpackage wsal-gravity-forms
  */
 
 add_filter( 'wsal_event_objects', 'wsal_gravityforms_add_custom_event_objects', 10, 2 );
