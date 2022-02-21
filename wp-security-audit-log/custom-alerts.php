@@ -273,6 +273,22 @@ $custom_alerts = array(
 				'read',
 			),
 
+			array(
+				5717,
+				WSAL_MEDIUM,
+				esc_html__( 'An entry was created edited', 'wsal-gravity-forms' ),
+				esc_html__( 'The entry %entry_name% was edited.', 'wsal-gravity-forms' ),
+				array(
+					esc_html__( 'Form name', 'wsal-gravity-forms' ) => '%form_name%',
+					esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
+				),
+				array(
+					esc_html__( 'View entry', 'wsal-gravity-forms' ) => '%EntryLink%',
+				),
+				'gravityforms_entries',
+				'modified',
+			),
+
 			/*
 			 * Settings.
 			 */

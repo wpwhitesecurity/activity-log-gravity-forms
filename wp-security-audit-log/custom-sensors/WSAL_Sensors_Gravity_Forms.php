@@ -45,12 +45,11 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			add_action( 'gform_pre_notification_deactivated', array( $this, 'event_form_notification_deactivated' ), 10, 2 );
 
 			// Entries.
-			add_action( 'gform_update_is_starred', array( $this, 'event_form_entry_starred' ), 10, 3 );
-			add_action( 'gform_update_is_read', array( $this, 'event_form_entry_read' ), 10, 3 );
 			add_action( 'gform_delete_entry', array( $this, 'event_form_entry_deleted' ), 10, 1 );
 			add_action( 'gform_update_status', array( $this, 'event_form_entry_trashed' ), 10, 3 );
 			add_action( 'gform_post_note_added', array( $this, 'event_form_entry_note_added' ), 10, 6 );
 			add_action( 'gform_pre_note_deleted', array( $this, 'event_form_entry_note_deleted' ), 10, 2 );
+			add_action( 'gform_post_update_entry_property', array( $this, 'event_form_entry_updated' ), 10, 4 );
 
 			// Global Settings.
 			add_action( 'updated_option', array( $this, 'event_settings_updated' ), 10, 3 );
@@ -62,16 +61,115 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	}
 
 	/**
+	 * Trigger event when an entry is modified.
+	 *
+	 * @param int    $entry_id - Entry ID.
+	 * @param string $property_name - Value being updated.
+	 * @param string $property_value - New value.
+	 * @param string $previous_value - Old value.
+	 * @return void
+	 */
+	public function event_form_entry_updated( $entry_id, $property_name, $property_value, $previous_value ) {
+
+		if ( isset( $_POST['name'] ) ) {
+			$item_being_updated = sanitize_text_field( wp_unslash( $_POST['name'] ) );
+			$entry              = GFAPI::get_entry( $entry_id );
+			$form               = GFAPI::get_form( $entry['form_id'] );
+
+			// Get the 1st field with a value so we can use it as the name.
+			if ( ! empty( rgar( $entry, '1' ) ) ) {
+				$entry_name = rgar( $entry, '1' );
+			} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
+				$entry_name = rgar( $entry, '2' );
+			} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
+				$entry_name = rgar( $entry, '3' );
+			} else {
+				$entry_name = 'Not found';
+			}
+
+			$editor_link = esc_url(
+				add_query_arg(
+					array(
+						'view' => 'entry',
+						'id'   => $entry['form_id'],
+						'lid'  => $entry_id,
+					),
+					admin_url( 'admin.php?page=gf_entries' )
+				)
+			);
+
+			if ( 'is_starred' === $item_being_updated ) {
+				// Starred.
+				if ( $previous_value !== $property_value && $property_value ) {
+					$variables = array(
+						'EventType'   => 'starred',
+						'entry_title' => $entry_name,
+						'form_name'   => $form['title'],
+						'form_id'     => $form['id'],
+						'EntryLink'   => $editor_link,
+					);
+					$this->plugin->alerts->Trigger( 5710, $variables );
+				}
+
+				// Unstarred.
+				if ( $previous_value !== $property_value && ! $property_value ) {
+					$variables = array(
+						'EventType'   => 'unstarred',
+						'entry_title' => $entry_name,
+						'form_name'   => $form['title'],
+						'form_id'     => $form['id'],
+						'EntryLink'   => $editor_link,
+					);
+					$this->plugin->alerts->Trigger( 5710, $variables );
+				}
+			} elseif ( 'is_read' === $item_being_updated ) {
+				// Starred.
+				if ( $property_value ) {
+					$variables = array(
+						'EventType'   => 'read',
+						'entry_title' => $entry_name,
+						'form_name'   => $form['title'],
+						'form_id'     => $form['id'],
+						'EntryLink'   => $editor_link,
+					);
+					$this->plugin->alerts->Trigger( 5711, $variables );
+				}
+
+				// Unstarred.
+				if ( ! $property_value ) {
+					$variables = array(
+						'EventType'   => 'unread',
+						'entry_title' => $entry_name,
+						'form_name'   => $form['title'],
+						'form_id'     => $form['id'],
+						'EntryLink'   => $editor_link,
+					);
+					$this->plugin->alerts->Trigger( 5711, $variables );
+				}
+			} else {
+				$variables = array(
+					'entry_name' => sanitize_text_field( $entry_name ),
+					'form_name'  => sanitize_text_field( $form['title'] ),
+					'form_id'    => $form['id'],
+					'EntryLink'  => $editor_link,
+				);
+
+				$this->plugin->alerts->Trigger( 5717, $variables );
+			}
+		}
+	}
+
+	/**
 	 * Handles forms being imported.
 	 *
 	 * @param  array $forms - new form data.
 	 * @return void
 	 */
 	public function event_forms_imported( $forms ) {
-        if ( ! isset( $wsal->alerts ) ) {
-            $wsal->alerts = new WSAL_AlertManager( $wsal );
-        }
-        
+		if ( ! isset( $wsal->alerts ) ) {
+			$wsal->alerts = new WSAL_AlertManager( $wsal );
+		}
+
 		foreach ( $forms as $form ) {
 			$wsal = WpSecurityAuditLog::GetInstance();
 
@@ -910,127 +1008,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	 */
 	public function event_form_notification_deactivated( $notification, $form ) {
 		return $this->formActivationDeactivationEventLog( $notification, $form, 'deactivated' );
-	}
-
-	/**
-	 * Trigger event when an entry is starred
-	 *
-	 * @param int    $entry_id - Entry ID.
-	 * @param string $property_value - New value.
-	 * @param string $previous_value - Old value.
-	 * @return void
-	 */
-	public function event_form_entry_starred( $entry_id, $property_value, $previous_value ) {
-
-		$entry = GFAPI::get_entry( $entry_id );
-		$form  = GFAPI::get_form( $entry['form_id'] );
-
-		// Get the 1st field with a value so we can use it as the name.
-		if ( ! empty( rgar( $entry, '1' ) ) ) {
-			$entry_name = rgar( $entry, '1' );
-		} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
-			$entry_name = rgar( $entry, '2' );
-		} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
-			$entry_name = rgar( $entry, '3' );
-		} else {
-			$entry_name = 'Not found';
-		}
-
-		$editor_link = esc_url(
-			add_query_arg(
-				array(
-					'view' => 'entry',
-					'id'   => $entry['form_id'],
-					'lid'  => $entry_id,
-				),
-				admin_url( 'admin.php?page=gf_entries' )
-			)
-		);
-
-		// Starred.
-		if ( $previous_value !== $property_value && 1 === $property_value ) {
-			$variables = array(
-				'EventType'   => 'starred',
-				'entry_title' => $entry_name,
-				'form_name'   => $form['title'],
-				'form_id'     => $form['id'],
-				'EntryLink'   => $editor_link,
-			);
-			$this->plugin->alerts->Trigger( 5710, $variables );
-		}
-
-		// Unstarred.
-		if ( $previous_value !== $property_value && 0 === $property_value ) {
-			$variables = array(
-				'EventType'   => 'unstarred',
-				'entry_title' => $entry_name,
-				'form_name'   => $form['title'],
-				'form_id'     => $form['id'],
-				'EntryLink'   => $editor_link,
-			);
-			$this->plugin->alerts->Trigger( 5710, $variables );
-		}
-
-	}
-
-	/**
-	 * Trigger event when an entry is read
-	 *
-	 * @param int    $entry_id - Entry ID.
-	 * @param string $property_value - New value.
-	 * @param string $previous_value - Old value.
-	 * @return void
-	 */
-	public function event_form_entry_read( $entry_id, $property_value, $previous_value ) {
-		$entry = GFAPI::get_entry( $entry_id );
-		$form  = GFAPI::get_form( $entry['form_id'] );
-
-		// Get the 1st field with a value so we can use it as the name.
-		if ( ! empty( rgar( $entry, '1' ) ) ) {
-			$entry_name = rgar( $entry, '1' );
-		} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
-			$entry_name = rgar( $entry, '2' );
-		} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
-			$entry_name = rgar( $entry, '3' );
-		} else {
-			$entry_name = 'Not found';
-		}
-
-		$editor_link = esc_url(
-			add_query_arg(
-				array(
-					'view' => 'entry',
-					'id'   => $entry['form_id'],
-					'lid'  => $entry_id,
-				),
-				admin_url( 'admin.php?page=gf_entries' )
-			)
-		);
-
-		// Starred.
-		if ( 1 === $property_value ) {
-			$variables = array(
-				'EventType'   => 'read',
-				'entry_title' => $entry_name,
-				'form_name'   => $form['title'],
-				'form_id'     => $form['id'],
-				'EntryLink'   => $editor_link,
-			);
-			$this->plugin->alerts->Trigger( 5711, $variables );
-		}
-
-		// Unstarred.
-		if ( 0 === $property_value ) {
-			$variables = array(
-				'EventType'   => 'unread',
-				'entry_title' => $entry_name,
-				'form_name'   => $form['title'],
-				'form_id'     => $form['id'],
-				'EntryLink'   => $editor_link,
-			);
-			$this->plugin->alerts->Trigger( 5711, $variables );
-		}
-
 	}
 
 	/**
