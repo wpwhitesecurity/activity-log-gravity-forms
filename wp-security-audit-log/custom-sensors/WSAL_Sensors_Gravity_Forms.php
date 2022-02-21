@@ -1,7 +1,7 @@
 <?php // phpcs:disable WordPress.Files.FileName.NotHyphenatedLowercase
 
 /**
- * Custom Sensors for PLUGINNAME
+ * Custom Sensors for Gravity Forms plugin.
  *
  * Class file for alert manager.
  *
@@ -68,12 +68,12 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	 * @return void
 	 */
 	public function event_forms_imported( $forms ) {
+        if ( ! isset( $wsal->alerts ) ) {
+            $wsal->alerts = new WSAL_AlertManager( $wsal );
+        }
+        
 		foreach ( $forms as $form ) {
 			$wsal = WpSecurityAuditLog::GetInstance();
-
-			if ( ! isset( $wsal->alerts ) ) {
-				$wsal->alerts = new WSAL_AlertManager( $wsal );
-			}
 
 			$variables = array(
 				'EventType' => 'imported',
