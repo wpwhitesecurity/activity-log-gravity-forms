@@ -276,7 +276,7 @@ $custom_alerts = array(
 			array(
 				5717,
 				WSAL_MEDIUM,
-				esc_html__( 'An entry was created edited', 'wsal-gravity-forms' ),
+				esc_html__( 'An entry was edited', 'wsal-gravity-forms' ),
 				esc_html__( 'The entry %entry_name% was edited.', 'wsal-gravity-forms' ),
 				array(
 					esc_html__( 'Form name', 'wsal-gravity-forms' ) => '%form_name%',

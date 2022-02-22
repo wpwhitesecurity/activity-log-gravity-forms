@@ -14,7 +14,6 @@ add_filter( 'admin_init', 'wsal_gravityforms_extension_replace_duplicate_event_n
 add_filter( 'wsal_load_public_sensors', 'wsal_gravityforms_extension_load_public_sensors' );
 add_action( 'wsal_togglealerts_append_content_to_toggle', 'append_content_to_toggle' );
 add_filter( 'wsal_load_on_frontend', 'wsal_gravityforms_allow_sensor_on_frontend', 10, 2 );
-add_action( 'init', 'wsal_gravityforms_init' );
 
 /**
  * Addes our plugin to the list of allowed public sensors.
@@ -171,43 +170,4 @@ function wsal_gravityforms_extension_replacement_duplicate_event_notice() {
 		}
 	</script>
 	<?php
-}
-
-/**
- * Checks for exporting of form data and triggers an event if needed. We do this here as the sensor does not detect this change.
- * Exactly like event 9099 within the WooCommerce extension and quite rare.
- */
-function wsal_gravityforms_init() {
-	if ( isset( $_POST['export_forms'] ) && check_admin_referer( 'gf_export_forms', 'gf_export_forms_nonce' ) ) {
-		$form_ids = ( isset( $_POST['gf_form_id'] ) ) ? sanitize_text_field( wp_unslash( $_POST['gf_form_id'] ) ) : array();
-		if ( ! empty( $form_ids ) ) {
-			wsal_gravityforms_event_process_export_forms( $form_ids );
-		}
-	}
-}
-
-/**
- * Triggers event 5719
- *
- * @param  array $form_ids - Array of form IDs being exported.
- */
-function wsal_gravityforms_event_process_export_forms( $form_ids ) {
-	foreach ( $form_ids as $form_id ) {
-		$form       = GFAPI::get_form( $form_id );
-		$alert_code = 5719;
-
-		$wsal = WpSecurityAuditLog::GetInstance();
-
-		if ( ! isset( $wsal->alerts ) ) {
-			$wsal->alerts = new WSAL_AlertManager( $wsal );
-		}
-
-		$variables = array(
-			'EventType' => 'exported',
-			'form_name' => sanitize_text_field( $form['title'] ),
-			'form_id'   => $form_id,
-		);
-
-		$wsal->alerts->Trigger( $alert_code, $variables );
-	}
 }

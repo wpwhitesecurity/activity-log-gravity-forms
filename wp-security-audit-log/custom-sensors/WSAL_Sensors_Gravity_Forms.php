@@ -53,7 +53,8 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 			// Global Settings.
 			add_action( 'updated_option', array( $this, 'event_settings_updated' ), 10, 3 );
-			add_action( 'wp_ajax_gf_process_export', array( $this, 'event_process_export' ), 10, 1 );
+			add_action( 'gform_post_export_entries', array( $this, 'event_process_export' ), 10, 5 );
+			add_action( 'gform_form_export_filename', array( $this, 'event_process_export_forms' ), 10, 2 );
 		}
 
 		// Form submitted.
@@ -75,17 +76,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			$item_being_updated = sanitize_text_field( wp_unslash( $_POST['name'] ) );
 			$entry              = GFAPI::get_entry( $entry_id );
 			$form               = GFAPI::get_form( $entry['form_id'] );
-
-			// Get the 1st field with a value so we can use it as the name.
-			if ( ! empty( rgar( $entry, '1' ) ) ) {
-				$entry_name = rgar( $entry, '1' );
-			} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
-				$entry_name = rgar( $entry, '2' );
-			} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
-				$entry_name = rgar( $entry, '3' );
-			} else {
-				$entry_name = 'Not found';
-			}
+			$entry_name         = $this->determine_entry_name( $entry );
 
 			$editor_link = esc_url(
 				add_query_arg(
@@ -166,13 +157,12 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	 * @return void
 	 */
 	public function event_forms_imported( $forms ) {
+		$wsal = WpSecurityAuditLog::GetInstance();
 		if ( ! isset( $wsal->alerts ) ) {
 			$wsal->alerts = new WSAL_AlertManager( $wsal );
 		}
 
 		foreach ( $forms as $form ) {
-			$wsal = WpSecurityAuditLog::GetInstance();
-
 			$variables = array(
 				'EventType' => 'imported',
 				'form_name' => sanitize_text_field( $form['title'] ),
@@ -185,8 +175,15 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 	/**
 	 * Handles triggering an event during export of fields
+	 *
+	 * @param array  $form       The Form object to get the entries from.
+	 * @param string $start_date The start date for when the export of entries should take place.
+	 * @param string $end_date   The end date for when the export of entries should stop.
+	 * @param array  $fields     The specified fields where the entries should be exported from.
+	 * @param string $export_id  A unique ID for the export.
 	 */
-	public function event_process_export() {
+	public function event_process_export( $form, $start_date, $end_date, $fields, $export_id ) {
+
 		if ( isset( $_POST['export_form'] ) && check_admin_referer( 'rg_start_export', 'rg_start_export_nonce' ) ) {
 
 			$form = GFAPI::get_form( sanitize_text_field( wp_unslash( $_POST['export_form'] ) ) );
@@ -194,13 +191,44 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			$variables = array(
 				'form_name' => sanitize_text_field( $form['title'] ),
 				'form_id'   => sanitize_text_field( wp_unslash( $_POST['export_form'] ) ),
-				'start'     => ( isset( $_POST['export_date_start'] ) && ! empty( $_POST['export_date_start'] ) ) ? sanitize_text_field( wp_unslash( $_POST['export_date_start'] ) ) : esc_html__( 'Not supplied', 'wsal-gravityforms' ),
-				'end'       => ( isset( $_POST['export_date_end'] ) && ! empty( $_POST['export_date_end'] ) ) ? sanitize_text_field( wp_unslash( $_POST['export_date_end'] ) ) : esc_html__( 'Not supplied', 'wsal-gravityforms' ),
+				'start'     => ( ! empty( $start_date ) ) ? sanitize_text_field( wp_unslash( $start_date ) ) : esc_html__( 'Not supplied', 'wsal-gravityforms' ),
+				'end'       => ( ! empty( $end_date ) ) ? sanitize_text_field( wp_unslash( $end_date ) ) : esc_html__( 'Not supplied', 'wsal-gravityforms' ),
 			);
 
 			$this->plugin->alerts->Trigger( 5718, $variables );
 		}
 	}
+
+	/**
+	 * Report event when forms are exported.
+	 *
+	 * @param string $filename - Export filename.
+	 * @param array  $form_ids - Ids being exported.
+	 * @return string $filename - Orignal filename.
+	 */
+	public function event_process_export_forms( $filename, $form_ids ) {
+		foreach ( $form_ids as $form_id ) {
+			$form       = GFAPI::get_form( $form_id );
+			$alert_code = 5719;
+
+			$wsal = WpSecurityAuditLog::GetInstance();
+
+			if ( ! isset( $wsal->alerts ) ) {
+				$wsal->alerts = new WSAL_AlertManager( $wsal );
+			}
+
+			$variables = array(
+				'EventType' => 'exported',
+				'form_name' => sanitize_text_field( $form['title'] ),
+				'form_id'   => $form_id,
+			);
+
+			$wsal->alerts->Trigger( $alert_code, $variables );
+		}
+
+		return $filename;
+	}
+
 
 	/**
 	 * Gather form data during an edit so we know what the old form was.
@@ -1017,19 +1045,9 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	 * @return void
 	 */
 	public function event_form_entry_deleted( $entry_id ) {
-		$entry = GFAPI::get_entry( $entry_id );
-		$form  = GFAPI::get_form( $entry['form_id'] );
-
-		// Get the 1st field with a value so we can use it as the name.
-		if ( ! empty( rgar( $entry, '1' ) ) ) {
-			$entry_name = rgar( $entry, '1' );
-		} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
-			$entry_name = rgar( $entry, '2' );
-		} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
-			$entry_name = rgar( $entry, '3' );
-		} else {
-			$entry_name = 'Not found';
-		}
+		$entry      = GFAPI::get_entry( $entry_id );
+		$form       = GFAPI::get_form( $entry['form_id'] );
+		$entry_name = $this->determine_entry_name( $entry );
 
 		$variables = array(
 			'EventType'   => 'deleted',
@@ -1051,19 +1069,9 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	 */
 	public function event_form_entry_trashed( $entry_id, $property_value, $previous_value ) {
 		if ( $previous_value !== $property_value && 'trash' === $property_value ) {
-			$entry = GFAPI::get_entry( $entry_id );
-			$form  = GFAPI::get_form( $entry['form_id'] );
-
-			// Get the 1st field with a value so we can use it as the name.
-			if ( ! empty( rgar( $entry, '1' ) ) ) {
-				$entry_name = rgar( $entry, '1' );
-			} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
-				$entry_name = rgar( $entry, '2' );
-			} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
-				$entry_name = rgar( $entry, '3' );
-			} else {
-				$entry_name = 'Not found';
-			}
+			$entry      = GFAPI::get_entry( $entry_id );
+			$form       = GFAPI::get_form( $entry['form_id'] );
+			$entry_name = $this->determine_entry_name( $entry );
 
 			$editor_link = esc_url(
 				add_query_arg(
@@ -1088,19 +1096,9 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		}
 
 		if ( $previous_value !== $property_value && 'active' === $property_value ) {
-			$entry = GFAPI::get_entry( $entry_id );
-			$form  = GFAPI::get_form( $entry['form_id'] );
-
-			// Get the 1st field with a value so we can use it as the name.
-			if ( ! empty( rgar( $entry, '1' ) ) ) {
-				$entry_name = rgar( $entry, '1' );
-			} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
-				$entry_name = rgar( $entry, '2' );
-			} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
-				$entry_name = rgar( $entry, '3' );
-			} else {
-				$entry_name = 'Not found';
-			}
+			$entry      = GFAPI::get_entry( $entry_id );
+			$form       = GFAPI::get_form( $entry['form_id'] );
+			$entry_name = $this->determine_entry_name( $entry );
 
 			$editor_link = esc_url(
 				add_query_arg(
@@ -1140,19 +1138,9 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	public function event_form_entry_note_added( $insert_id, $entry_id, $user_id, $user_name, $note, $note_type ) {
 
 		if ( 'user' === $note_type ) {
-			$entry = GFAPI::get_entry( $entry_id );
-			$form  = GFAPI::get_form( $entry['form_id'] );
-
-			// Get the 1st field with a value so we can use it as the name.
-			if ( ! empty( rgar( $entry, '1' ) ) ) {
-				$entry_name = rgar( $entry, '1' );
-			} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
-				$entry_name = rgar( $entry, '2' );
-			} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
-				$entry_name = rgar( $entry, '3' );
-			} else {
-				$entry_name = 'Not found';
-			}
+			$entry      = GFAPI::get_entry( $entry_id );
+			$form       = GFAPI::get_form( $entry['form_id'] );
+			$entry_name = $this->determine_entry_name( $entry );
 
 			$editor_link = esc_url(
 				add_query_arg(
@@ -1184,20 +1172,10 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	 * @param int $lead_id - Lead ID.
 	 */
 	public function event_form_entry_note_deleted( $note_id, $lead_id ) {
-		$entry = GFAPI::get_entry( $lead_id );
-		$form  = GFAPI::get_form( $entry['form_id'] );
-		$note  = GFAPI::get_note( $note_id );
-
-		// Get the 1st field with a value so we can use it as the name.
-		if ( ! empty( rgar( $entry, '1' ) ) ) {
-			$entry_name = rgar( $entry, '1' );
-		} elseif ( ! empty( rgar( $entry, '2' ) ) ) {
-			$entry_name = rgar( $entry, '2' );
-		} elseif ( ! empty( rgar( $entry, '3' ) ) ) {
-			$entry_name = rgar( $entry, '3' );
-		} else {
-			$entry_name = esc_html__( 'Not found', 'wsal-gravity-forms' );
-		}
+		$entry      = GFAPI::get_entry( $lead_id );
+		$form       = GFAPI::get_form( $entry['form_id'] );
+		$note       = GFAPI::get_note( $note_id );
+		$entry_name = $this->determine_entry_name( $entry );
 
 		$editor_link = esc_url(
 			add_query_arg(
@@ -1440,5 +1418,28 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		$trim_all && $glued_string = preg_replace( '/(\s)/ixsm', '', $glued_string );
 
 		return (string) $glued_string;
+	}
+
+	/**
+	 * Determien the name for a given, entry.
+	 *
+	 * @param  array $entry - Entry to determine name of.
+	 * @return string $entry_name - The name.
+	 */
+	public function determine_entry_name( $entry ) {
+		$propery_ids = array(
+			'1',
+			'2',
+			'3',
+		);
+
+		foreach ( $propery_ids as $id ) {
+			$have_name = rgar( $entry, $id );
+			if ( ! empty( $have_name ) ) {
+				return rgar( $have_name, $id );
+			}
+		}
+
+		return esc_html__( 'Not found', 'wsal-gravity-forms' );
 	}
 }
