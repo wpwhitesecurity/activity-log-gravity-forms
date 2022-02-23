@@ -10,8 +10,8 @@
  * License: GPL2
  * Network: true
  *
- * @package Wsal
- * @subpackage Wsal Custom Events Loader
+ * @package wsal
+ * @subpackage wsal-gravity-forms
  */
 
 /*
@@ -32,7 +32,7 @@
 */
 
 /*
- REQUIRED. Here we include and fire up the main core class. This will be needed regardless so be sure to leave line 37-39 in tact.
+REQUIRED. Here we include and fire up the main core class. This will be needed regardless so be sure to leave line 37-39 in tact.
 */
 require_once plugin_dir_path( __FILE__ ) . 'core/class-extension-core.php';
 $wsal_extension = new WPWhiteSecurity\ActivityLog\Extensions\Common\Core( __FILE__, 'wsal-gravityforms' );

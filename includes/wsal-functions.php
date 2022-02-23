@@ -1,7 +1,11 @@
 <?php
-/*
-	Filter in our custom functions into WSAL.
+/**
+ * Add our neccesary hooks and filters.
+ *
+ * @package wsal
+ * @subpackage wsal-gravity-forms
  */
+
 add_filter( 'wsal_event_objects', 'wsal_gravityforms_add_custom_event_objects', 10, 2 );
 add_filter( 'wsal_event_type_data', 'wsal_gravityforms_add_custom_event_type', 10, 2 );
 add_filter( 'wsal_togglealerts_sub_category_events', 'wsal_gravityforms_extension_togglealerts_sub_category_events' );
@@ -11,35 +15,50 @@ add_filter( 'wsal_load_public_sensors', 'wsal_gravityforms_extension_load_public
 add_action( 'wsal_togglealerts_append_content_to_toggle', 'append_content_to_toggle' );
 add_filter( 'wsal_load_on_frontend', 'wsal_gravityforms_allow_sensor_on_frontend', 10, 2 );
 
-
+/**
+ * Addes our plugin to the list of allowed public sensors.
+ *
+ * @param  array ] $value - Allowed sensors.
+ * @return array
+ */
 function wsal_gravityforms_extension_load_public_sensors( $value ) {
-  $value[] = 'Gravity_Forms';
-  return $value;
+	$value[] = 'Gravity_Forms';
+	return $value;
 }
 
+/**
+ * Ensures front end sensor can load when needed.
+ *
+ * @param bool  $default - Current loading situation.
+ * @param array $frontend_events - Array of current front end events.
+ *
+ * @return bool
+ */
 function wsal_gravityforms_allow_sensor_on_frontend( $default, $frontend_events ) {
-  $should_load = ( $default || ! empty( $frontend_events['gravityforms'] ) ) ? true : false;;
-  return $should_load;
+	return ( $default || ! empty( $frontend_events['gravityforms'] ) );
 }
 
 /**
  * Append some extra content below an event in the ToggleAlerts view.
+ *
+ * @param int $alert_id - Event ID.
+ *
+ * @return void
  */
 function append_content_to_toggle( $alert_id ) {
 
-  if ( 5709 === $alert_id ) {
-    $frontend_events     = WSAL_Settings::get_frontend_events();
-    $enable_for_visitors = ( isset( $frontend_events['gravityforms'] ) && $frontend_events['gravityforms'] ) ? true : false;
-    ?>
-    <tr>
-      <td></td>
-      <td>
-        <input name="frontend-events[gravityforms]" type="checkbox" id="frontend-events[woocommerce]" value="1" <?php checked( $enable_for_visitors ); ?> />
-      </td>
-      <td colspan="2"><?php esc_html_e( 'Keep a log when website visitors submits a form (by default the plugin only keeps a log when logged in users submit a form).', 'wsal-gravity-forms' ); ?></td>
-    </tr>
-    <?php
-  }
+	if ( 5709 === $alert_id ) {
+		$frontend_events     = WSAL_Settings::get_frontend_events();
+		$enable_for_visitors = ( isset( $frontend_events['gravityforms'] ) && $frontend_events['gravityforms'] ) ? true : false;
+		?>
+	<tr><td></td>
+	<td>
+	<input name="frontend-events[gravityforms]" type="checkbox" id="frontend-events[woocommerce]" value="1" <?php checked( $enable_for_visitors ); ?> />
+	</td>
+	<td colspan="2"><?php esc_html_e( 'Keep a log when website visitors submits a form (by default the plugin only keeps a log when logged in users submit a form).', 'wsal-gravity-forms' ); ?></td>
+	</tr>
+		<?php
+	}
 }
 
 /**
@@ -63,23 +82,36 @@ function wsal_gravityforms_add_custom_event_objects( $objects ) {
 	return $objects;
 }
 
- function wsal_gravityforms_add_custom_event_type( $types ) {
- 	$new_types = array(
-		'starred'   => __( 'Starred', 'wsal-gravity-forms' ),
-		'unstarred' => __( 'Unstarred', 'wsal-gravity-forms' ),
-		'read'      => __( 'Read', 'wsal-gravity-forms' ),
-		'unread'    => __( 'Unread', 'wsal-gravity-forms' ),
-		'submitted' => __( 'Submitted', 'wsal-gravity-forms' ),
- 	);
+/**
+ * Added our event types to the available list.
+ *
+ * @param  array $types - Current event types.
+ *
+ * @return array $types - Altered list.
+ */
+function wsal_gravityforms_add_custom_event_type( $types ) {
+	$new_types = array(
+		'starred'   => esc_html__( 'Starred', 'wsal-gravity-forms' ),
+		'unstarred' => esc_html__( 'Unstarred', 'wsal-gravity-forms' ),
+		'read'      => esc_html__( 'Read', 'wsal-gravity-forms' ),
+		'unread'    => esc_html__( 'Unread', 'wsal-gravity-forms' ),
+		'submitted' => esc_html__( 'Submitted', 'wsal-gravity-forms' ),
+		'imported'  => esc_html__( 'Imported', 'wsal-gravity-forms' ),
+		'exported'  => esc_html__( 'Exported', 'wsal-gravity-forms' ),
+	);
 
- 	// combine the two arrays.
- 	$types = array_merge( $types, $new_types );
+	// combine the two arrays.
+	$types = array_merge( $types, $new_types );
 
- 	return $types;
- }
+	return $types;
+}
 
- /**
- * Add specific events so we can use them for category titles.
+/**
+ * Lets WSAL know which events should have a sub category.
+ *
+ * @param  array $sub_category_events - Current list of events.
+ *
+ * @return array $sub_category_events - Appended list of events.
  */
 function wsal_gravityforms_extension_togglealerts_sub_category_events( $sub_category_events ) {
 	$new_events          = array( 5700, 5705, 5706, 5710, 5716 );
@@ -88,7 +120,12 @@ function wsal_gravityforms_extension_togglealerts_sub_category_events( $sub_cate
 }
 
 /**
- * Add sub cateogry titles to ToggleView page in WSAL.
+ * Adds the titles to the ToggleEvents view for the relevent events.
+ *
+ * @param string $title - Default title for this event.
+ * @param int    $alert_id - Alert ID we are determining the title for.
+ *
+ * @return string $title - Our new title.
  */
 function wsal_gravityforms_extension_togglealerts_sub_category_titles( $title, $alert_id ) {
 	if ( 5700 === $alert_id ) {
@@ -125,12 +162,12 @@ function wsal_gravityforms_extension_replace_duplicate_event_notice() {
  * Replacement "duplicate event" notice text.
  */
 function wsal_gravityforms_extension_replacement_duplicate_event_notice() {
-	$replacement_text = __( 'You are running an old version of WP Activity Log. Please update the plugin to run it alongside this extension: GravityForms', 'wp-security-audit-log' );
+	$replacement_text = esc_html__( 'You are running an old version of WP Activity Log. Please update the plugin to run it alongside this extension: GravityForms', 'wp-security-audit-log' );
 	?>
 	<script type="text/javascript">
 		if ( jQuery( '.notice.notice-error span[style="color:#dc3232; font-weight:bold;"]' ).length ) {
 			jQuery( '.notice.notice-error span[style="color:#dc3232; font-weight:bold;"]' ).parent().text( '<?php echo esc_html( $replacement_text ); ?>' );
 		}
 	</script>
-<?php
+	<?php
 }
