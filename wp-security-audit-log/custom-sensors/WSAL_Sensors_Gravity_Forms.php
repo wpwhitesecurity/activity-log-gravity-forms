@@ -1436,7 +1436,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		foreach ( $propery_ids as $id ) {
 			$have_name = rgar( $entry, $id );
 			if ( ! empty( $have_name ) ) {
-				return rgar( $have_name, $id );
+				return $have_name;
 			}
 		}
 
