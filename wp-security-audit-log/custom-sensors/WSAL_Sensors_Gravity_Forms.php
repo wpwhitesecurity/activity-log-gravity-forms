@@ -72,8 +72,8 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	 */
 	public function event_form_entry_updated( $entry_id, $property_name, $property_value, $previous_value ) {
 
-		if ( isset( $_POST['name'] ) ) {
-			$item_being_updated = sanitize_text_field( wp_unslash( $_POST['name'] ) );
+		if ( isset( $_POST['gforms_save_entry'] ) || isset( $_POST['name'] ) ) {
+			$item_being_updated = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : false;
 			$entry              = GFAPI::get_entry( $entry_id );
 			$form               = GFAPI::get_form( $entry['form_id'] );
 			$entry_name         = $this->determine_entry_name( $entry );
