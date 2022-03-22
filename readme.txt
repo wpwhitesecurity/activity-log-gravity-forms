@@ -4,10 +4,10 @@ Plugin URI: https://wpactivitylog.com
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.html
 Tags: activity log for Gravity Forms, WP Activity Log extension, activity logs
-Requires at least: 4.4
-Tested up to: 5.8.3
-Stable tag: 1.1
-Requires PHP: 5.6
+Requires at least: 5.0
+Tested up to: 5.9.2
+Stable tag: 1.2.0
+Requires PHP: 7.0
 
 Keep a log of changes your team do in the Gravity Forms plugin, forms, entries (leads) & more.
 
@@ -80,6 +80,21 @@ Please refer to our [Support & Documentation pages](https://wpactivitylog.com/su
 1. The list of forms, notifications, entries and other Gravity Form plugin changes the WP Activity Log plugin can keep a log of.
 
 == Changelog ==
+
+= 1.2.0 (2022-03-24) =
+
+Extensions: Release notes: [Yoast SEO, WPForms & Gravity Forms activity log extension updates](https://wpactivitylog.com/extensions-march-2022-update/)
+
+* **New event IDs:**
+	* 5714: Added / delete note from entry (lead).
+	5717: Entry (lead) was modified.
+	5718: Exported entries from a form.
+	5719: Imported / exported a form.
+
+* **Bug fixes:**
+	* Fixed: Links to forms do not work when both Gravity Forms and WPForms extensions are installed at the same time.
+	* Fixed: PHP fatal error reported when a forum is submitted.
+	* Fixed: Event ID 5710 not reported when an entry is starred / unstarred.
 
 = 1.1 (2021-04-28) =
 
