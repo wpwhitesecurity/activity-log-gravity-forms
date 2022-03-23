@@ -87,9 +87,9 @@ Extensions: Release notes: [Yoast SEO, WPForms & Gravity Forms activity log exte
 
 * **New event IDs:**
 	* 5714: Added / delete note from entry (lead).
-	5717: Entry (lead) was modified.
-	5718: Exported entries from a form.
-	5719: Imported / exported a form.
+	* 5717: Entry (lead) was modified.
+	* 5718: Exported entries from a form.
+	* 5719: Imported / exported a form.
 
 * **Bug fixes:**
 	* Fixed: Links to forms do not work when both Gravity Forms and WPForms extensions are installed at the same time.
