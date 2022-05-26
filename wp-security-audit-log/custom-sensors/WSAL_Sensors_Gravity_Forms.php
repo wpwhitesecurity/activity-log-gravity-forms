@@ -410,7 +410,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 					foreach ( $changed_items as $confirmation ) {
 
-						if ( ! self::was_triggered_recently( 5705 ) ) {
+						if ( ! $this->was_triggered_recently( 5705 ) ) {
 							if ( empty( $confirmation['isActive'] ) ) {
 								$active_state = 'deactivated';
 							} else {
@@ -702,7 +702,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 							$value = 'Delete entries permanently automatically';
 						}
 
-						if ( ! self::was_triggered_recently( 5703 ) ) {
+						if ( ! $this->was_triggered_recently( 5703 ) ) {
 							$variables = array(
 								'EventType'         => $event_type,
 								'setting_name'      => sanitize_text_field( str_replace( '_', ' ', ucfirst( preg_replace( '/([a-z0-9])([A-Z])/', '$1 $2', $name ) ) ) ),
@@ -1406,5 +1406,45 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		}
 
 		return esc_html__( 'Not found', 'wsal-gravity-forms' );
+	}
+
+    /**
+	 * Check if the alert was triggered recently.
+	 *
+	 * Checks last 5 events if they occured less than 20 seconds ago.
+	 *
+	 * @param integer|array $alert_id - Alert code.
+	 * @return boolean
+	 */
+	protected function was_triggered_recently( $alert_id ) {
+
+		if ( method_exists( 'self', 'was_triggered_recently' ) ) {
+			return self::was_triggered_recently();
+		}
+
+		// if we have already checked this don't check again.
+		if ( isset( $this->cached_alert_checks ) && array_key_exists( $alert_id, $this->cached_alert_checks ) && $this->cached_alert_checks[ $alert_id ] ) {
+			return true;
+		}
+		$query = new WSAL_Models_OccurrenceQuery();
+		$query->addOrderBy( 'created_on', true );
+		$query->setLimit( 5 );
+		$last_occurences  = $query->getAdapter()->Execute( $query );
+		$known_to_trigger = false;
+		foreach ( $last_occurences as $last_occurence ) {
+			if ( $known_to_trigger ) {
+				break;
+			}
+			if ( ! empty( $last_occurence ) && ( $last_occurence->created_on + 20 ) > time() ) {
+				if ( ! is_array( $alert_id ) && $last_occurence->alert_id === $alert_id ) {
+					$known_to_trigger = true;
+				} elseif ( is_array( $alert_id ) && in_array( $last_occurence[0]->alert_id, $alert_id, true ) ) {
+					$known_to_trigger = true;
+				}
+			}
+		}
+		// once we know the answer to this don't check again to avoid queries.
+		$this->cached_alert_checks[ $alert_id ] = $known_to_trigger;
+		return $known_to_trigger;
 	}
 }
