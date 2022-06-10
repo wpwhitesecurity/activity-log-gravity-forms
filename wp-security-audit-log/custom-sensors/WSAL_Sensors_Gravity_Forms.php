@@ -123,7 +123,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 						'form_id'     => $form['id'],
 						'EntryLink'   => $editor_link,
 					);
-					$this->plugin->alerts->trigger_event( 5711, $variables );
+          $this->plugin->alerts->trigger_event( 5711, $variables );
 				}
 
 				// Unstarred.
@@ -144,7 +144,6 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					'form_id'    => $form['id'],
 					'EntryLink'  => $editor_link,
 				);
-
 				$this->plugin->alerts->trigger_event( 5717, $variables );
 			}
 		}
