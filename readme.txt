@@ -81,7 +81,7 @@ Please refer to our [Support & Documentation pages](https://wpactivitylog.com/su
 
 == Changelog ==
 
-= 1.2.1 (2021-06-14) =
+= 1.2.1 (2022-06-14) =
 
 * **Improvements**
 	* Updated plugin inline with recent WP Activity Log Changes.
