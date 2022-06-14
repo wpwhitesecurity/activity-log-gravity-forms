@@ -1281,7 +1281,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			if ( 'gform_enable_background_updates' === $option_name ) {
 				$option_found = true;
 				$option_name  = 'Background updates';
-				$event_type   = ( 1 === $value['enabled'] ) ? 'enabled' : 'disabled';
+				$event_type   = ( $value ) ? 'enabled' : 'disabled';
 				$value        = ( 1 === $value ) ? 'On' : 'Off';
 				$old_value    = ( 1 === $old_value ) ? 'On' : 'Off';
 			}
