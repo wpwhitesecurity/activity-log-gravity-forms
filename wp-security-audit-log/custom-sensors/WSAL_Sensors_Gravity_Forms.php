@@ -1451,13 +1451,14 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 
 		if ( method_exists( 'self', 'was_triggered_recently' ) ) {
 			return self::was_triggered_recently();
-		}		
+		}
 
 		// if we have already checked this don't check again.
 		if ( isset( $this->cached_alert_checks ) && array_key_exists( $alert_id, $this->cached_alert_checks ) && $this->cached_alert_checks[ $alert_id ] ) {
 			return true;
 		}
 		$query = new WSAL_Models_OccurrenceQuery();
+    
 		if ( method_exists( $query, 'add_order_by' ) ) {
 			$query->add_order_by( 'created_on', true );
 			$query->set_limit( 5 );
@@ -1467,6 +1468,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			$query->setLimit( 5 );
 			$last_occurences  = $query->GetAdapter()->Execute( $query );
 		}
+
 		$known_to_trigger = false;
 		foreach ( $last_occurences as $last_occurence ) {
 			if ( $known_to_trigger ) {
