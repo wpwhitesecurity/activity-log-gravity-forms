@@ -99,7 +99,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 						'form_id'     => $form['id'],
 						'EntryLink'   => $editor_link,
 					);
-					$this->plugin->alerts->trigger_event( 5710, $variables );
+					$this->trigger_event( 5710, $variables );
 				}
 
 				// Unstarred.
@@ -111,7 +111,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 						'form_id'     => $form['id'],
 						'EntryLink'   => $editor_link,
 					);
-					$this->plugin->alerts->trigger_event( 5710, $variables );
+					$this->trigger_event( 5710, $variables );
 				}
 			} elseif ( 'is_read' === $item_being_updated ) {
 				// Starred.
@@ -123,7 +123,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 						'form_id'     => $form['id'],
 						'EntryLink'   => $editor_link,
 					);
-					$this->plugin->alerts->trigger_event( 5711, $variables );
+					$this->trigger_event( 5711, $variables );
 				}
 
 				// Unstarred.
@@ -135,7 +135,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 						'form_id'     => $form['id'],
 						'EntryLink'   => $editor_link,
 					);
-					$this->plugin->alerts->trigger_event( 5711, $variables );
+					$this->trigger_event( 5711, $variables );
 				}
 			} else {
 				$variables = array(
@@ -145,7 +145,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					'EntryLink'  => $editor_link,
 				);
 
-				$this->plugin->alerts->trigger_event( 5717, $variables );
+				$this->trigger_event( 5717, $variables );
 			}
 		}
 	}
@@ -169,7 +169,11 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'form_id'   => $form['id'],
 			);
 
-			$wsal->alerts->trigger_event( 5719, $variables );
+			if ( method_exists( $wsal->alerts, 'trigger_event' ) ) {
+				$wsal->alerts->trigger_event( 5719, $variables );
+			} else {
+				$wsal->alerts->Trigger( 5719, $variables );
+			}
 		}
 	}
 
@@ -195,7 +199,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'end'       => ( ! empty( $end_date ) ) ? sanitize_text_field( wp_unslash( $end_date ) ) : esc_html__( 'Not supplied', 'wsal-gravityforms' ),
 			);
 
-			$this->plugin->alerts->trigger_event( 5718, $variables );
+			$this->trigger_event( 5718, $variables );
 		}
 	}
 
@@ -223,7 +227,11 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'form_id'   => $form_id,
 			);
 
-			$wsal->alerts->trigger_event( $alert_code, $variables );
+			if ( method_exists( $wsal->alerts, 'trigger_event' ) ) {
+				$wsal->alerts->trigger_event( $alert_code, $variables );
+			} else {
+				$wsal->alerts->Trigger( $alert_code, $variables );
+			}
 		}
 
 		return $filename;
@@ -278,7 +286,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'EditorLinkForm' => $editor_link,
 			);
 
-			$this->plugin->alerts->trigger_event( 5700, $variables );
+			$this->trigger_event( 5700, $variables );
 		} else {
 			// Otherwise, the form has been edited, so lets see whats going on.
 			?>
@@ -313,7 +321,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'EditorLinkForm' => $editor_link,
 		);
 
-		$this->plugin->alerts->trigger_event( 5701, $variables );
+		$this->trigger_event( 5701, $variables );
 
 		return $form_id;
 	}
@@ -333,7 +341,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'form_id'   => $form['id'],
 		);
 
-		$this->plugin->alerts->trigger_event( 5702, $variables );
+		$this->trigger_event( 5702, $variables );
 	}
 
 	/**
@@ -364,7 +372,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'EditorLinkForm'     => $editor_link,
 		);
 
-		$this->plugin->alerts->trigger_event( 5704, $variables );
+		$this->trigger_event( 5704, $variables );
 	}
 
 	/**
@@ -427,7 +435,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 								'EditorLinkForm'       => $editor_link,
 							);
 
-							$this->plugin->alerts->trigger_event_if( $alert_code, $variables, array( $this, 'check_if_new_confirmation' ) );
+							$this->trigger_event_if( $alert_code, $variables, array( $this, 'check_if_new_confirmation' ) );
 						}
 					}
 				}
@@ -489,7 +497,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					);
 
 					if ( $event_type ) {
-						$this->plugin->alerts->trigger_event_if(
+						$this->trigger_event_if(
 							$alert_code,
 							$variables,
 							/**
@@ -499,8 +507,13 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 							 * @return bool
 							 */
 							function ( $manager ) {
-								// don't fire if there's already an event 5707.
-								return ! $manager->will_or_has_triggered( 5707 );
+								if ( method_exists( $manager, 'will_or_has_triggered' ) ) {
+									// don't fire if there's already an event 5707.
+									return ! $manager->will_or_has_triggered( 5707 );
+								} else {
+									// don't fire if there's already an event 5707.
+									return ! $manager->WillOrHasTriggered( 5707 );
+								}
 							}
 						);
 					}
@@ -566,7 +579,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 									'EditorLinkForm' => $editor_link,
 								);
 
-								$this->plugin->alerts->trigger_event_if( 5715, $variables, array( $this, 'must_not_duplicated_form' ) );
+								$this->trigger_event_if( 5715, $variables, array( $this, 'must_not_duplicated_form' ) );
 							}
 						}
 					}
@@ -600,7 +613,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 									'EditorLinkForm' => $editor_link,
 								);
 
-								$this->plugin->alerts->trigger_event_if( 5715, $variables, array( $this, 'must_not_duplicated_form' ) );
+								$this->trigger_event_if( 5715, $variables, array( $this, 'must_not_duplicated_form' ) );
 							}
 						}
 					}
@@ -635,7 +648,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 										'EditorLinkForm' => $editor_link,
 									);
 
-									$this->plugin->alerts->trigger_event( 5715, $variables );
+									$this->trigger_event( 5715, $variables );
 							}
 						}
 					}
@@ -712,7 +725,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 								'form_id'           => $form_id,
 								'EditorLinkForm'    => $editor_link,
 							);
-							$this->plugin->alerts->trigger_event( 5703, $variables );
+							$this->trigger_event( 5703, $variables );
 						}
 					}
 				} else {
@@ -790,7 +803,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 							'form_id'           => $form_id,
 							'EditorLinkForm'    => $editor_link,
 						);
-						$this->plugin->alerts->trigger_event_if( 5703, $variables, array( $this, 'must_not_duplicated_form' ) );
+						$this->trigger_event_if( 5703, $variables, array( $this, 'must_not_duplicated_form' ) );
 					}
 				}
 			}
@@ -805,14 +818,26 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	 * @return bool
 	 */
 	public function must_not_duplicated_form( WSAL_AlertManager $manager ) {
-		if ( $manager->will_or_has_triggered( 5704 ) ) {
-			return false;
-		}
-		if ( $manager->will_or_has_triggered( 5705 ) ) {
-			return false;
-		}
-		if ( $manager->will_or_has_triggered( 5706 ) ) {
-			return false;
+		if ( method_exists( $manager, 'will_or_has_triggered' ) ) {
+			if ( $manager->will_or_has_triggered( 5704 ) ) {
+				return false;
+			}
+			if ( $manager->will_or_has_triggered( 5705 ) ) {
+				return false;
+			}
+			if ( $manager->will_or_has_triggered( 5706 ) ) {
+				return false;
+			}
+		} else {
+			if ( $manager->WillOrHasTriggered( 5704 ) ) {
+				return false;
+			}
+			if ( $manager->WillOrHasTriggered( 5705 ) ) {
+				return false;
+			}
+			if ( $manager->WillOrHasTriggered( 5706 ) ) {
+				return false;
+			}		
 		}
 		return true;
 	}
@@ -824,8 +849,14 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 	 * @return bool
 	 */
 	public function check_if_new_confirmation( WSAL_AlertManager $manager ) {
-		if ( $manager->will_or_has_triggered( 5705 ) ) {
-			return false;
+		if ( method_exists( $manager, 'will_or_has_triggered' ) ) {
+			if ( $manager->will_or_has_triggered( 5705 ) ) {
+				return false;
+			}
+		} else {
+			if ( $manager->WillOrHasTriggered( 5705 ) ) {
+				return false;
+			}	
 		}
 		return true;
 	}
@@ -876,7 +907,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					'EditorLinkForm'       => $editor_link,
 				);
 
-				$this->plugin->alerts->trigger_event( 5705, $variables );
+				$this->trigger_event( 5705, $variables );
 			} else {
 				$editor_link = esc_url(
 					add_query_arg(
@@ -902,7 +933,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					'EditorLinkForm'       => $editor_link,
 				);
 
-				$this->plugin->alerts->trigger_event_if( 5705, $variables );
+				$this->trigger_event_if( 5705, $variables );
 			}
 		}
 
@@ -942,7 +973,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'EditorLinkForm'       => $editor_link,
 		);
 
-		$this->plugin->alerts->trigger_event( 5705, $variables );
+		$this->trigger_event( 5705, $variables );
 
 		return $confirmation;
 	}
@@ -977,7 +1008,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'EditorLinkForm'    => $editor_link,
 		);
 
-		$this->plugin->alerts->trigger_event( 5706, $variables );
+		$this->trigger_event( 5706, $variables );
 
 		return $notification;
 	}
@@ -1009,7 +1040,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'EditorLinkForm'    => $editor_link,
 		);
 
-		$this->plugin->alerts->trigger_event( 5707, $variables, true );
+		$this->trigger_event( 5707, $variables, true );
 
 		return $notification;
 	}
@@ -1055,7 +1086,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'form_name'   => $form['title'],
 			'form_id'     => $form['id'],
 		);
-		$this->plugin->alerts->trigger_event( 5713, $variables );
+		$this->trigger_event( 5713, $variables );
 
 	}
 
@@ -1092,7 +1123,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'form_id'     => $form['id'],
 				'EntryLink'   => $editor_link,
 			);
-			$this->plugin->alerts->trigger_event( 5712, $variables );
+			$this->trigger_event( 5712, $variables );
 		}
 
 		if ( $previous_value !== $property_value && 'active' === $property_value ) {
@@ -1119,7 +1150,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'form_id'     => $form['id'],
 				'EntryLink'   => $editor_link,
 			);
-			$this->plugin->alerts->trigger_event( 5712, $variables );
+			$this->trigger_event( 5712, $variables );
 		}
 
 	}
@@ -1161,7 +1192,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 				'form_id'     => $form['id'],
 				'EntryLink'   => $editor_link,
 			);
-			$this->plugin->alerts->trigger_event( 5714, $variables );
+			$this->trigger_event( 5714, $variables );
 		}
 	}
 
@@ -1196,7 +1227,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'form_id'     => $form['id'],
 			'EntryLink'   => $editor_link,
 		);
-		$this->plugin->alerts->trigger_event( 5714, $variables );
+		$this->trigger_event( 5714, $variables );
 
 	}
 
@@ -1250,7 +1281,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			if ( 'gform_enable_background_updates' === $option_name ) {
 				$option_found = true;
 				$option_name  = 'Background updates';
-				$event_type   = ( 1 === $value['enabled'] ) ? 'enabled' : 'disabled';
+				$event_type   = ( $value ) ? 'enabled' : 'disabled';
 				$value        = ( 1 === $value ) ? 'On' : 'Off';
 				$old_value    = ( 1 === $old_value ) ? 'On' : 'Off';
 			}
@@ -1303,7 +1334,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					'old_value'    => $old_value,
 					'new_value'    => $value,
 				);
-				$this->plugin->alerts->trigger_event( $alert_code, $variables );
+				$this->trigger_event( $alert_code, $variables );
 			}
 		}
 	}
@@ -1346,7 +1377,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			'email'     => $from_addresss,
 			'EntryLink' => $editor_link,
 		);
-		$this->plugin->alerts->trigger_event( 5709, $variables );
+		$this->trigger_event( 5709, $variables );
 	}
 
 	/**
@@ -1408,7 +1439,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		return esc_html__( 'Not found', 'wsal-gravity-forms' );
 	}
 
-    /**
+	/**
 	 * Check if the alert was triggered recently.
 	 *
 	 * Checks last 5 events if they occured less than 20 seconds ago.
@@ -1427,9 +1458,17 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			return true;
 		}
 		$query = new WSAL_Models_OccurrenceQuery();
-		$query->addOrderBy( 'created_on', true );
-		$query->setLimit( 5 );
-		$last_occurences  = $query->getAdapter()->Execute( $query );
+    
+		if ( method_exists( $query, 'add_order_by' ) ) {
+			$query->add_order_by( 'created_on', true );
+			$query->set_limit( 5 );
+			$last_occurences  = $query->get_adapter()->execute( $query );
+		} else {
+			$query->addOrderBy( 'created_on', true );
+			$query->setLimit( 5 );
+			$last_occurences  = $query->GetAdapter()->Execute( $query );
+		}
+
 		$known_to_trigger = false;
 		foreach ( $last_occurences as $last_occurence ) {
 			if ( $known_to_trigger ) {
@@ -1446,5 +1485,31 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		// once we know the answer to this don't check again to avoid queries.
 		$this->cached_alert_checks[ $alert_id ] = $known_to_trigger;
 		return $known_to_trigger;
+	}
+
+	/**
+	 * Temporary function to bridge the transition between WSAL pre/post coding-standards.
+	 */
+	private function trigger_event_if( $alert_code, $variables, $condition ) {
+		$alert_manager = $this->plugin->alerts;
+
+		if ( method_exists( $alert_manager, 'trigger_event_if' ) ) {
+			$this->plugin->alerts->trigger_event_if( $alert_code, $variables, $condition );
+		} else {
+			$this->plugin->alerts->TriggerIf( $alert_code, $variables, $condition );
+		}
+	}
+
+	/**
+	 * Temporary function to bridge the transition between WSAL pre/post coding-standards.
+	 */
+	private function trigger_event( $alert_code, $variables ) {
+		$alert_manager = $this->plugin->alerts;
+
+		if ( method_exists( $alert_manager, 'trigger_event' ) ) {
+			$this->plugin->alerts->trigger_event_if( $alert_code, $variables );
+		} else {
+			$this->plugin->alerts->Trigger( $alert_code, $variables );
+		}
 	}
 }
