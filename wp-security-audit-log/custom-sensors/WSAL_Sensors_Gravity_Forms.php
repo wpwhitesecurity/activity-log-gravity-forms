@@ -933,7 +933,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 					'EditorLinkForm'       => $editor_link,
 				);
 
-				$this->trigger_event_if( 5705, $variables );
+				$this->trigger_event( 5705, $variables );
 			}
 		}
 
@@ -1507,7 +1507,7 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 		$alert_manager = $this->plugin->alerts;
 
 		if ( method_exists( $alert_manager, 'trigger_event' ) ) {
-			$this->plugin->alerts->trigger_event_if( $alert_code, $variables );
+			$this->plugin->alerts->trigger_event( $alert_code, $variables );
 		} else {
 			$this->plugin->alerts->Trigger( $alert_code, $variables );
 		}
