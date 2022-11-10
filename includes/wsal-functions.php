@@ -51,11 +51,12 @@ function append_content_to_toggle( $alert_id ) {
 		$frontend_events     = WSAL_Settings::get_frontend_events();
 		$enable_for_visitors = ( isset( $frontend_events['gravityforms'] ) && $frontend_events['gravityforms'] ) ? true : false;
 		?>
-	<tr><td></td>
-	<td>
-	<input name="frontend-events[gravityforms]" type="checkbox" id="frontend-events[woocommerce]" value="1" <?php checked( $enable_for_visitors ); ?> />
-	</td>
-	<td colspan="2"><?php esc_html_e( 'Keep a log when website visitors submits a form (by default the plugin only keeps a log when logged in users submit a form).', 'wsal-gravity-forms' ); ?></td>
+	<tr class="alert-wrapper" data-alert-cat="Gravity Forms" data-alert-subcat="Monitor Gravity Forms" data-is-attached-to-alert="5709">
+		<td></td>
+		<td>
+		<input name="frontend-events[gravityforms]" type="checkbox" id="frontend-events[woocommerce]" value="1" <?php checked( $enable_for_visitors ); ?> />
+		</td>
+		<td colspan="2"><?php esc_html_e( 'Keep a log when website visitors submits a form (by default the plugin only keeps a log when logged in users submit a form).', 'wsal-gravity-forms' ); ?></td>
 	</tr>
 		<?php
 	}
