@@ -81,6 +81,15 @@ Please refer to our [Support & Documentation pages](https://wpactivitylog.com/su
 
 == Changelog ==
 
+= 1.2.2 (2022-11-16) =
+
+* **Improvements**
+	* Ensure compatability with current and upcoming WP Activity Log release.
+	* Ensure correct positioning and filtering of items under the Enable/Disable Events view.
+
+* **Bug fixes**
+	* PHP Error during creaction of a confirmation.
+
 = 1.2.1 (2022-06-14) =
 
 * **Improvements**
