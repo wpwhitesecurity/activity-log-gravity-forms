@@ -1,17 +1,17 @@
-# Copyright (C) 2021 WP White Security
-# This file is distributed under the same license as the WP Activity Log for Gravity Forms plugin.
+# Copyright (C) 2022 WP White Security
+# This file is distributed under the GPL2.
 msgid ""
 msgstr ""
-"Project-Id-Version: WP Activity Log for Gravity Forms 1.1.0\n"
+"Project-Id-Version: WP Activity Log for Gravity Forms 1.2.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/activity-log-gravity-forms\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-04-27T11:24:00+01:00\n"
+"POT-Creation-Date: 2022-11-16T18:20:56+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.4.0\n"
+"X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: wsal-gravity-forms\n"
 
 #. Plugin Name of the plugin
@@ -34,304 +34,349 @@ msgstr ""
 msgid "http://www.wpwhitesecurity.com/"
 msgstr ""
 
-#: includes/wsal-functions.php:39
+#: includes/wsal-functions.php:59
 msgid "Keep a log when website visitors submits a form (by default the plugin only keeps a log when logged in users submit a form)."
 msgstr ""
 
-#: includes/wsal-functions.php:52
+#: includes/wsal-functions.php:72
 msgid "Forms in Gravity Forms"
 msgstr ""
 
-#: includes/wsal-functions.php:53
+#: includes/wsal-functions.php:73
 msgid "Confirmations in Gravity Forms"
 msgstr ""
 
-#: includes/wsal-functions.php:54
+#: includes/wsal-functions.php:74
 msgid "Notifications in Gravity Forms"
 msgstr ""
 
-#: includes/wsal-functions.php:55
+#: includes/wsal-functions.php:75
 msgid "Entries in Gravity Forms"
 msgstr ""
 
-#: includes/wsal-functions.php:56
+#: includes/wsal-functions.php:76
 msgid "Fields in Gravity Forms"
 msgstr ""
 
-#: includes/wsal-functions.php:57
+#: includes/wsal-functions.php:77
 msgid "Settings in Gravity Forms"
 msgstr ""
 
-#: includes/wsal-functions.php:68
+#: includes/wsal-functions.php:95
 msgid "Starred"
 msgstr ""
 
-#: includes/wsal-functions.php:69
+#: includes/wsal-functions.php:96
 msgid "Unstarred"
 msgstr ""
 
-#: includes/wsal-functions.php:70
+#: includes/wsal-functions.php:97
 msgid "Read"
 msgstr ""
 
-#: includes/wsal-functions.php:71
+#: includes/wsal-functions.php:98
 msgid "Unread"
 msgstr ""
 
-#: includes/wsal-functions.php:72
+#: includes/wsal-functions.php:99
 msgid "Submitted"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:4
+#: includes/wsal-functions.php:100
+msgid "Imported"
+msgstr ""
+
+#: includes/wsal-functions.php:101
+msgid "Exported"
+msgstr ""
+
+#: wp-security-audit-log/custom-alerts.php:13
 msgid "Gravity Forms"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:5
+#: wp-security-audit-log/custom-alerts.php:14
 msgid "Monitor Gravity Forms"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:10
+#: wp-security-audit-log/custom-alerts.php:19
 msgid "A form was created, modified"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:11
+#: wp-security-audit-log/custom-alerts.php:20
 msgid "The Form called %form_name%."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:14
-#: wp-security-audit-log/custom-alerts.php:30
-#: wp-security-audit-log/custom-alerts.php:45
-#: wp-security-audit-log/custom-alerts.php:60
-#: wp-security-audit-log/custom-alerts.php:93
-#: wp-security-audit-log/custom-alerts.php:108
-#: wp-security-audit-log/custom-alerts.php:129
-#: wp-security-audit-log/custom-alerts.php:144
-#: wp-security-audit-log/custom-alerts.php:162
-#: wp-security-audit-log/custom-alerts.php:177
-#: wp-security-audit-log/custom-alerts.php:196
-#: wp-security-audit-log/custom-alerts.php:211
-#: wp-security-audit-log/custom-alerts.php:243
-#: wp-security-audit-log/custom-alerts.php:258
+#: wp-security-audit-log/custom-alerts.php:23
+#: wp-security-audit-log/custom-alerts.php:39
+#: wp-security-audit-log/custom-alerts.php:54
+#: wp-security-audit-log/custom-alerts.php:69
+#: wp-security-audit-log/custom-alerts.php:102
+#: wp-security-audit-log/custom-alerts.php:117
+#: wp-security-audit-log/custom-alerts.php:138
+#: wp-security-audit-log/custom-alerts.php:153
+#: wp-security-audit-log/custom-alerts.php:171
+#: wp-security-audit-log/custom-alerts.php:186
+#: wp-security-audit-log/custom-alerts.php:205
+#: wp-security-audit-log/custom-alerts.php:220
+#: wp-security-audit-log/custom-alerts.php:252
+#: wp-security-audit-log/custom-alerts.php:267
+#: wp-security-audit-log/custom-alerts.php:283
+#: wp-security-audit-log/custom-alerts.php:314
+#: wp-security-audit-log/custom-alerts.php:328
 msgid "Form ID"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:17
-#: wp-security-audit-log/custom-alerts.php:33
-#: wp-security-audit-log/custom-alerts.php:63
-#: wp-security-audit-log/custom-alerts.php:96
-#: wp-security-audit-log/custom-alerts.php:132
-#: wp-security-audit-log/custom-alerts.php:147
-#: wp-security-audit-log/custom-alerts.php:165
-#: wp-security-audit-log/custom-alerts.php:180
+#: wp-security-audit-log/custom-alerts.php:26
+#: wp-security-audit-log/custom-alerts.php:42
+#: wp-security-audit-log/custom-alerts.php:72
+#: wp-security-audit-log/custom-alerts.php:105
+#: wp-security-audit-log/custom-alerts.php:141
+#: wp-security-audit-log/custom-alerts.php:156
+#: wp-security-audit-log/custom-alerts.php:174
+#: wp-security-audit-log/custom-alerts.php:189
 msgid "View form in the editor"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:26
+#: wp-security-audit-log/custom-alerts.php:35
 msgid "A form was moved to trash"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:27
+#: wp-security-audit-log/custom-alerts.php:36
 msgid "Moved the form to trash."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:29
-#: wp-security-audit-log/custom-alerts.php:195
-#: wp-security-audit-log/custom-alerts.php:226
-#: wp-security-audit-log/custom-alerts.php:242
-#: wp-security-audit-log/custom-alerts.php:257
+#: wp-security-audit-log/custom-alerts.php:38
+#: wp-security-audit-log/custom-alerts.php:204
+#: wp-security-audit-log/custom-alerts.php:235
+#: wp-security-audit-log/custom-alerts.php:251
+#: wp-security-audit-log/custom-alerts.php:266
+#: wp-security-audit-log/custom-alerts.php:282
 msgid "Form name"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:42
+#: wp-security-audit-log/custom-alerts.php:51
 msgid "A form was permanently deleted"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:43
+#: wp-security-audit-log/custom-alerts.php:52
 msgid "Permanently deleted the form %form_name%."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:55
+#: wp-security-audit-log/custom-alerts.php:64
 msgid "A form setting was modified"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:56
+#: wp-security-audit-log/custom-alerts.php:65
 msgid "The setting %setting_name% in form %form_name%."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:58
-#: wp-security-audit-log/custom-alerts.php:276
+#: wp-security-audit-log/custom-alerts.php:67
+#: wp-security-audit-log/custom-alerts.php:301
 msgid "Previous value"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:59
-#: wp-security-audit-log/custom-alerts.php:277
+#: wp-security-audit-log/custom-alerts.php:68
+#: wp-security-audit-log/custom-alerts.php:302
 msgid "New value"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:72
+#: wp-security-audit-log/custom-alerts.php:81
 msgid "A form was duplicated"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:73
+#: wp-security-audit-log/custom-alerts.php:82
 msgid "Duplicated the form %original_form_name%."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:75
+#: wp-security-audit-log/custom-alerts.php:84
 msgid "New form name"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:76
+#: wp-security-audit-log/custom-alerts.php:85
 msgid "Source form ID"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:77
+#: wp-security-audit-log/custom-alerts.php:86
 msgid "New form ID"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:80
+#: wp-security-audit-log/custom-alerts.php:89
 msgid "View new duplicated form in the editor"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:89
+#: wp-security-audit-log/custom-alerts.php:98
 msgid "A field was created, modified or deleted"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:90
+#: wp-security-audit-log/custom-alerts.php:99
 msgid "The Field called %field_name% in the form %form_name%."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:92
+#: wp-security-audit-log/custom-alerts.php:101
 msgid "Field type"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:105
+#: wp-security-audit-log/custom-alerts.php:114
 msgid "A form was submitted"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:106
+#: wp-security-audit-log/custom-alerts.php:115
 msgid "Submitted the form %form_name%."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:109
+#: wp-security-audit-log/custom-alerts.php:118
 msgid "Submission email"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:112
-#: wp-security-audit-log/custom-alerts.php:199
-#: wp-security-audit-log/custom-alerts.php:214
-#: wp-security-audit-log/custom-alerts.php:230
-#: wp-security-audit-log/custom-alerts.php:261
+#: wp-security-audit-log/custom-alerts.php:121
+#: wp-security-audit-log/custom-alerts.php:208
+#: wp-security-audit-log/custom-alerts.php:223
+#: wp-security-audit-log/custom-alerts.php:239
+#: wp-security-audit-log/custom-alerts.php:270
+#: wp-security-audit-log/custom-alerts.php:286
 msgid "View entry"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:124
+#: wp-security-audit-log/custom-alerts.php:133
 msgid "A confirmation was created, modified or deleted"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:125
+#: wp-security-audit-log/custom-alerts.php:134
 msgid "The Confirmation called %confirmation_name% in the form %form_name%."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:127
+#: wp-security-audit-log/custom-alerts.php:136
 msgid "Confirmation type"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:128
+#: wp-security-audit-log/custom-alerts.php:137
 msgid "Confirmation message"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:141
+#: wp-security-audit-log/custom-alerts.php:150
 msgid "A confirmation was activated or deactivated"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:142
+#: wp-security-audit-log/custom-alerts.php:151
 msgid "The confirmation %confirmation_name% in the form %form_name%."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:159
+#: wp-security-audit-log/custom-alerts.php:168
 msgid "A notification was created, modified or deleted"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:160
+#: wp-security-audit-log/custom-alerts.php:169
 msgid "The Notification called %notification_name% in the form %form_name%."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:174
+#: wp-security-audit-log/custom-alerts.php:183
 msgid "A notification was activated or deactivated"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:175
+#: wp-security-audit-log/custom-alerts.php:184
 msgid "Changed the status of the Notification called %notification_name% in the form %form_name%."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:192
+#: wp-security-audit-log/custom-alerts.php:201
 msgid "An entry was starred or unstarred"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:193
+#: wp-security-audit-log/custom-alerts.php:202
 msgid "Entry title: %entry_title%."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:208
+#: wp-security-audit-log/custom-alerts.php:217
 msgid "An entry was marked as read or unread"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:209
+#: wp-security-audit-log/custom-alerts.php:218
 msgid "The entry called %entry_title% from form %form_name%."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:223
+#: wp-security-audit-log/custom-alerts.php:232
 msgid "An entry was moved to trash"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:224
+#: wp-security-audit-log/custom-alerts.php:233
 msgid "Deleted the entry %event_desc%."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:227
+#: wp-security-audit-log/custom-alerts.php:236
 msgid "Form ID "
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:239
+#: wp-security-audit-log/custom-alerts.php:248
 msgid "An entry was permanently deleted"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:240
+#: wp-security-audit-log/custom-alerts.php:249
 msgid "Permanently deleted the entry %entry_title%."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:253
+#: wp-security-audit-log/custom-alerts.php:262
 msgid "An entry note was created or deleted"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:254
+#: wp-security-audit-log/custom-alerts.php:263
 msgid "The entry note %entry_note%."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:256
+#: wp-security-audit-log/custom-alerts.php:265
 msgid "Entry title"
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:273
+#: wp-security-audit-log/custom-alerts.php:279
+msgid "An entry was edited"
+msgstr ""
+
+#: wp-security-audit-log/custom-alerts.php:280
+msgid "The entry %entry_name% was edited."
+msgstr ""
+
+#: wp-security-audit-log/custom-alerts.php:298
 msgid "A plugin setting was changed."
 msgstr ""
 
-#: wp-security-audit-log/custom-alerts.php:274
+#: wp-security-audit-log/custom-alerts.php:299
 msgid "Changed the plugin setting %setting_name%."
 msgstr ""
 
-#: wp-security-audit-log/custom-sensors/WSAL_Sensors_Gravity_Forms.php:972
+#: wp-security-audit-log/custom-alerts.php:311
+msgid "Form entries were imported / exported."
+msgstr ""
+
+#: wp-security-audit-log/custom-alerts.php:312
+msgid "The entries from the form %form_name%."
+msgstr ""
+
+#: wp-security-audit-log/custom-alerts.php:315
+msgid "Date range start"
+msgstr ""
+
+#: wp-security-audit-log/custom-alerts.php:316
+msgid "Date range end"
+msgstr ""
+
+#: wp-security-audit-log/custom-alerts.php:325
+msgid "A form was imported / exported."
+msgstr ""
+
+#: wp-security-audit-log/custom-alerts.php:326
+msgid "The form %form_name%."
+msgstr ""
+
+#: wp-security-audit-log/custom-sensors/WSAL_Sensors_Gravity_Forms.php:1120
 msgid "moved to trash"
 msgstr ""
 
-#: wp-security-audit-log/custom-sensors/WSAL_Sensors_Gravity_Forms.php:1010
+#: wp-security-audit-log/custom-sensors/WSAL_Sensors_Gravity_Forms.php:1147
 msgid "restored"
 msgstr ""
 
-#: wp-security-audit-log/custom-sensors/WSAL_Sensors_Gravity_Forms.php:1081
-msgid "Not found"
+#: wp-security-audit-log/custom-sensors/WSAL_Sensors_Gravity_Forms.php:1359
+msgid "Not provided"
 msgstr ""
 
-#: wp-security-audit-log/custom-sensors/WSAL_Sensors_Gravity_Forms.php:1221
-msgid "Not provided"
+#: wp-security-audit-log/custom-sensors/WSAL_Sensors_Gravity_Forms.php:1439
+msgid "Not found"
 msgstr ""
