@@ -89,7 +89,7 @@ Please refer to our [Support & Documentation pages](https://wpactivitylog.com/su
 
 * **Bug fixes**
 	* PHP Error during creaction of a confirmation.
-
+  
 = 1.2.1 (2022-06-14) =
 
 * **Improvements**
