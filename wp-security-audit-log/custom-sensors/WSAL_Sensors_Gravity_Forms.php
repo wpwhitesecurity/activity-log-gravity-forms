@@ -1474,11 +1474,18 @@ class WSAL_Sensors_Gravity_Forms extends WSAL_AbstractSensor {
 			if ( $known_to_trigger ) {
 				break;
 			}
-			if ( ! empty( $last_occurence ) && ( $last_occurence[ 'created_on' ] + 20 ) > time() ) {
-				if ( ! is_array( $alert_id ) && $last_occurence[ 'alert_id' ] === $alert_id ) {
-					$known_to_trigger = true;
-				} elseif ( is_array( $alert_id ) && in_array( $last_occurence[0][ 'alert_id' ], $alert_id, true ) ) {
-					$known_to_trigger = true;
+			$created_on   = ( is_array( $last_occurence ) && isset( $last_occurence[ 'created_on' ] ) ) ? $last_occurence[ 'created_on' ] : $last_occurence->created_on;
+			if ( ! empty( $last_occurence ) && ( $created_on + 20 ) > time() ) {
+				if ( ! is_array( $alert_id ) ) {
+					$occ_alert_id = ( is_array( $last_occurence ) && isset( $last_occurence[ 'alert_id' ] ) ) ? $last_occurence[ 'alert_id' ] : $last_occurence->alert_id;
+					if ( $occ_alert_id === $alert_id ) {
+						$known_to_trigger = true;
+					}
+				} elseif ( is_array( $alert_id ) ) {
+					$occ_alert_id = ( is_array( $last_occurence[0] ) && isset( $last_occurence[0][ 'alert_id' ] ) ) ? $last_occurence[0][ 'alert_id' ] : $last_occurence[0]->alert_id;
+					if ( in_array( $occ_alert_id, $alert_id, true ) ) {
+						$known_to_trigger = true;
+					}
 				}
 			}
 		}
