@@ -14,6 +14,8 @@
  * @subpackage wsal-gravity-forms
  */
 
+use WSAL\Helpers\Classes_Helper;
+
 /*
 	Copyright(c) 2022  WP White Security  (email : info@wpwhitesecurity.com)
 
@@ -44,3 +46,24 @@ if ( ! defined( 'WSAL_CLASS_PREFIX' ) ) {
 
 // Include extension specific functions.
 require_once plugin_dir_path( __FILE__ ) . 'includes/wsal-functions.php';
+
+add_action(
+	'wsal_custom_alerts_register',
+	/**
+	* Adds sensors classes to the Class Helper
+	*
+	* @return void
+	*
+	* @since latest
+	*/
+	function () {
+		require_once __DIR__ . '/wp-security-audit-log/class-gravity-forms-custom-alerts.php';
+
+		Classes_Helper::add_to_class_map(
+			array(
+				'WSAL\\Custom_Alerts\\Gravity_Forms_Custom_Alerts' => __DIR__ . '/wp-security-audit-log/class-gravity-forms-custom-alerts.php',
+			)
+		);
+	}
+);
+
