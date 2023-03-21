@@ -88,7 +88,7 @@ if ( ! class_exists( '\WSAL\Custom_Alerts\Gravity_Forms_Custom_Alerts' ) ) {
 							5703,
 							WSAL_MEDIUM,
 							esc_html__( 'A form setting was modified', 'wsal-gravity-forms' ),
-							esc_html__( 'The setting %1$setting_name% in form %2$form_name%.', 'wsal-gravity-forms' ),
+							esc_html__( 'The setting %setting_name% in form %form_name%.', 'wsal-gravity-forms' ),
 							array(
 								esc_html__( 'Previous value', 'wsal-gravity-forms' ) => '%old_setting_value%',
 								esc_html__( 'New value', 'wsal-gravity-forms' ) => '%setting_value%',
@@ -122,7 +122,7 @@ if ( ! class_exists( '\WSAL\Custom_Alerts\Gravity_Forms_Custom_Alerts' ) ) {
 							5715,
 							WSAL_MEDIUM,
 							esc_html__( 'A field was created, modified or deleted', 'wsal-gravity-forms' ),
-							esc_html__( 'The Field called %1$field_name% in the form %2$form_name%.', 'wsal-gravity-forms' ),
+							esc_html__( 'The Field called %field_name% in the form %form_name%.', 'wsal-gravity-forms' ),
 							array(
 								esc_html__( 'Field type', 'wsal-gravity-forms' ) => '%field_type%',
 								esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
@@ -157,7 +157,7 @@ if ( ! class_exists( '\WSAL\Custom_Alerts\Gravity_Forms_Custom_Alerts' ) ) {
 							5705,
 							WSAL_MEDIUM,
 							esc_html__( 'A confirmation was created, modified or deleted', 'wsal-gravity-forms' ),
-							esc_html__( 'The Confirmation called %1$confirmation_name% in the form %2$form_name%.', 'wsal-gravity-forms' ),
+							esc_html__( 'The Confirmation called %confirmation_name% in the form %form_name%.', 'wsal-gravity-forms' ),
 							array(
 								esc_html__( 'Confirmation type', 'wsal-gravity-forms' ) => '%confirmation_type%',
 								esc_html__( 'Confirmation message', 'wsal-gravity-forms' ) => '%confirmation_message%',
@@ -174,7 +174,7 @@ if ( ! class_exists( '\WSAL\Custom_Alerts\Gravity_Forms_Custom_Alerts' ) ) {
 							5708,
 							WSAL_LOW,
 							esc_html__( 'A confirmation was activated or deactivated', 'wsal-gravity-forms' ),
-							esc_html__( 'The confirmation %1$confirmation_name% in the form %2$form_name%.', 'wsal-gravity-forms' ),
+							esc_html__( 'The confirmation %confirmation_name% in the form %form_name%.', 'wsal-gravity-forms' ),
 							array(
 								esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
 							),
@@ -241,7 +241,7 @@ if ( ! class_exists( '\WSAL\Custom_Alerts\Gravity_Forms_Custom_Alerts' ) ) {
 							5711,
 							WSAL_LOW,
 							esc_html__( 'An entry was marked as read or unread', 'wsal-gravity-forms' ),
-							esc_html__( 'The entry called %1$entry_title% from form %2$form_name%.', 'wsal-gravity-forms' ),
+							esc_html__( 'The entry called %entry_title% from form %form_name%.', 'wsal-gravity-forms' ),
 							array(
 								esc_html__( 'Form ID', 'wsal-gravity-forms' ) => '%form_id%',
 							),
