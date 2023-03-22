@@ -492,18 +492,11 @@ if ( ! class_exists( '\WSAL\Plugin_Sensors\Gravity_Forms_Sensor' ) ) {
 								/**
 								 * The WSAL alert manager.
 								 *
-								 * @param WSAL_AlertManager $manager
-								 *
 								 * @return bool
 								 */
-								function ( $manager ) {
-									if ( method_exists( $manager, 'will_or_has_triggered' ) ) {
-										// don't fire if there's already an event 5707.
-										return ! $manager->will_or_has_triggered( 5707 );
-									} else {
-										// don't fire if there's already an event 5707.
-										return ! $manager->WillOrHasTriggered( 5707 );
-									}
+								function () {
+									// don't fire if there's already an event 5707.
+									return ! Alert_Manager::will_or_has_triggered( 5707 );
 								}
 							);
 						}
