@@ -6,6 +6,8 @@
  * @subpackage wsal-gravity-forms
  */
 
+use WSAL\Helpers\Classes_Helper;
+
 add_filter( 'wsal_event_objects', 'wsal_gravityforms_add_custom_event_objects', 10, 2 );
 add_filter( 'wsal_event_type_data', 'wsal_gravityforms_add_custom_event_type', 10, 2 );
 add_filter( 'wsal_togglealerts_sub_category_events', 'wsal_gravityforms_extension_togglealerts_sub_category_events' );
@@ -172,3 +174,24 @@ function wsal_gravityforms_extension_replacement_duplicate_event_notice() {
 	</script>
 	<?php
 }
+
+add_action(
+	'wsal_sensors_manager_add',
+	/**
+	* Adds sensors classes to the Class Helper
+	*
+	* @return void
+	*
+	* @since latest
+	*/
+	function () {
+		require_once __DIR__ . '/../wp-security-audit-log/sensors/class-gravity-forms-sensor.php';
+
+		Classes_Helper::add_to_class_map(
+			array(
+				'WSAL\\Plugin_Sensors\\Gravity_Forms_Sensor' => __DIR__ . '/../wp-security-audit-log/sensors/class-gravity-forms-sensor.php',
+			)
+		);
+	}
+);
+

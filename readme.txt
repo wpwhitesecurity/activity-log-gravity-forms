@@ -5,9 +5,9 @@ License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.html
 Tags: activity log for Gravity Forms, WP Activity Log extension, activity logs
 Requires at least: 5.0
-Tested up to: 5.9.2
-Stable tag: 1.2.1
-Requires PHP: 7.0
+Tested up to: 6.1.1
+Stable tag: 1.2.2
+Requires PHP: 7.2
 
 Keep a log of changes your team do in the Gravity Forms plugin, forms, entries (leads) & more.
 
@@ -81,14 +81,14 @@ Please refer to our [Support & Documentation pages](https://wpactivitylog.com/su
 
 == Changelog ==
 
-= 1.2.2 (2022-11-16) =
+= 1.2.2 (2022-11-17) =
 
 * **Improvements**
-	* Ensure compatability with current and upcoming WP Activity Log release.
+	* Ensure compatability with current and upcoming [WP Activity Log](https://wpactivitylog.com) release.
 	* Ensure correct positioning and filtering of items under the Enable/Disable Events view.
 
 * **Bug fixes**
-	* PHP Error during creaction of a confirmation.
+	* PHP Error reported during the creaction of a form confirmation.
   
 = 1.2.1 (2022-06-14) =
 
